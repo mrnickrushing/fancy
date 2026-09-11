@@ -988,9 +988,11 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
       fare("V","The Country Loaf","Naturally leavened with the same starter that lifts the focaccia &#8212; mixed the day before, left to rise slow, and baked dark."),
     ])}
     {course("Sweet","I Dolci",[
-      fare("VII","Cinnamon Swirl with Vanilla Drizzle","A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze."),
-      fare("VIII","Honey Focaccia Muffins","Focaccia muffins, boxed and drizzled with award-winning Chetco Gold raw honey from right here on the Chetco River."),
-    ],("sweet-cinnamon.webp","Cinnamon swirl focaccia with vanilla drizzle"))}
+      fare("VI","Cinnamon Swirl with Vanilla Drizzle","A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze."),
+      fare("VII","Honey Focaccia Muffins","Focaccia muffins, boxed and drizzled with award-winning Chetco Gold raw honey from right here on the Chetco River."),
+      fare("VIII","Seasonal Desserts","Pumpkin pie focaccia when the pumpkins come in, and cranberry walnut at Christmas. Ask what is on this week, or request one through the order page."),
+    ],("sweet-cinnamon.webp","Cinnamon swirl focaccia with vanilla drizzle"),
+      note="Everything sweet is sweetened with coconut sugar.")}
     {course("Focaccia Muffins","I Piccoli",[
       fare("IX","Jalape&#241;o &amp; Roasted Garlic Muffins","Hand-sized, crisp-edged, crowned with jalape&#241;o and toasted garlic."),
       fare("X","Peppered Pickle Muffins","Made with Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles infused right into the dough. Organic ingredients only."),
