@@ -23,5 +23,13 @@
         "credentialsSource": "remote"
       }
     }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "ascAppId": "6811223231",
+        "appleTeamId": "PH4AKDQ4Q7"
+      }
+    }
   }
 }

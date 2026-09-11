@@ -43,8 +43,9 @@ Two things on the server exist for it:
   awaited: it can never delay or fail the order the customer is waiting on, and
   a token Expo reports as `DeviceNotRegistered` is dropped.
 
-See `app/README.md`, particularly the note about `eas init` — until it is run,
-push registration and OTA updates are inert by design.
+The app ships through EAS as `@rushingtechnologies/ohyoufancyfocaccia-admin`,
+and reaches the App Store as **Bread Lady** (Apple ID `6811223231`). Its own
+build, submit and over-the-air update commands are in `app/README.md`.
 
 The `Postgres` service carries `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` and
 `PGDATA=/var/lib/postgresql/data/pgdata` (the official image needs the data

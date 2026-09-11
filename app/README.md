@@ -84,25 +84,38 @@ npm test           # vitest, over src/utils
 npx expo-doctor
 ```
 
-## Before the first build
+## Building and shipping
 
-This app has not been through `eas init` yet, so `app.json` carries no
-`extra.eas.projectId` and no `updates` block. That is deliberate — a made-up
-project id produces an app that fails to fetch its own updates. Two things
-follow from it, both of which fix themselves once it is run:
+| | |
+|---|---|
+| Expo project | `@rushingtechnologies/ohyoufancyfocaccia-admin` (`05ee10d4-e4eb-4a78-a1ca-d6d35874adbf`) |
+| Bundle identifier | `com.nickrushing.ohyoufancyfocaccia`, iOS and Android alike |
+| App Store Connect | Apple ID `6811223231`, listed as **Bread Lady** |
+| Apple team | `PH4AKDQ4Q7` |
+| OTA channel | `production`, `runtimeVersion` following `appVersion` |
 
-- **Push notifications register as a no-op.** `getExpoPushTokenAsync` needs a
-  project to mint a token against, so the hook returns nothing instead of
-  throwing. The server side is finished and tested; it is only the token that
-  is missing.
-- **OTA updates are off.** `Updates.isEnabled` is false, and the Updates screen
-  says so rather than pretending.
+The store listing is **Bread Lady**, and `expo.name` matches it, so the name
+under the icon on Amanda's phone is the name in the App Store. The repository,
+the slug and the bundle identifier all still say `ohyoufancyfocaccia`; they are
+identifiers rather than names, and renaming a slug or a bundle id costs more
+than it is worth.
+
+The App ID carries the **Push Notifications** capability, which is what lets
+Expo mint a token for it. Its Broadcast sub-capability is deliberately off.
 
 ```bash
 cd app
-eas init                 # writes the project id, and the updates url
-eas build --platform ios --profile production
+eas build --platform ios --profile production            # build
+eas build --platform ios --profile production --auto-submit  # build and send to TestFlight
+eas update --channel production --message "..."          # OTA, no review
 ```
 
-`eas.json` has no `submit` block yet either: it needs an App Store Connect app
-id and an Apple team id, which exist only once the app is registered there.
+The first build asks for signing credentials. `ios.credentialsSource` is
+`remote`, so EAS keeps the distribution certificate and the push key; it needs
+to authenticate with Apple once to create them.
+
+Before shipping:
+
+```bash
+npm run typecheck && npm test && npx expo-doctor
+```
