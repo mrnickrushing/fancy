@@ -7,7 +7,7 @@ per image; where a heavily-textured crust cannot reach the budget even at low
 quality, pixel dimensions come down instead.
 """
 from PIL import Image, ImageDraw
-import os, io
+import os, io, sys
 
 SRC = "/root/.claude/uploads/01dc96a3-a6dd-5803-8a08-d1aa320808c5"
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "img")
@@ -70,6 +70,19 @@ def prepare_logo(stem, size=480, out="logo", budget=TARGET):
     im.putalpha(m)
     fit(im, f"{OUT}/{out}.webp", lo=60, hi=92, target=budget)
 
+def prepare_splash_scene(src=os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                          "src", "splash-scene.jpg")):
+    """The courtyard photograph behind the loading screen.
+
+    It is the only image on that screen and sits under a burgundy wash, so it
+    gets a larger budget than a gallery bake. The source is already cropped
+    clear of the dark frame the original screenshot carried."""
+    im = Image.open(src).convert("RGB")
+    got = fit(im, f"{OUT}/splash-scene.webp", lo=40, hi=92, target=220 * 1024)
+    if not got:
+        raise SystemExit("splash-scene: cannot reach budget")
+    print(f"splash-scene.webp       {im.size[0]}x{im.size[1]:<5} q{got[0]}  {len(got[1])//1024}KB")
+
 JOBS = [
     ("d3b4b8ed", "hero-garden", 760), ("37832b3a", "savory-round", 600),
     ("38faf7e6", "sweet-cinnamon", 580), ("7a4f2f1e", "muffins-jalapeno", 600),
@@ -95,6 +108,9 @@ JOBS = [
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
+    if sys.argv[1:] == ["splash"]:          # the photo alone; the bakes need the upload set
+        prepare_splash_scene()
+        sys.exit()
     prepare_logo("c2a2c49b")
     prepare_logo("c2a2c49b", size=840, out="logo-splash", budget=140 * 1024)
     for stem, name, w in JOBS:

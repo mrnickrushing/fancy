@@ -20,7 +20,10 @@
     setTimeout(function(){ s.remove(); },900);
     document.removeEventListener('keydown',enter);
   }
-  requestAnimationFrame(function(){ if(scene) scene.classList.add('on'); });
+  // fade the photograph in once it has decoded, never half-painted
+  function showScene(){ requestAnimationFrame(function(){ scene.classList.add('on'); }); }
+  if(scene){ if(scene.complete && scene.naturalWidth) showScene();
+             else scene.addEventListener('load',showScene); }
   at(60,function(){ ring.classList.add('on'); });
   at(420,function(){ marks.forEach(function(m){ m.classList.add('on'); }); });
   ings.forEach(function(el,i){
