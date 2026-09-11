@@ -52,8 +52,15 @@ ADMIN_PAGES = [
 
 # Which script each page carries. Every script is its own file so the
 # server can keep a CSP without unsafe-inline.
-SCRIPTS = {"index.html": "splash.js", "order.html": "order.js", "reviews.html": "reviews.js",
-           "admin.html": "admin.js", "admin-login.html": "admin-login.js"}
+# Which scripts each page carries, in load order. Every script is its own
+# file so the server can keep a CSP without unsafe-inline. nav.js runs the
+# masthead drawer and the shrink-on-scroll on every public page.
+NAV_JS = ["nav.js"]
+SCRIPTS = {"index.html": NAV_JS + ["splash.js"], "order.html": NAV_JS + ["order.js"],
+           "reviews.html": NAV_JS + ["reviews.js"], "about.html": NAV_JS,
+           "breads.html": NAV_JS, "gallery.html": NAV_JS, "contact.html": NAV_JS,
+           "policies.html": NAV_JS, "404.html": NAV_JS,
+           "admin.html": ["admin.js"], "admin-login.html": ["admin-login.js"]}
 
 NAV = {"Home": "./", "About": "./about.html", "Our Breads": "./breads.html", "Order": "./order.html",
        "Gallery": "./gallery.html", "Reviews": "./reviews.html", "Contact": "./contact.html",
@@ -72,12 +79,14 @@ LINKS = {
     "Oh! You Fancy Focaccia": FB,
     "Facebook": FB,
     "Write to Us": f"mailto:{EMAIL}",
+    "Read the Reviews": "./reviews.html",
 }
 
 def rewrite_assets(html):
     """Canvas artboards reference images by bare filename — the runtime resolves
     them from the document's own file table. A real server needs a real path."""
-    html = re.sub(r'src="([a-z0-9-]+\.(?:webp|png|jpg|svg))"', r'src="./img/\1"', html)
+    html = re.sub(r'\bsrc="([a-z0-9-]+\.(?:webp|png|jpg|svg))"', r'src="./img/\1"', html)
+    html = re.sub(r'data-src="([a-z0-9-]+\.(?:webp|png|jpg|svg))"', r'data-src="./img/\1"', html)
     html = re.sub(r'url\(\./([a-z0-9-]+\.(?:webp|png|jpg|svg))\)', r'url(./img/\1)', html)
     return html
 
@@ -102,9 +111,6 @@ html{overflow-x:clip}
 img{max-width:100%;height:auto}
 .wrap,.mid,.narrow{width:100%}
 
-/* masthead nav scrolls rather than wrapping into a mess */
-.nav-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.nav-scroll::-webkit-scrollbar{display:none}
 .skip-link{position:fixed;left:var(--s4);top:var(--s4);z-index:1000;transform:translateY(-180%);background:var(--burgundy);color:var(--paper);padding:.7rem 1rem;border-radius:var(--r-sm);font-family:var(--serif);font-weight:600}
 .skip-link:focus{transform:translateY(0)}
 
@@ -118,44 +124,52 @@ img{max-width:100%;height:auto}
   .g3{grid-template-columns:repeat(2,minmax(0,1fr))}
   .sec{padding-block:var(--s16)}
   /* every two-column composition stacks */
-  .wrap[style*="grid-template-columns"]{grid-template-columns:1fr!important;gap:var(--s10)!important}
-  div[style*="grid-template-columns:1fr 300px"],
-  div[style*="grid-template-columns:1fr 340px"]{grid-template-columns:1fr!important}
-  [style*="columns:4"]{columns:2!important}
-  [style*="columns:3"]{columns:2!important}
+  .duo{grid-template-columns:1fr;gap:var(--s10)}
+  .ftr-cols{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s10)}
+  .hero-grid{grid-template-columns:1fr!important;gap:var(--s10)!important}
   .oval,.shot-oval{width:100%!important;max-width:420px;margin-inline:auto}
 }
 @media (max-width:640px){
   :root{--xxxl:2.6rem;--xxl:2rem;--xl:1.55rem;--lg:1.2rem;--base:1rem}
   .wrap,.mid,.narrow{padding-inline:var(--s5)}
   .g2,.g3,.g4{grid-template-columns:1fr}
-  [style*="columns:2"],[style*="columns:4"],[style*="columns:3"]{columns:1!important}
   .sec{padding-block:var(--s12)}
   .btn{width:100%;padding-inline:var(--s5)}
+  .hero{padding-block:var(--s12)}
+  .hero-cta .btn{min-width:0;width:100%}
   .enamel{padding-block:var(--s10)}
-  .enamel p[style*="font-size:3.1rem"]{font-size:1.9rem!important}
+  .enamel-lead{font-size:1.9rem}
   .fare-t{flex-wrap:wrap}
   .fare-t::after{display:none}
-  footer div[style*="grid-template-columns:repeat(3"]{grid-template-columns:1fr!important;gap:var(--s8)!important}
-  .ftr-bot,footer div[style*="justify-content:space-between"]{flex-direction:column;gap:var(--s3)}
+  .gal{grid-template-columns:1fr}
+  .ftr-cols{grid-template-columns:1fr;gap:var(--s8)}
+  .ftr-bot{flex-direction:column;gap:var(--s3)}
 }
-/* masthead on a phone: the flanking olive rules have nowhere to go, and the
-   nav has to scroll horizontally rather than wrap into a broken stack */
-@media (max-width:820px){
-  header .brand-row > svg{display:none}
-  header nav{justify-content:flex-start!important;flex-wrap:nowrap!important;
-    padding-inline:var(--s5)!important;gap:var(--s6)!important}
-  header nav a{white-space:nowrap;flex-shrink:0}
+
+/* ── masthead: rail above, drawer below ──────────────────────────────
+   The horizontal rail measured 833px of links inside a 390px viewport,
+   so four of the eight destinations sat off-screen behind a scrollbar
+   that had been hidden. Under 900px the rail is replaced outright by a
+   button and a full-width drawer. */
+@media (max-width:900px){
+  .brand-row > svg{display:none}
+  html.js .nav-rail{display:none}
+  html.js .nav-toggle{display:inline-flex}
+  .nav-drawer[data-open="1"]{display:block}
+  .mast-in{padding-block:var(--s3)}
+  /* with the script blocked there is no drawer to open, so the rail stays
+     and is allowed a visible scrollbar rather than a hidden one */
+  html:not(.js) .nav-rail{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;
+    padding-inline:var(--s5)}
+  html:not(.js) .nav-link{white-space:nowrap;flex-shrink:0}
 }
 @media (max-width:640px){
-  .ribbon,header > div:first-child{font-size:.62rem!important;letter-spacing:.16em!important}
-  header nav{gap:var(--s5)!important}
-  /* the script wordmark is too wide for a phone beside the emblem */
-  header .brand-row p[style*="var(--script)"]{font-size:2.1rem!important}
-  header .brand-row p[style*="text-transform:uppercase"]{font-size:.84rem!important;
-    letter-spacing:.26em!important}
-  header .brand-row img{width:48px!important;height:48px!important}
-  header .brand-row{gap:var(--s4)!important;padding-inline:var(--s4)}
+  .ribbon-full{display:none}
+  .ribbon-short{display:inline}
+  .brand-script{font-size:2.1rem}
+  .brand-caps{font-size:.84rem;letter-spacing:.26em}
+  .brand-mark{width:48px;height:48px}
+  .brand-row{gap:var(--s4);padding-inline:var(--s4)}
 }
 @media print{.splash{display:none!important}}
 """
@@ -191,6 +205,9 @@ SPLASH_CSS = """
 .splash .frame{position:absolute;inset:28px;border:1px solid oklch(.85 .07 80/.22)}
 .splash .frame::before{content:'';position:absolute;inset:9px;border:1px solid oklch(.85 .07 80/.11)}
 .splash-in{position:relative;z-index:2;text-align:center;padding-inline:var(--s6)}
+.splash-script{font-family:var(--script);font-size:4.6rem;line-height:.78;color:#F2DFC0}
+.splash-caps{font-family:var(--serif);font-size:2.2rem;font-weight:700;letter-spacing:.3em;
+  text-transform:uppercase;color:#F2DFC0;margin-top:.55rem;padding-left:.3em}
 .splash-mark{opacity:0;transform:translateY(9px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
 .splash-mark.on{opacity:1;transform:none}
 .splash-ring circle.draw{stroke-dasharray:604;stroke-dashoffset:604;
@@ -220,8 +237,8 @@ body.splashing{overflow:hidden}
 @media (max-width:640px){
   .ing-w{font-size:1.8rem}.ing-rail{height:76px;margin-top:var(--s6)}
   .splash .frame{inset:16px}
-  .splash-in p[style*="var(--script)"]{font-size:3.1rem!important}
-  .splash-in p[style*="uppercase"][style*="2.2rem"]{font-size:1.3rem!important}
+  .splash-script{font-size:3.1rem}
+  .splash-caps{font-size:1.3rem}
   .splash-tag{margin-top:var(--s6)!important}
   .splash-enter{margin-top:var(--s6)!important}
   /* a phone has no keyboard to press, and the line only crowds the button */
@@ -231,8 +248,8 @@ body.splashing{overflow:hidden}
 /* a small old phone (360x640) is the tightest case there is */
 @media (max-width:640px) and (max-height:700px){
   .ing-rail{height:62px;margin-top:var(--s4)}
-  .splash-in p[style*="var(--script)"]{font-size:2.6rem!important}
-  .splash-in p[style*="uppercase"][style*="2.2rem"]{font-size:1.1rem!important}
+  .splash-script{font-size:2.6rem}
+  .splash-caps{font-size:1.1rem}
   .splash-tag{margin-top:var(--s4)!important}
   .splash-enter{margin-top:var(--s4)!important}
   .splash-in{padding-block:var(--s4)}
@@ -242,7 +259,7 @@ body.splashing{overflow:hidden}
 @media (min-width:641px) and (max-height:860px){
   .splash-badge{width:min(460px,36vh);height:min(460px,36vh)}
   .ing-rail{height:76px;margin-top:var(--s5)}
-  .splash-in p[style*="var(--script)"]{font-size:3.8rem!important}
+  .splash-script{font-size:3.8rem}
   .splash-tag{margin-top:var(--s5)!important}
   .splash-enter{margin-top:var(--s5)!important}
   .splash-in{padding-block:var(--s5) 64px}
@@ -283,16 +300,20 @@ SPLASH_JS = """
   function showScene(){ requestAnimationFrame(function(){ scene.classList.add('on'); }); }
   if(scene){ if(scene.complete && scene.naturalWidth) showScene();
              else scene.addEventListener('load',showScene); }
+  // The ingredient roll used to run at 760ms a step and the whole screen
+  // held for eleven seconds. Nobody waits eleven seconds to read a bakery
+  // menu, so the same choreography now plays out in about six, and the
+  // way out appears inside two.
   at(60,function(){ ring.classList.add('on'); });
-  at(420,function(){ marks.forEach(function(m){ m.classList.add('on'); }); });
+  at(320,function(){ marks.forEach(function(m){ m.classList.add('on'); }); });
   ings.forEach(function(el,i){
-    at(1300+i*760,function(){ el.classList.add('on'); });
-    if(i<ings.length-1) at(1300+(i+1)*760,function(){ el.classList.remove('on'); el.classList.add('gone'); });
+    at(900+i*500,function(){ el.classList.add('on'); });
+    if(i<ings.length-1) at(900+(i+1)*500,function(){ el.classList.remove('on'); el.classList.add('gone'); });
   });
-  dims.forEach(function(el,i){ at(1480+i*760,function(){ el.classList.add('on'); }); });
-  at(5300,function(){ tag.classList.add('on'); });
-  at(5750,function(){ ent.classList.add('on'); skip.classList.add('on'); });
-  at(11000,enter);                       // never trap anyone behind it
+  dims.forEach(function(el,i){ at(1020+i*500,function(){ el.classList.add('on'); }); });
+  at(1700,function(){ tag.classList.add('on'); });
+  at(1900,function(){ ent.classList.add('on'); skip.classList.add('on'); });
+  at(6000,enter);                        // never trap anyone behind it
   ent.addEventListener('click',function(e){ e.preventDefault(); enter(); });
   s.addEventListener('click',enter);
   document.addEventListener('keydown',enter);
@@ -316,9 +337,8 @@ SPLASH_HTML = """
         style="position:absolute;inset:7.5%;width:85%;height:85%;border-radius:50%">
     </div>
     <div class="splash-mark" style="margin-top:var(--s6)">
-      <p style="font-family:var(--script);font-size:4.6rem;line-height:.78;color:#F2DFC0">Oh! You Fancy</p>
-      <p style="font-family:var(--serif);font-size:2.2rem;font-weight:700;letter-spacing:.3em;
-        text-transform:uppercase;color:#F2DFC0;margin-top:.55rem;padding-left:.3em">Focaccia</p>
+      <p class="splash-script">Oh! You Fancy</p>
+      <p class="splash-caps">Focaccia</p>
     </div>
     <div class="ing-rail">
       <div class="ing"><p class="ing-w">Farina</p><p class="ing-g">flour</p></div>
@@ -425,11 +445,6 @@ def build():
             # the review form and the live reviews sit before the closing sign
             body = body.replace('<section class="enamel">', P.REVIEW_FORM + '<section class="enamel">', 1)
         html = rewrite_assets(rewrite_links(body))
-        # the masthead nav needs to scroll on narrow screens
-        html = html.replace('<nav style="display:flex;justify-content:center;gap:var(--s8);',
-                            '<nav class="nav-scroll" style="display:flex;justify-content:center;gap:var(--s8);')
-        html = html.replace('<div style="display:flex;align-items:center;justify-content:center;gap:var(--s6)">',
-                            '<div class="brand-row" style="display:flex;align-items:center;justify-content:center;gap:var(--s6)">', 1)
         is_home = fname == "index.html"
         is_admin = fname.startswith("admin")
         is_utility = fname in {f for f, *_ in UTILITY_PAGES}
@@ -442,7 +457,7 @@ def build():
             head_extra = '<base href="/">\n<meta name="robots" content="noindex,nofollow">\n'
         if is_utility:
             head_extra += '<meta name="robots" content="noindex">\n'
-        script = SCRIPTS.get(fname)
+        scripts = SCRIPTS.get(fname, [])
         page = DOC.format(
             title=title, desc=desc or title,
             canon=base + ("" if is_home else fname),
@@ -451,7 +466,7 @@ def build():
             head_extra=head_extra,
             splash=SPLASH_HTML if is_home else "",
             body=html,
-            script=f'<script src="./{script}" defer></script>' if script else "",
+            script="\n".join(f'<script src="./{j}" defer></script>' for j in scripts),
         )
         with open(os.path.join(PUBLIC, fname), "w", encoding="utf-8") as fh:
             fh.write(page)
