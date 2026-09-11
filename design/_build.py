@@ -562,6 +562,19 @@ LOADER = f"""
 
 NAV = ["Home","About","Our Breads","Order","Gallery","Reviews","Contact","Policies"]
 
+# Amanda's Oregon Domestic Kitchen license, shown in the footer of every page
+# because a home-kitchen bakery is worth being open about. Set the number and
+# it appears; leave it empty and the line does not render at all, so the site
+# can never publish a half-filled license.
+LICENSE = {"number": "", "expires": "06/2028"}
+
+def license_line():
+    if not LICENSE["number"]:
+        return ""
+    expires = f' &#183; valid through {LICENSE["expires"]}' if LICENSE["expires"] else ''
+    return ('\n      <p style="font-size:var(--xs);opacity:.62;margin-top:var(--s4);max-width:36ch">'
+            f'Oregon Domestic Kitchen Bakery License No. {LICENSE["number"]}{expires}</p>\n      ')
+
 def olive_rule(w=190, flip=False):
     t = ' transform="scale(-1,1) translate(-190,0)"' if flip else ''
     return f"""<svg width="{w}" height="34" viewBox="0 0 190 34" aria-hidden="true">
@@ -701,7 +714,7 @@ FOOTER = f"""<footer style="background:var(--burgundy-ink);color:#D8BFA0;padding
   </div>
   <div class="ftr-cols">
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">The Bakery</p>
-      <p style="font-size:var(--sm);opacity:.82;max-width:36ch">Artisan focaccia and sourdough baked by hand in Brookings, Oregon. Organic ingredients, a living starter, and small batches that sell out.</p></div>
+      <p style="font-size:var(--sm);opacity:.82;max-width:36ch">Artisan focaccia and sourdough baked by hand in Brookings, Oregon. Organic ingredients, a living starter, and small batches that sell out.</p>{license_line()}</div>
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">Explore</p>
       <ul style="display:flex;flex-direction:column;gap:.5rem;font-size:var(--sm)">
       {''.join(f'<li><a href="#" style="color:#D8BFA0">{n}</a></li>' for n in NAV[1:])}</ul></div>
@@ -794,7 +807,7 @@ HOME = masthead("Home") + f"""
     <div>
       <p class="caps kicker kicker-l">From the Board</p>
       <h2 style="font-size:var(--xl);margin-bottom:var(--s3);text-align:left">What we are baking</h2>
-      <p style="opacity:.78;margin-bottom:var(--s8)">The board turns over with the season and with the best and freshest our neighbours are growing.</p>
+      <p style="opacity:.78;margin-bottom:var(--s8)">The board turns over with the season and with the best and freshest our neighbors are growing.</p>
       <div class="fare"><span class="fare-n">I</span><div class="fare-b">
         <p class="fare-t"><span>Olive &amp; Sun-Dried Tomato Swirl</span></p>
         <p class="fare-d">Green and kalamata olives, sun-dried tomato, herbs, grated cheese. Crisp at the edge, soft through the middle.</p></div></div>
@@ -908,7 +921,7 @@ CREED = [("Organic, all the way down","We bake with organic ingredients because 
 ("A starter with a history","Everything begins with a bubbly sourdough starter. Mama makes the dough, and the dough takes its time."),
 ("Hands, not machines","No shortcuts and nothing mechanical doing the shaping. Every loaf is worked until it is ready."),
 ("Small batch, always","We bake what we can bake well. That is why we sell out, and why it is always fresh."),
-("Savory and sweet both","There are so many options when it comes to focaccia. We are still finding new ones."),
+("Savory and sweet","There are so many options when it comes to focaccia. We create new flavors every month."),
 ("Baked with love","The one ingredient we cannot buy and will not skip. Our customers taste it, and they say so.")]
 
 ABOUT = masthead("About") + head_band("La Nostra Storia","Welcome to Oh! You Fancy Focaccia",
@@ -922,8 +935,8 @@ ABOUT = masthead("About") + head_band("La Nostra Storia","Welcome to Oh! You Fan
       <p class="caps kicker kicker-l">From Our Kitchen</p>
       <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s6)">From our kitchen<br>to your table</h2>
       <p style="opacity:.8;margin-bottom:var(--s5)">Oh! You Fancy Focaccia is a family-run bakery in Brookings, Oregon, on the Curry County coast.</p>
-      <p style="opacity:.8;margin-bottom:var(--s5)">What started as a love of bread became a booth at the Brookings-Harbor Farmers Market &#8212; and then loaves going out to neighbours, friends, and folks far enough away that we had to start shipping.</p>
-      <p style="opacity:.8;margin-bottom:var(--s5)">We bake savory and sweet focaccia with organic ingredients: olives and garlic and jalape&#241;o, sun-dried tomato and herbs, cinnamon and honey. We infuse our neighbours&#8217; pickles and drizzle our neighbours&#8217; honey.</p>
+      <p style="opacity:.8;margin-bottom:var(--s5)">What started as a love of bread became a booth at the Brookings-Harbor Farmers Market &#8212; and then loaves going out to neighbors, friends, and folks far enough away that we had to start shipping.</p>
+      <p style="opacity:.8;margin-bottom:var(--s5)">We bake savory and sweet focaccia with organic ingredients: olives and garlic and jalape&#241;o, sun-dried tomato and herbs, cinnamon and honey. We infuse our neighbors&#8217; pickles and drizzle our neighbors&#8217; honey.</p>
       <p style="opacity:.8;margin-bottom:var(--s5)">The same mother starter goes into our sourdough loaves &#8212; mixed the day before, left to rise slow, and baked dark alongside everything else.</p>
       <p style="opacity:.8;margin-bottom:var(--s8)">Every Wednesday and Saturday the crates come out, the gold paper bags get filled, and we hand out samples until the last loaf is gone.</p>
       <div style="border-left:2px solid var(--burgundy);padding-left:var(--s6)">
@@ -986,7 +999,7 @@ COURSE_VIEW = [
     ("sweet",     "I Dolci",        "Sweet",           ("sweet-cinnamon.webp", "Brown buttered cinnamon roll focaccia"),
      "Everything sweet is sweetened with coconut sugar."),
     ("small",     "I Piccoli",      "Focaccia Muffins", ("muffins-jalapeno.webp", "Jalapeno, garlic and onion focaccia muffins"),
-     "Every flavour on this list can be baked as a focaccia muffin."),
+     "Every flavor on this list can be baked as a focaccia muffin."),
     ("art",       "L&#8217;Arte",   "Focaccia Art",    ("heart-loaf.webp", "Focaccia baked in a cast iron heart pan"), ""),
 ]
 
@@ -1180,7 +1193,7 @@ REVIEWS = masthead("Reviews") + head_band("Parole Gentili","What Our Customers S
     <h2 class="h-sec">Go see Amanda,<br>you will love it</h2>
     {dimple_rule()}
     <div class="grid g2">
-      {quote("Who has tried the Focaccia from the Brookings Farmers market?? They have sweet and savory flavors. The samples were amazing so I bought the &#8216;Oh you Fancy.&#8217; It was delicious the way it is but turning into a pizza was super fast and easy. Go see Amanda, you will love it.","A neighbour in Brookings")}
+      {quote("Who has tried the Focaccia from the Brookings Farmers market?? They have sweet and savory flavors. The samples were amazing so I bought the &#8216;Oh you Fancy.&#8217; It was delicious the way it is but turning into a pizza was super fast and easy. Go see Amanda, you will love it.","A neighbor in Brookings")}
       {quote("OMG! I tried some the other day and it is absolutely the best focaccia I&#8217;ve ever had in my life. My husband agreed.","A market regular")}
       {quote("Super yummy food. Baked with love for sure. So many varieties. Get there early cause this girl sells out quick!","Linnea")}
       {quote("It is the best. My family loved it. All three were gone in a day.","A Brookings customer")}
