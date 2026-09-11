@@ -566,14 +566,18 @@ NAV = ["Home","About","Our Breads","Order","Gallery","Reviews","Contact","Polici
 # because a home-kitchen bakery is worth being open about. Set the number and
 # it appears; leave it empty and the line does not render at all, so the site
 # can never publish a half-filled license.
-LICENSE = {"number": "", "expires": "06/2028"}
+LICENSE = {"number": "AG-L1104331DKB", "expires": "06/2028"}
 
 def license_line():
     if not LICENSE["number"]:
         return ""
-    expires = f' &#183; valid through {LICENSE["expires"]}' if LICENSE["expires"] else ''
+    # The number and the expiry each stay whole: left to wrap freely the line
+    # breaks after the separator and orphans "\u00b7 expires" at the end of a row.
+    expires = (f'<span style="white-space:nowrap"> &#183; expires {LICENSE["expires"]}</span>'
+               if LICENSE["expires"] else '')
     return ('\n      <p style="font-size:var(--xs);opacity:.62;margin-top:var(--s4);max-width:36ch">'
-            f'Oregon Domestic Kitchen Bakery License No. {LICENSE["number"]}{expires}</p>\n      ')
+            f'Oregon Domestic Kitchen Bakery License '
+            f'<span style="white-space:nowrap">No. {LICENSE["number"]}</span>{expires}</p>\n      ')
 
 def olive_rule(w=190, flip=False):
     t = ' transform="scale(-1,1) translate(-190,0)"' if flip else ''
