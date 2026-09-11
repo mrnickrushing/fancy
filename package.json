@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "license": "UNLICENSED",
-  "description": "Website for Oh! You Fancy Focaccia — an artisan focaccia bakery in Brookings, Oregon",
-  "engines": { "node": ">=20" },
+  "description": "Website for Oh! You Fancy Focaccia \u2014 an artisan focaccia bakery in Brookings, Oregon",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "build": "python3 site/build_site.py",
+    "build:site": "python3 site/build_site.py",
     "start": "node server.js",
     "test": "node --test test/*.test.js"
   },

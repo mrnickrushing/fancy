@@ -4,11 +4,18 @@
 `npm start`, so nothing needs Python at build time and a deploy cannot fail on
 a missing interpreter.
 
-To change the site, edit the design source and regenerate:
+The regeneration script is called `build:site`, **not `build`** — nixpacks
+auto-runs any script literally named `build`, and the Node image has no
+`python3`. Naming it `build` failed the first deploy with `sh: 1: python3: not
+found`. Leave the name alone.
+
+To change the site, edit the design source and regenerate locally, then commit
+the result:
 
 ```bash
-python3 site/build_site.py   # or: npm run build
+npm run build:site
 npm test
+git add public && git commit
 ```
 
 ## How it fits together
