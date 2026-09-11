@@ -5,7 +5,7 @@
   {"course": "savory", "name": "Cheesy Jalapeño", "description": "Melted and bubbling, with jalapeño baked right into the top.", "price": 15},
   {"course": "sourdough", "name": "The Country Loaf", "description": "Naturally leavened with the same starter that lifts the focaccia — mixed the day before, left to rise slow, and baked dark.", "price": 15},
   {"course": "sweet", "name": "Cinnamon Swirl with Vanilla Drizzle", "description": "A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze.", "price": 15},
-  {"course": "sweet", "name": "Honey Focaccia Bites", "description": "Pull-apart bites, boxed and drizzled with Chetco Gold raw honey.", "price": 2},
+  {"course": "sweet", "name": "Honey Focaccia Muffins", "description": "Focaccia muffins, boxed and drizzled with Chetco Gold raw honey.", "price": 2},
   {"course": "small", "name": "Jalapeño & Roasted Garlic Muffins", "description": "Hand-sized, crisp-edged, crowned with jalapeño and toasted garlic.", "price": 2},
   {"course": "small", "name": "Peppered Pickle Muffins", "description": "Brookings Pickled Goodies’ spicy bread-and-butter pickles, infused right into the dough.", "price": 2},
   {"course": "small", "name": "Sea Salt Focaccia Muffins", "description": "Olive-oil brushed and salt flaked. No rolls here — every small one is a focaccia muffin.", "price": 2},

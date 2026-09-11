@@ -863,7 +863,7 @@ HOME = masthead("Home") + f"""
       <div style="display:flex;gap:var(--s5);align-items:baseline;padding-block:var(--s5);
         border-bottom:1px solid var(--rule-soft)">
         <span class="fare-n">&#8212;</span><div><h3 style="font-size:var(--lg)">Chetco Gold Raw Honey</h3>
-        <p style="font-size:var(--sm);opacity:.74">Award-winning raw honey from the Chetco River, over our focaccia bites.</p></div></div>
+        <p style="font-size:var(--sm);opacity:.74">Award-winning raw honey from the Chetco River, over our honey focaccia muffins.</p></div></div>
       <div style="display:flex;gap:var(--s5);align-items:baseline;padding-block:var(--s5);
         border-bottom:1px solid var(--rule-soft)">
         <span class="fare-n">&#8212;</span><div><h3 style="font-size:var(--lg)">The Dawg House</h3>
@@ -989,7 +989,7 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
     ])}
     {course("Sweet","I Dolci",[
       fare("VII","Cinnamon Swirl with Vanilla Drizzle","A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze."),
-      fare("VIII","Honey Focaccia Bites","Pull-apart bites, boxed and drizzled with award-winning Chetco Gold raw honey from right here on the Chetco River."),
+      fare("VIII","Honey Focaccia Muffins","Focaccia muffins, boxed and drizzled with award-winning Chetco Gold raw honey from right here on the Chetco River."),
     ],("sweet-cinnamon.webp","Cinnamon swirl focaccia with vanilla drizzle"))}
     {course("Focaccia Muffins","I Piccoli",[
       fare("IX","Jalape&#241;o &amp; Roasted Garlic Muffins","Hand-sized, crisp-edged, crowned with jalape&#241;o and toasted garlic."),
