@@ -214,7 +214,14 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
 .fare{display:flex;align-items:baseline;gap:var(--s4);padding-block:var(--s5);
   border-bottom:1px solid var(--rule-soft)}
 .fare-n{font-family:var(--serif);font-size:var(--sm);color:var(--gold-read);
-  font-weight:600;width:34px;flex-shrink:0;letter-spacing:.1em}
+  font-weight:600;width:var(--fare-n,34px);flex-shrink:0;letter-spacing:.1em;
+  white-space:nowrap}
+/* The bill of fare runs to XXXIV now. 34px fits about as far as XII, and
+   past that the numerals ran straight into the titles beside them, so the
+   courses get a column wide enough for the longest. In em, so it tracks
+   whatever face is actually serving rather than a pixel guess made against
+   the fallback. The home page board stops at V and keeps the narrow one. */
+.course{--fare-n:4.4em}
 .fare-b{flex-grow:1}
 .fare-t{font-family:var(--serif);font-size:var(--lg);font-weight:600;
   display:flex;align-items:baseline;gap:var(--s3)}
@@ -799,7 +806,7 @@ HOME = masthead("Home") + f"""
         One starter.<br><span style="font-style:italic;font-weight:500">Endless flavor</span><br>possibilities.</h1>
       <p class="hero-lede">
         Focaccia and sourdough from one mother starter &#8212; savory and sweet,
-        dimpled and blistered, and made by hand on the southern Oregon coast.</p>
+        dimpled and blistered &#8212; made by hand on the southern Oregon coast.</p>
       <div class="hero-cta">
         <a href="#" class="btn btn-fill">Order for Pickup</a>
         <a href="#" class="btn btn-line">See the Bill of Fare</a>
