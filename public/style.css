@@ -40,7 +40,7 @@ ul{list-style:none}
 
 /* ── keyboard focus: one visible ring everywhere, never the UA default ── */
 :focus-visible{outline:2px solid var(--burgundy);outline-offset:3px;border-radius:var(--r-sm)}
-.btn-fill:focus-visible,.enamel :focus-visible,.ribbon :focus-visible,
+.btn-fill:focus-visible,.enamel :focus-visible,
 footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
 
 /* visually hidden, still read aloud */
@@ -91,13 +91,8 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
 .btn-pale:hover{background:var(--gold-pale);color:var(--burgundy-ink);letter-spacing:.32em}
 
 /* ══ masthead ══════════════════════════════════════════════════════
-   The ribbon is one line at every width, and the header shrinks to a
-   slim bar once you start reading. Nothing here is an inline style, so
-   the responsive sheet can restyle it by class. */
-.ribbon{background:var(--burgundy-ink);color:var(--gold-pale);text-align:center;
-  padding:.55rem var(--s5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ribbon-short{display:none}
-
+   The header shrinks to a slim bar once you start reading. Nothing here
+   is an inline style, so the responsive sheet can restyle it by class. */
 .mast{background:var(--paper);border-bottom:1px solid var(--rule);
   padding-block:var(--s6) 0;position:sticky;top:0;z-index:50}
 .mast-in{text-align:center}
@@ -408,8 +403,6 @@ img{max-width:100%;height:auto}
   html:not(.js) .nav-link{white-space:nowrap;flex-shrink:0}
 }
 @media (max-width:640px){
-  .ribbon-full{display:none}
-  .ribbon-short{display:inline}
   .brand-script{font-size:2.9rem}
   .brand-caps{font-size:1.02rem;letter-spacing:.28em}
   .brand-mark{width:54px;height:54px}

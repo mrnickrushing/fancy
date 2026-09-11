@@ -82,7 +82,7 @@ ul{list-style:none}
 
 /* ── keyboard focus: one visible ring everywhere, never the UA default ── */
 :focus-visible{outline:2px solid var(--burgundy);outline-offset:3px;border-radius:var(--r-sm)}
-.btn-fill:focus-visible,.enamel :focus-visible,.ribbon :focus-visible,
+.btn-fill:focus-visible,.enamel :focus-visible,
 footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
 
 /* visually hidden, still read aloud */
@@ -133,13 +133,8 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
 .btn-pale:hover{background:var(--gold-pale);color:var(--burgundy-ink);letter-spacing:.32em}
 
 /* ══ masthead ══════════════════════════════════════════════════════
-   The ribbon is one line at every width, and the header shrinks to a
-   slim bar once you start reading. Nothing here is an inline style, so
-   the responsive sheet can restyle it by class. */
-.ribbon{background:var(--burgundy-ink);color:var(--gold-pale);text-align:center;
-  padding:.55rem var(--s5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ribbon-short{display:none}
-
+   The header shrinks to a slim bar once you start reading. Nothing here
+   is an inline style, so the responsive sheet can restyle it by class. */
 .mast{background:var(--paper);border-bottom:1px solid var(--rule);
   padding-block:var(--s6) 0;position:sticky;top:0;z-index:50}
 .mast-in{text-align:center}
@@ -601,7 +596,7 @@ def dimple_rule():
     return '<div class="dimples"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>'
 
 def masthead(active):
-    """The ribbon and the sticky header.
+    """The sticky header.
 
     Everything is on a real class rather than an inline style, so the
     responsive sheet can shrink the header on scroll and swap the
@@ -620,10 +615,7 @@ def masthead(active):
 
     links  = "".join(link(n) for n in NAV)
     drawer = "".join(link(n, True) for n in NAV)
-    return f"""<div class="ribbon caps">
-  <span class="ribbon-full">Brookings-Harbor Farmers Market &#183; Wednesdays &amp; Saturdays &#183; 9am &#8216;til sold out</span>
-  <span class="ribbon-short">Wed &amp; Sat &#183; from 9am</span></div>
-<header class="mast">
+    return f"""<header class="mast">
   <div class="mast-in">
     <div class="brand-row">
       {olive_rule(120)}
@@ -1325,9 +1317,6 @@ LOADER_M = f"""
 </div>"""
 
 MOBILE = f"""
-<div style="background:var(--burgundy-ink);color:var(--gold-pale);text-align:center;
-  padding:.5rem .5rem" class="caps" style="font-size:.58rem">
-  Wed &amp; Sat &#183; 9am &#8216;til sold out</div>
 <header style="background:var(--paper);border-bottom:1px solid var(--rule);
   padding:var(--s6) var(--s5) 0;position:sticky;top:0;z-index:50">
   <div style="display:flex;align-items:flex-start;justify-content:space-between">

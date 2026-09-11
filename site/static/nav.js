@@ -49,9 +49,9 @@
   }
 
   /* ── shrink on scroll ──────────────────────────────────────────────
-     The ribbon plus the full masthead took 221px of a 900px laptop
-     viewport before a word of the page showed. Past the first screenful
-     the bar slims to a single row. */
+     The full masthead took a large bite out of a 900px laptop viewport
+     before a word of the page showed. Past the first screenful the bar
+     slims to a single row. */
   var mast = document.querySelector('.mast');
   if (mast && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     var shrunk = false;
