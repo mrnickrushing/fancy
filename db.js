@@ -5,27 +5,14 @@
 // up the same way with no migration tooling to run.
 const { Pool } = require('pg');
 const crypto = require('crypto');
+const MENU_CATALOG = require('./menu.json');
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-// The bill of fare, as it stands on the Our Breads page. Seeded once, into an
-// empty menu table; after that the admin's Menu tab owns it. Prices are null
-// until Amanda enters them — an order for an unpriced item is a request she
-// quotes, exactly as every order was before the site could take them.
-const MENU_SEED = [
-  ['savory',    'Olive & Sun-Dried Tomato Swirl', 'A spiralled round layered with green and kalamata olives, sun-dried tomato, herbs and grated cheese.', 15],
-  ['savory',    'Jalapeño, Olive & Red Onion',    'Our signature round — fresh jalapeño, mixed olives, red onion and herbs across a golden, dimpled crust.', 15],
-  ['savory',    'Roasted Garlic & Sea Salt',      'Olive oil, roasted garlic and flaky salt on a pillowy sourdough crumb.', 15],
-  ['savory',    'Cheesy Jalapeño',                'Melted and bubbling, with jalapeño baked right into the top.', 15],
-  ['sourdough', 'The Country Loaf',               'Naturally leavened with the same starter that lifts the focaccia — mixed the day before, left to rise slow, and baked dark.', 15],
-  ['sweet',     'Cinnamon Swirl with Vanilla Drizzle', 'A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze.', 15],
-  ['sweet',     'Honey Focaccia Bites',           'Pull-apart bites, boxed and drizzled with Chetco Gold raw honey.', 2],
-  ['small',     'Jalapeño & Roasted Garlic Muffins', 'Hand-sized, crisp-edged, crowned with jalapeño and toasted garlic.', 2],
-  ['small',     'Peppered Pickle Muffins',        'Brookings Pickled Goodies’ spicy bread-and-butter pickles, infused right into the dough.', 2],
-  ['small',     'Sea Salt Rolls',                 'Soft pull-apart rounds, olive-oil brushed and salt flaked.', 2],
-  ['art',       'Heart Loaf',                     'A little hand-shaped heart. They go fast.', 15],
-  ['art',       'Flower Garden',                  'Hand-painted in vegetables and herbs — a whole garden across the top of the dough.', 15],
-];
+// The bill of fare is shared by the database seed and the generated public
+// menu. Existing installations keep Amanda's edits; missing catalog entries
+// are added once on startup so the two customer-facing paths cannot drift.
+const MENU_SEED = MENU_CATALOG.map(({ course, name, description, price }) => [course, name, description, price]);
 
 const COURSES = { savory: 'Savory', sourdough: 'Sourdough', sweet: 'Sweet', small: 'Muffins & Rolls', art: 'Focaccia Art' };
 
@@ -156,6 +143,7 @@ async function initSchema() {
     );
   `);
   await seedMenu();
+  await ensureCatalogItems();
   await backfillMenuPrices();
 }
 
@@ -174,9 +162,24 @@ async function seedMenu() {
   );
 }
 
-// The live menu was seeded before Amanda gave us prices, so those rows carry
-// NULL and the order page quotes them instead. Fill the blanks by course —
-// fifteen dollars a bread, two for a muffin-sized one.
+async function ensureCatalogItems() {
+  const values = [];
+  const rowsSql = MENU_SEED.map(([course, name, description, price], i) => {
+    values.push(course, name, description, price, i);
+    const offset = i * 5;
+    return `($${offset + 1},$${offset + 2},$${offset + 3},$${offset + 4},$${offset + 5})`;
+  });
+  await pool.query(
+    `INSERT INTO menu_items (course, name, description, price, sort_order)
+    SELECT v.course, v.name, v.description, v.price::numeric, v.sort_order::integer
+     FROM (VALUES ${rowsSql.join(',')}) AS v(course, name, description, price, sort_order)
+     WHERE NOT EXISTS (SELECT 1 FROM menu_items m WHERE m.name = v.name)`,
+    values
+  );
+}
+
+// Older installations may have menu rows with NULL prices from before the
+// standing catalog was finalized. Fill only those blanks from MENU_SEED.
 //
 // Once only, and never on top of a price that is already set. Clearing a
 // price in the admin is how Amanda marks something quote-on-request, so a

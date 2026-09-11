@@ -49,8 +49,10 @@ rather than charging cards:
    (the status follows the money), send the confirmation or a receipt, mark it
    completed.
 
-Prices are optional per item. An unpriced item shows *quoted on confirmation*
-and the customer sees the total in the confirmation email.
+The standing menu is shared from the root `menu.json` catalog. Amanda can
+still add seasonal or quote-on-request items from the admin, but the generated
+Bill of Fare and the initial database menu start from the same names,
+descriptions, and prices.
 
 ## Two things the canvas does that a web server cannot
 
@@ -59,7 +61,7 @@ and the customer sees the total in the confirmation email.
    rewrites these to `./img/…`.
 2. **A looping loading screen.** The canvas version loops forever so it can be
    seen on an artboard. The site version runs once, is skippable by click or
-   keypress, self-dismisses after 11s so nobody is ever trapped, and sets a
+   keypress, self-dismisses after 4s so nobody is ever trapped, and sets a
    `sessionStorage` flag so it does not replay as you move between pages.
 
 One thing the admin pages do that the others do not: they carry

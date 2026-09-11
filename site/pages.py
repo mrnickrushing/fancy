@@ -596,7 +596,7 @@ POLICIES = D.masthead("Policies") + D.head_band("Le Regole", "Before You Order",
     <div class="plate" style="padding:var(--s10);margin-bottom:var(--s8)">
       <h2>Privacy</h2>
       <p>We use the name, email, phone number, address, order details, and messages you provide to answer questions, prepare orders, and administer the bakery. We do not collect payment card details on this website. Orders and reviews are stored in the bakery's private order system so they can be fulfilled and managed.</p>
-      <p>To ask about information associated with your request, email <a href="#">info@ohyoufancyfocaccia.com</a>. Replace this plain-language notice with customer-approved legal text before launch if a formal privacy policy is required.</p>
+      <p>To ask about information associated with your request, email <a href="#">info@ohyoufancyfocaccia.com</a>.</p>
     </div>
     <p class="cal-note">Last updated 09-11-2026. These notes describe the current site behavior; Amanda should confirm the final business policy before publishing.</p>
   </div>

@@ -193,6 +193,7 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
   display:flex;align-items:baseline;gap:var(--s3)}
 .fare-t::after{content:'';flex-grow:1;border-bottom:1.5px dotted var(--rule);
   transform:translateY(-4px)}
+.fare-price{font-size:.78em;white-space:nowrap;color:var(--burgundy);font-weight:700}
 /* the description is read, not decorated: roman, a size up, and lifted
    out of the low-contrast range italic at .72 opacity put it in */
 .fare-d{font-size:1rem;opacity:.82;max-width:70ch;margin-top:var(--s2);
@@ -410,7 +411,7 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
   <div class="narrow" style="position:relative">
     <p class="caps kicker">La Lista</p>
     <h1 style="font-size:var(--xxl);margin-bottom:var(--s5)">The Bill of Fare</h1>
-    <p style="font-size:var(--lg);opacity:.76;font-style:italic;line-height:1.6">What comes out of the oven changes with the season, and with whatever our neighbours are growing. Every bread is $15, focaccia or sourdough alike; muffins and honey buns are $2 each.</p>
+    <p style="font-size:var(--lg);opacity:.76;font-style:italic;line-height:1.6">Prices are shown for the standing menu. Seasonal and custom bakes can be requested through the order page and confirmed by Amanda.</p>
     <div style="display:flex;justify-content:center;margin-top:var(--s8)"><svg width="190" height="34" viewBox="0 0 190 34" aria-hidden="true">
 <g fill="none" stroke="#4E6023" stroke-width="1.2" stroke-linecap="round">
 <path d="M2 17C40 17 82 14 126 9"/>
@@ -433,10 +434,10 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
       <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">Savory</h2>
       <div style="width:64px;height:2px;background:var(--burgundy);margin-bottom:var(--s4)"></div>
       <div class="fare"><span class="fare-n">I</span><div class="fare-b">
-      <p class="fare-t"><span>Olive &amp; Sun-Dried Tomato Swirl</span></p><p class="fare-d">A spiralled round layered with green and kalamata olives, sun-dried tomato, herbs and grated cheese. Crisp at the edges, soft through the middle.</p></div></div><div class="fare"><span class="fare-n">II</span><div class="fare-b">
-      <p class="fare-t"><span>Jalape&#241;o, Olive &amp; Red Onion</span></p><p class="fare-d">Our signature round &#8212; fresh jalape&#241;o, mixed olives, red onion and herbs across a golden, dimpled crust.</p></div></div><div class="fare"><span class="fare-n">III</span><div class="fare-b">
-      <p class="fare-t"><span>Roasted Garlic &amp; Sea Salt</span></p><p class="fare-d">Simple and perfect. Olive oil, roasted garlic and flaky salt on a pillowy sourdough crumb.</p></div></div><div class="fare"><span class="fare-n">IV</span><div class="fare-b">
-      <p class="fare-t"><span>Cheesy Jalape&#241;o</span></p><p class="fare-d">Melted and bubbling, with jalape&#241;o baked right into the top.</p></div></div>
+      <p class="fare-t"><span>Olive &amp; Sun-Dried Tomato Swirl</span><span class="fare-price">$15</span></p><p class="fare-d">A spiralled round layered with green and kalamata olives, sun-dried tomato, herbs and grated cheese. Crisp at the edges, soft through the middle.</p></div></div><div class="fare"><span class="fare-n">II</span><div class="fare-b">
+      <p class="fare-t"><span>Jalape&#241;o, Olive &amp; Red Onion</span><span class="fare-price">$15</span></p><p class="fare-d">Our signature round &#8212; fresh jalape&#241;o, mixed olives, red onion and herbs across a golden, dimpled crust.</p></div></div><div class="fare"><span class="fare-n">III</span><div class="fare-b">
+      <p class="fare-t"><span>Roasted Garlic &amp; Sea Salt</span><span class="fare-price">$15</span></p><p class="fare-d">Simple and perfect. Olive oil, roasted garlic and flaky salt on a pillowy sourdough crumb.</p></div></div><div class="fare"><span class="fare-n">IV</span><div class="fare-b">
+      <p class="fare-t"><span>Cheesy Jalape&#241;o</span><span class="fare-price">$15</span></p><p class="fare-d">Melted and bubbling, with jalape&#241;o baked right into the top.</p></div></div>
     </div>
     <figure class="shot " style="height:360px;"><img src="savory-round.webp" alt="Jalapeno, olive and red onion focaccia" width="600" height="600" loading="lazy" decoding="async"></figure>
   </div>
@@ -448,8 +449,7 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
       <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">Sourdough</h2>
       <div style="width:64px;height:2px;background:var(--burgundy);margin-bottom:var(--s4)"></div>
       <div class="fare"><span class="fare-n">V</span><div class="fare-b">
-      <p class="fare-t"><span>The Country Loaf</span></p><p class="fare-d">Naturally leavened with the same starter that lifts the focaccia &#8212; mixed the day before, left to rise slow, and baked dark.</p></div></div><div class="fare"><span class="fare-n">VI</span><div class="fare-b">
-      <p class="fare-t"><span>Sourdough Through the Week</span></p><p class="fare-d">What goes into the oven changes with the week. Ask at the market table, or write ahead and we will set one by for you.</p></div></div>
+      <p class="fare-t"><span>The Country Loaf</span><span class="fare-price">$15</span></p><p class="fare-d">Naturally leavened with the same starter that lifts the focaccia &#8212; mixed the day before, left to rise slow, and baked dark.</p></div></div>
     </div>
     
   </div>
@@ -461,8 +461,8 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
       <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">Sweet</h2>
       <div style="width:64px;height:2px;background:var(--burgundy);margin-bottom:var(--s4)"></div>
       <div class="fare"><span class="fare-n">VII</span><div class="fare-b">
-      <p class="fare-t"><span>Cinnamon Swirl with Vanilla Drizzle</span></p><p class="fare-d">A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze.</p></div></div><div class="fare"><span class="fare-n">VIII</span><div class="fare-b">
-      <p class="fare-t"><span>Honey Focaccia Bites</span></p><p class="fare-d">Pull-apart bites, boxed and drizzled with award-winning Chetco Gold raw honey from right here on the Chetco River.</p></div></div>
+      <p class="fare-t"><span>Cinnamon Swirl with Vanilla Drizzle</span><span class="fare-price">$15</span></p><p class="fare-d">A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze.</p></div></div><div class="fare"><span class="fare-n">VIII</span><div class="fare-b">
+      <p class="fare-t"><span>Honey Focaccia Bites</span><span class="fare-price">$2</span></p><p class="fare-d">Pull-apart bites, boxed and drizzled with award-winning Chetco Gold raw honey from right here on the Chetco River.</p></div></div>
     </div>
     <figure class="shot " style="height:360px;"><img src="sweet-cinnamon.webp" alt="Cinnamon swirl focaccia with vanilla drizzle" width="448" height="657" loading="lazy" decoding="async"></figure>
   </div>
@@ -474,9 +474,9 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
       <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">Muffins &amp; Rolls</h2>
       <div style="width:64px;height:2px;background:var(--burgundy);margin-bottom:var(--s4)"></div>
       <div class="fare"><span class="fare-n">IX</span><div class="fare-b">
-      <p class="fare-t"><span>Jalape&#241;o &amp; Roasted Garlic</span></p><p class="fare-d">Hand-sized, crisp-edged, crowned with jalape&#241;o and toasted garlic.</p></div></div><div class="fare"><span class="fare-n">X</span><div class="fare-b">
-      <p class="fare-t"><span>Peppered Pickle</span></p><p class="fare-d">Made with Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles infused right into the dough. Organic ingredients only.</p></div></div><div class="fare"><span class="fare-n">XI</span><div class="fare-b">
-      <p class="fare-t"><span>Sea Salt Rolls</span></p><p class="fare-d">Soft pull-apart rounds, olive-oil brushed and salt flaked.</p></div></div>
+      <p class="fare-t"><span>Jalape&#241;o &amp; Roasted Garlic Muffins</span><span class="fare-price">$2</span></p><p class="fare-d">Hand-sized, crisp-edged, crowned with jalape&#241;o and toasted garlic.</p></div></div><div class="fare"><span class="fare-n">X</span><div class="fare-b">
+      <p class="fare-t"><span>Peppered Pickle Muffins</span><span class="fare-price">$2</span></p><p class="fare-d">Made with Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles infused right into the dough. Organic ingredients only.</p></div></div><div class="fare"><span class="fare-n">XI</span><div class="fare-b">
+      <p class="fare-t"><span>Sea Salt Rolls</span><span class="fare-price">$2</span></p><p class="fare-d">Soft pull-apart rounds, olive-oil brushed and salt flaked.</p></div></div>
     </div>
     <figure class="shot " style="height:360px;"><img src="muffins-jalapeno.webp" alt="Jalapeno and roasted garlic focaccia muffins" width="600" height="600" loading="lazy" decoding="async"></figure>
   </div>
@@ -488,9 +488,8 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
       <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">Focaccia Art</h2>
       <div style="width:64px;height:2px;background:var(--burgundy);margin-bottom:var(--s4)"></div>
       <div class="fare"><span class="fare-n">XII</span><div class="fare-b">
-      <p class="fare-t"><span>Heart Loaves</span></p><p class="fare-d">Little hand-shaped hearts. They go fast.</p></div></div><div class="fare"><span class="fare-n">XIII</span><div class="fare-b">
-      <p class="fare-t"><span>Flower Gardens</span></p><p class="fare-d">Hand-painted in vegetables and herbs &#8212; a whole garden across the top of the dough.</p></div></div><div class="fare"><span class="fare-n">XIV</span><div class="fare-b">
-      <p class="fare-t"><span>Seasonal &amp; Custom</span></p><p class="fare-d">Tell us the occasion. We have made a great many things that were never on a list.</p></div></div>
+      <p class="fare-t"><span>Heart Loaf</span><span class="fare-price">$15</span></p><p class="fare-d">Little hand-shaped hearts. They go fast.</p></div></div><div class="fare"><span class="fare-n">XIII</span><div class="fare-b">
+      <p class="fare-t"><span>Flower Garden</span><span class="fare-price">$15</span></p><p class="fare-d">Hand-painted in vegetables and herbs &#8212; a whole garden across the top of the dough.</p></div></div>
     </div>
     <figure class="shot " style="height:360px;"><img src="heart-loaf.webp" alt="A hand-shaped focaccia heart" width="510" height="510" loading="lazy" decoding="async"></figure>
   </div>
