@@ -36,6 +36,14 @@ test('the loading screen carries the hill scene, not a flat wash', async () => {
     'the splash fell back to a flat gradient');
 });
 
+test('reduced motion mutes the scene, which the script turns on regardless', async () => {
+  const css = (await request(app).get('/style.css')).text;
+  const block = css.slice(css.indexOf('@media (prefers-reduced-motion:reduce)'));
+  assert.ok(block, 'no reduced-motion block at all');
+  assert.match(block.slice(0, block.indexOf('}\n}') + 3), /\.splash \.scene[^}]*transition:none/,
+    'the scene keeps its 12s drift for reduced-motion visitors');
+});
+
 test('every splash mark is driven, not just the first', async () => {
   const page = (await request(app).get('/')).text;
   const marks = page.match(/class="splash-mark"/g) || [];

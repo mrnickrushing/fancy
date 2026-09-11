@@ -237,7 +237,7 @@ LOADER_CSS = f"""
 @keyframes mark{{0%,{_pct(0.85)}%{{opacity:0;transform:translateY(9px)}}
   {_pct(1.7)}%,100%{{opacity:1;transform:none}}}}
 
-.ing-rail{{position:relative;height:96px;margin-top:var(--s8)}}
+.ing-rail{{position:relative;height:96px;margin-top:var(--s6)}}
 .ing{{position:absolute;inset:0;opacity:0}}
 {"".join(f'.ing:nth-child({i+1}){{animation:ing{i} {CYCLE}s var(--ease) infinite}}' for i in range(5))}
 .ing-w{{font-family:var(--serif);font-size:2.5rem;font-weight:500;font-style:italic;
@@ -279,7 +279,7 @@ CORNER = """<svg class="corner c-%s" width="96" height="96" viewBox="0 0 96 96" 
 <ellipse cx="58" cy="33" rx="3.6" ry="4.8" transform="rotate(30 58 33)" fill="#8FA05E"/>
 <circle cx="6" cy="6" r="2.6" fill="#D9A94E" opacity=".8"/></svg>"""
 
-def logo_badge(size=200, draw=True):
+def logo_badge(size=200, draw=True, src="logo.webp"):
     """The real label, with the gold ring stroking on around it."""
     ring = f'''<svg width="{size}" height="{size}" viewBox="0 0 200 200" aria-hidden="true"
   class="ring" style="position:absolute;inset:0">
@@ -290,7 +290,7 @@ def logo_badge(size=200, draw=True):
 </svg>'''
     return f'''<div style="position:relative;width:{size}px;height:{size}px;margin:0 auto">
   {ring}
-  <img src="logo.webp" alt="Oh! You Fancy Focaccia" class="mark"
+  <img src="{src}" alt="Oh! You Fancy Focaccia" class="mark"
     style="position:absolute;inset:{int(size*0.075)}px;width:{int(size*0.85)}px;
     height:{int(size*0.85)}px;border-radius:50%">
 </div>'''
@@ -319,7 +319,7 @@ LOADER = f"""
   {CORNER % 'tl'}{CORNER % 'tr'}{CORNER % 'bl'}{CORNER % 'br'}
   <div class="vig"></div>
   <div class="load-in">
-    {logo_badge(300)}
+    {logo_badge(420, src="logo-splash.webp")}
     <div class="mark" style="margin-top:var(--s6)">
       <p style="font-family:var(--script);font-size:4.6rem;line-height:.78;color:#F2DFC0">Oh! You Fancy</p>
       <p style="font-family:var(--serif);font-size:2.2rem;font-weight:700;letter-spacing:.3em;
@@ -332,7 +332,7 @@ LOADER = f"""
 
     <div class="dim-rail"><i></i><i></i><i></i><i></i><i></i></div>
 
-    <div class="tag-line" style="margin-top:var(--s10)">
+    <div class="tag-line" style="margin-top:var(--s8)">
       <p style="font-family:var(--serif);font-size:.78rem;font-weight:600;letter-spacing:.46em;
         text-transform:uppercase;color:#D9A94E">Pane &#183; Amore &#183; Sempre</p>
     </div>
@@ -937,17 +937,17 @@ LOADER_M = f"""
   <div class="frame" style="inset:18px"></div>
   <div class="vig"></div>
   <div class="load-in">
-    {logo_badge(196)}
+    {logo_badge(290, src="logo-splash.webp")}
     <div class="mark" style="margin-top:var(--s5)">
       <p style="font-family:var(--script);font-size:3.1rem;line-height:.78;color:#F2DFC0">Oh! You Fancy</p>
       <p style="font-family:var(--serif);font-size:1.4rem;font-weight:700;letter-spacing:.3em;
         text-transform:uppercase;color:#F2DFC0;margin-top:.45rem;padding-left:.3em">Focaccia</p>
     </div>
-    <div class="ing-rail" style="height:76px;margin-top:var(--s6)">
+    <div class="ing-rail" style="height:72px;margin-top:var(--s5)">
       {''.join(f'<div class="ing"><p class="ing-w" style="font-size:1.85rem">{w}</p><p class="ing-g" style="font-size:.6rem">{g}</p></div>' for w,g in INGREDIENTS)}
     </div>
     <div class="dim-rail" style="gap:13px">{'<i></i>'*5}</div>
-    <div class="tag-line" style="margin-top:var(--s8)">
+    <div class="tag-line" style="margin-top:var(--s6)">
       <p style="font-family:var(--serif);font-size:.66rem;font-weight:600;letter-spacing:.36em;
         text-transform:uppercase;color:#D9A94E">Pane &#183; Amore &#183; Sempre</p></div>
     <div class="enter" style="margin-top:var(--s6)"><a href="#" class="btn btn-pale">Entra</a></div>
