@@ -1006,11 +1006,11 @@ GAL_SECTIONS = [
    ("sea-salt-round.webp","Sea Salt Round","Olive-oil brushed, salt flaked, still warm.",300),
    ("square-focaccia.webp","The Roasted Garlic Boss","True garlic lovers want this one. Roasted garlic, garlic oil and minced garlic.",300)]),
  ("Le Teglie","Slabs &amp; Pans", [
-   ("olive-slab.webp","Olive &amp; Sun-Dried Tomato Slab","Green and black olives with sun-dried tomato, pressed into the dimples.",400),
-   ("rosemary-slab.webp","Rosemary &amp; Cracked Pepper","The plain one. Hardest to get right.",390),
-   ("potato-onion.webp","Potato, Caramelised Onion &amp; Rosemary","Sliced potato and slow onions under cracked pepper and parmesan.",380),
-   ("pesto-skillet.webp","Pesto &amp; Parmesan, in Cast Iron","Basil pesto and shredded parmesan, baked in the pan it is served from.",250),
-   ("wide-slab.webp","Cheese, Sun-Dried Tomato &amp; Olive","The long tray. What a market morning looks like.",250)]),
+   ("olive-slab.webp","The Mediterranean Olive","Olive variety and sun dried tomatoes.",400),
+   ("rosemary-slab.webp","The Rosemary and Black Pepper","Rosemary and cracked black pepper, right across the tray.",390),
+   ("potato-onion.webp","The Fall Favorite","Roasted potatoes, rosemary, garlic, caramelized onions and Fontana cheese.",380),
+   ("pesto-skillet.webp","The Pesto and Cashew Cheese","Basil pesto and cashew cheese, baked in the pan it is served from.",250),
+   ("wide-slab.webp","The Focaccia Queen","Tomatoes, cheese, onions, garlic and an olive variety &#8212; Kalamata, pimento and black olives &#8212; with cold pressed olive oil.",250)]),
  ("Le Spirali","Swirls", [
    ("jalapeno-swirl-xl.webp","Jalape&#241;o Cheese Swirl","Cheese caught and caramelised in the coils.",300),
    ("swirl-jalapeno.webp","Jalape&#241;o Swirl","Layer on layer, blistered at the edge.",300),
