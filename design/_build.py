@@ -466,7 +466,7 @@ ABOUT = header("about") + page_hero("Our Story","Welcome to Oh! You Fancy Focacc
 
 # ══ OUR BREADS ════════════════════════════════════════════════════════
 def menu_row(name, desc, tag=None):
-    t = f'<span class="tag {"tag-olive" if tag=="olive" else ""}" style="margin-left:12px;vertical-align:middle">{tag.upper()}</span>' if tag and tag!="olive" else ''
+    t = f'<span class="tag" style="margin-left:12px;vertical-align:middle">{tag.upper()}</span>' if tag else ''
     return f"""<div style="display:flex;gap:var(--space-6);padding-block:var(--space-6);
   border-bottom:1px solid var(--divider);align-items:flex-start">
   <div style="flex-shrink:0;width:8px;height:8px;border-radius:50%;background:var(--gold);margin-top:14px"></div>
@@ -791,23 +791,23 @@ MOBILE = f"""
 
 # ── write files ───────────────────────────────────────────────────────
 import json
-PAGES = [("Main", HOME, 1440, 5400), ("Mobile", MOBILE, 390, 2900),
-         ("About", ABOUT, 1440, 3400), ("Breads", BREADS, 1440, 4100),
-         ("Gallery", GALLERY, 1440, 2900), ("Reviews", REVIEWS, 1440, 2900),
-         ("Contact", CONTACT, 1440, 3200)]
+PAGES = [("Main", HOME, 1440, 5900), ("Mobile", MOBILE, 390, 3250),
+         ("About", ABOUT, 1440, 3850), ("Breads", BREADS, 1440, 4750),
+         ("Gallery", GALLERY, 1440, 3300), ("Reviews", REVIEWS, 1440, 3250),
+         ("Contact", CONTACT, 1440, 3650)]
 for name, body, w, h in PAGES:
     with open(os.path.join(OUT, f"{name}.dc.html"), "w", encoding="utf-8") as f:
         f.write(page(body, w, h))
     print(f"wrote {name}.dc.html")
 
 canvas = {"artboards":[
-  {"file":"Main.dc.html","x":0,"y":0,"w":1440,"h":5400,"title":"Home","print":"flow"},
-  {"file":"Mobile.dc.html","x":1560,"y":0,"w":390,"h":2900,"title":"Home - mobile","print":"flow"},
-  {"file":"About.dc.html","x":0,"y":5560,"w":1440,"h":3400,"title":"About","print":"flow"},
-  {"file":"Breads.dc.html","x":1560,"y":5560,"w":1440,"h":4100,"title":"Our Breads","print":"flow"},
-  {"file":"Gallery.dc.html","x":0,"y":9820,"w":1440,"h":2900,"title":"Gallery","print":"flow"},
-  {"file":"Reviews.dc.html","x":1560,"y":9820,"w":1440,"h":2900,"title":"Reviews","print":"flow"},
-  {"file":"Contact.dc.html","x":0,"y":12880,"w":1440,"h":3200,"title":"Contact","print":"flow"}],
+  {"file":"Main.dc.html","x":0,"y":0,"w":1440,"h":5900,"title":"Home","print":"flow"},
+  {"file":"Mobile.dc.html","x":1560,"y":0,"w":390,"h":3250,"title":"Home - mobile","print":"flow"},
+  {"file":"About.dc.html","x":0,"y":6060,"w":1440,"h":3850,"title":"About","print":"flow"},
+  {"file":"Breads.dc.html","x":1560,"y":6060,"w":1440,"h":4750,"title":"Our Breads","print":"flow"},
+  {"file":"Gallery.dc.html","x":0,"y":10970,"w":1440,"h":3300,"title":"Gallery","print":"flow"},
+  {"file":"Reviews.dc.html","x":1560,"y":10970,"w":1440,"h":3250,"title":"Reviews","print":"flow"},
+  {"file":"Contact.dc.html","x":0,"y":14430,"w":1440,"h":3650,"title":"Contact","print":"flow"}],
  "annotations":[
   {"id":"brief","x":-460,"y":0,"w":380,"text":"Oh! You Fancy Focaccia\n\nPalette lifted from the logo: burgundy #8E1B1B, olive #4E6023, gold #C08A2E, parchment #F5EDD8.\n\nStructure follows Sugar Haus (home / about / menu / gallery / reviews / contact) with the ordering flow removed.\n\nType: Playfair Display + Lora + Pinyon Script for the wordmark."},
   {"id":"photos","x":-460,"y":380,"w":380,"text":"Every tan panel is a photo slot with an engraved placeholder. Swap in Amanda's real photography before this goes anywhere near a client."},

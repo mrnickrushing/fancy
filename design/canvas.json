@@ -5,7 +5,7 @@
       "x": 0,
       "y": 0,
       "w": 1440,
-      "h": 5400,
+      "h": 5900,
       "title": "Home",
       "print": "flow"
     },
@@ -14,52 +14,52 @@
       "x": 1560,
       "y": 0,
       "w": 390,
-      "h": 2900,
+      "h": 3250,
       "title": "Home - mobile",
       "print": "flow"
     },
     {
       "file": "About.dc.html",
       "x": 0,
-      "y": 5560,
+      "y": 6060,
       "w": 1440,
-      "h": 3400,
+      "h": 3850,
       "title": "About",
       "print": "flow"
     },
     {
       "file": "Breads.dc.html",
       "x": 1560,
-      "y": 5560,
+      "y": 6060,
       "w": 1440,
-      "h": 4100,
+      "h": 4750,
       "title": "Our Breads",
       "print": "flow"
     },
     {
       "file": "Gallery.dc.html",
       "x": 0,
-      "y": 9820,
+      "y": 10970,
       "w": 1440,
-      "h": 2900,
+      "h": 3300,
       "title": "Gallery",
       "print": "flow"
     },
     {
       "file": "Reviews.dc.html",
       "x": 1560,
-      "y": 9820,
+      "y": 10970,
       "w": 1440,
-      "h": 2900,
+      "h": 3250,
       "title": "Reviews",
       "print": "flow"
     },
     {
       "file": "Contact.dc.html",
       "x": 0,
-      "y": 12880,
+      "y": 14430,
       "w": 1440,
-      "h": 3200,
+      "h": 3650,
       "title": "Contact",
       "print": "flow"
     }
