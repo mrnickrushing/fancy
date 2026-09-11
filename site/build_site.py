@@ -273,11 +273,12 @@ DOC = """<!doctype html>
 <meta name="description" content="{desc}">
 <meta name="theme-color" content="#8E1B1B">
 <link rel="canonical" href="{canon}">
+<meta property="og:url" content="{canon}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Oh! You Fancy Focaccia">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
-<meta property="og:image" content="./img/hero-garden.webp">
+<meta property="og:image" content="https://ohyoufancyfocaccia.com/img/hero-garden.webp">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="./img/logo.webp" type="image/webp">
 <link rel="apple-touch-icon" href="./img/logo.webp">
@@ -300,6 +301,7 @@ LD_JSON = """<script type="application/ld+json">
   "@context": "https://schema.org",
   "@type": "Bakery",
   "name": "Oh! You Fancy Focaccia",
+  "url": "https://ohyoufancyfocaccia.com/",
   "description": "Small-batch organic focaccia baked by hand in Brookings, Oregon.",
   "email": "ohyoufancyfocaccia@gmail.com",
   "sameAs": ["https://www.facebook.com/profile.php?id=61584072034572"],
@@ -333,7 +335,7 @@ def build():
     with open(os.path.join(PUBLIC, "splash.js"), "w", encoding="utf-8") as fh:
         fh.write(SPLASH_JS.strip() + "\n")
 
-    base = "https://ohyoufancyfocaccia.up.railway.app/"
+    base = "https://ohyoufancyfocaccia.com/"
     for fname, body, title, desc in PAGES:
         html = rewrite_assets(rewrite_links(body))
         # the masthead nav needs to scroll on narrow screens

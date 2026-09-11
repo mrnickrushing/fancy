@@ -53,3 +53,9 @@ test('unknown paths fall back to the home page, not a crash', async () => {
   assert.strictEqual(res.status, 404);
   assert.match(res.text, /Oh! You Fancy Focaccia/);
 });
+
+test('canonical redirect stays off until CANONICAL_HOST is set', async () => {
+  // the module was loaded without the variable, so www must still serve
+  const res = await request(app).get('/').set('Host', 'www.ohyoufancyfocaccia.com');
+  assert.strictEqual(res.status, 200);
+});

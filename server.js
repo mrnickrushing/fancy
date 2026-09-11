@@ -35,6 +35,20 @@ app.use(helmet({
 }));
 app.use(compression());
 
+// Send every hostname to one canonical host, so www and the apex do not both
+// get indexed. Off unless CANONICAL_HOST is set — enabling it before the apex
+// DNS record exists would redirect the only working hostname into a dead one.
+const CANONICAL_HOST = process.env.CANONICAL_HOST;
+if (CANONICAL_HOST) {
+  app.use((req, res, next) => {
+    const host = (req.headers.host || '').toLowerCase().split(':')[0];
+    if (host && host !== CANONICAL_HOST && !host.endsWith('.up.railway.app')) {
+      return res.redirect(308, `https://${CANONICAL_HOST}${req.originalUrl}`);
+    }
+    next();
+  });
+}
+
 app.get('/healthz', (_req, res) => res.status(200).send('ok'));
 
 app.use(express.static(PUBLIC_DIR, {
