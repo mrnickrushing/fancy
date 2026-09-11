@@ -42,25 +42,31 @@ Twenty-nine bakes, grouped into six courses rather than one flat wall:
 
 ## Captions
 
-Written from what is visible in each photograph — nothing in the source material
-names these bakes, so appearance is the only evidence.
+Nothing in the source material names any of these bakes, so every caption was
+read off the photograph itself.
 
-Seeing five of them again at full resolution turned up real errors, since
-corrected:
+**All 29 have now been seen at full resolution**, which matters: the first pass
+was written from a 300px contact sheet and got nine of them wrong. Corrected:
 
 | Was | Is actually |
 |---|---|
-| "Rosemary Oval — hand-stretched long rather than round" | **Potato, Caramelised Onion & Rosemary** — sliced potato, slow onions, cracked pepper, parmesan |
-| "Skillet Focaccia — green with herbs" | **Pesto & Parmesan, in Cast Iron** — basil pesto, shredded parmesan |
-| "Olive Slab — green and kalamata" | **Olive & Sun-Dried Tomato Slab** — the tomato was missed entirely |
+| "Cheesy Jalapeño" | **Scallion & Chilli Crisp** — spring onion, sesame, chilli crisp. Not jalapeño, not cheese, not Italian |
+| "Rosemary Oval" | **Potato, Caramelised Onion & Rosemary** — a different bake entirely |
+| "Skillet Focaccia, green with herbs" | **Pesto & Parmesan, in Cast Iron** |
+| "Honey Bites" | **Hot Honey Bites** — chilli flake and sesame under the honey |
+| "Olive Slab" | **Olive & Sun-Dried Tomato Slab** — the tomato was missed |
+| "Jalapeño, Dimpled" | **Jalapeño & Cheese** |
+| "Garlic & Herb" | **Roasted Garlic & Herb** — whole soft cloves |
 | "Rosemary & Sea Salt" | **Rosemary & Cracked Pepper** |
-| "The Long Tray" | **Cheese, Sun-Dried Tomato & Olive** |
+| "Heart Loaf" | **Everything Heart** — sesame, poppy, garlic, onion |
 
-Two files were renamed to match: `rosemary-oval` → `potato-onion`,
-`skillet` → `pesto-skillet`.
+Four files were renamed to match: `rosemary-oval` → `potato-onion`,
+`skillet` → `pesto-skillet`, `cheesy-jalapeno` → `scallion-chili`,
+`honey-bites` → `hot-honey-bites`.
 
-**Amanda should still read every caption.** She knows what she calls these; a
-thumbnail can only show what a topping looks like, not what is in the dough.
+**Amanda still has final say.** A photograph shows what is on top and nothing
+about what is in the dough — the dark swirl is still captioned by appearance
+("Caramelised Swirl") because its flavour cannot be read off the picture.
 
 ## Still missing
 

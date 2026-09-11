@@ -728,14 +728,14 @@ GAL_SECTIONS = [
  ("I Salati","Savory", [
    ("savory-round.webp","Jalape&#241;o, Olive &amp; Red Onion","The round people recognise us by.",300),
    ("jalapeno-garlic-round.webp","Jalape&#241;o &amp; Roasted Garlic","Toasted garlic right across the top.",300),
-   ("jalapeno-dimpled.webp","Jalape&#241;o, Dimpled","Deep wells, with the oil pooling in them.",300),
-   ("cheesy-jalapeno.webp","Cheesy Jalape&#241;o","Melted and bubbling, baked into the crust.",280),
+   ("jalapeno-dimpled.webp","Jalape&#241;o &amp; Cheese","Cheese browned into every ridge, jalape&#241;o set down in the wells.",300),
+   ("scallion-chili.webp","Scallion &amp; Chilli Crisp","Spring onion, toasted sesame and chilli crisp. The one that is not Italian at all.",280),
    ("tomato-olive-round.webp","Tomato, Olive &amp; Onion","Cherry tomatoes burst against the dough.",300),
    ("olive-tomato.webp","Olive &amp; Sun-Dried Tomato","Crisp at the edge, soft through the middle.",300),
-   ("garlic-herb-round.webp","Garlic &amp; Herb","Green with herbs, gold underneath.",280),
+   ("garlic-herb-round.webp","Roasted Garlic &amp; Herb","Whole cloves gone soft and golden, under sage, oregano and thyme.",280),
    ("lemon-pepper.webp","Lemon Pepper &amp; Garlic","Cracked pepper, lemon zest, plenty of oil.",300),
    ("sea-salt-round.webp","Sea Salt Round","Olive-oil brushed, salt flaked, still warm.",300),
-   ("square-focaccia.webp","Square Cut","Baked in the pan, corners and all.",300)]),
+   ("square-focaccia.webp","Garlic &amp; Herb Square","Baked in the pan, corners and all.",300)]),
  ("Le Teglie","Slabs &amp; Pans", [
    ("olive-slab.webp","Olive &amp; Sun-Dried Tomato Slab","Green and black olives with sun-dried tomato, pressed into the dimples.",400),
    ("rosemary-slab.webp","Rosemary &amp; Cracked Pepper","The plain one. Hardest to get right.",390),
@@ -755,9 +755,9 @@ GAL_SECTIONS = [
    ("sweet-cinnamon.webp","Cinnamon Swirl","A whole pan, pulled apart in ridges and glazed.",420),
    ("cinnamon-drizzle-2.webp","Cinnamon, Drizzled","Vanilla glaze laid across the top in ribbons.",410),
    ("cinnamon-dark.webp","Deep Cinnamon","Taken further in the oven, glossy and dark.",400),
-   ("honey-bites.webp","Honey Bites","Boxed, and drizzled with Chetco Gold raw honey.",360)]),
+   ("hot-honey-bites.webp","Hot Honey Bites","Chilli flake and sesame, drizzled with Chetco Gold raw honey. Boxed by the dozen.",360)]),
  ("L&#8217;Arte","Focaccia Art", [
-   ("heart-loaf.webp","Heart Loaf","Little hand-shaped hearts. They go fast.",300),
+   ("heart-loaf.webp","Everything Heart","Sesame, poppy, garlic and onion over a hand-shaped heart. They go fast.",300),
    ("art-garden.webp","Flower Garden","Painted in herbs and vegetables, one stem at a time.",395),
    ("hero-garden.webp","Flower Garden, Again","No two are ever laid out the same way.",390)]),
 ]
