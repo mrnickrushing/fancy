@@ -1003,7 +1003,6 @@ GAL_SECTIONS = [
    ("olive-tomato.webp","Olive &amp; Sun-Dried Tomato","Specialty made to order.",300),
    ("garlic-herb-round.webp","The Italiano","The true Italian focaccia. Focaccia originated in Rome, Italy, and you can taste it in this loaf. Sage, oregano, thyme, basil and garlic.",280),
    ("lemon-pepper.webp","Lemon Pepper &amp; Garlic","Cracked pepper, lemon zest, plenty of oil.",300),
-   ("sea-salt-round.webp","Sea Salt Round","Olive-oil brushed, salt flaked, still warm.",300),
    ("square-focaccia.webp","The Roasted Garlic Boss","True garlic lovers want this one. Roasted garlic, garlic oil and minced garlic.",300)]),
  ("Le Teglie","Slabs &amp; Pans", [
    ("olive-slab.webp","The Mediterranean Olive","Olive variety and sun dried tomatoes.",400),
@@ -1015,18 +1014,19 @@ GAL_SECTIONS = [
    ("jalapeno-swirl-xl.webp","Jalape&#241;o, Garlic and Chedda Sourdough","Jalape&#241;o, garlic and cheddar wound through a sourdough spiral.",300),
    ("swirl-jalapeno.webp","Jalape&#241;o Swirl","Layer on layer, blistered at the edge.",300),
    ("plain-swirl.webp","Classic Artisan Celtic Salted Sourdough","Nothing on it but Celtic salt.",300),
-   ("caramel-swirl.webp","Caramelised Swirl","Dark at the edges, glossy, unwinding in rings.",300)]),
+   ("caramel-swirl.webp","The Mediterranean Sourdough","Sun dried tomato and olive variety.",300)]),
  ("I Piccoli","Muffins &amp; Rolls", [
    ("muffins-jalapeno.webp","Jalape&#241;o &amp; Garlic Muffins","Hand-sized, crowned with toasted garlic.",300),
-   ("parm-muffins.webp","Garlic Parmesan Muffins","Crisp-edged and golden all over.",300),
-   ("herb-rolls.webp","Herb Rolls","Sage, rosemary and garlic, pulled apart warm.",300)]),
+   ("parm-muffins.webp","The Roasted Garlic Focaccia Muffins","Roasted garlic, hand-sized.",300),
+   ("sea-salt-round.webp","The Plain Jane Celtic Salted Focaccia Muffin","Celtic salt, and nothing else.",300),
+   ("herb-rolls.webp","The Italiano Focaccia Muffins","The Italiano in muffin form &#8212; sage, oregano, thyme, basil and garlic.",300)]),
  ("I Dolci","Sweet", [
    ("sweet-cinnamon.webp","The Brown Buttered Cinnamon Roll","Flax seed oil butter. Coconut sugar.",420),
    ("cinnamon-drizzle-2.webp","The Pow Cacao","A decadent chocolate focaccia dessert, sweetened with coconut sugar.",410),
    ("cinnamon-dark.webp","The Apple Fritter","Apple fritter focaccia dessert.",400),
    ("hot-honey-bites.webp","The Hot Honey","Chili peppers, garlic and local honey from the happiest honey bees.",360)]),
  ("L&#8217;Arte","Focaccia Art", [
-   ("heart-loaf.webp","Everything Heart","Sesame, poppy, garlic and onion over a hand-shaped heart. They go fast.",300),
+   ("heart-loaf.webp","The Everything Focaccia","Poppy seeds, sesame seeds, onion and garlic.",300),
    ("art-garden.webp","Flower Garden with a Bee","Specialty made to order.",395),
    ("hero-garden.webp","Flower Garden","Specialty made to order.",390)]),
 ]
