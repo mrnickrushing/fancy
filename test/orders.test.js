@@ -81,10 +81,13 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     const res = await request(app).get('/api/menu');
     assert.equal(res.status, 200);
     assert.ok(res.body.items.length >= 10);
-    // $15 a bread, focaccia or sourdough alike; $2 for a muffin-sized one.
     // Nothing ships unpriced any more, so nothing falls back to "quoted".
+    // Checked against MENU_SEED rather than a by-course rule: the honey bites
+    // are $2 despite being a sweet, and a rule would not have caught that.
+    const expected = new Map(db.MENU_SEED.map(([, name, , price]) => [name, price]));
     for (const i of res.body.items) {
-      assert.equal(Number(i.price), i.course === 'small' ? 2 : 15, `${i.name} priced wrong`);
+      assert.ok(expected.has(i.name), `${i.name} is not in MENU_SEED`);
+      assert.equal(Number(i.price), expected.get(i.name), `${i.name} priced wrong`);
     }
     assert.equal(res.body.courses.savory, 'Savory');
   });

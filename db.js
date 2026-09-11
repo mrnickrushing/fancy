@@ -19,7 +19,7 @@ const MENU_SEED = [
   ['savory',    'Cheesy Jalapeño',                'Melted and bubbling, with jalapeño baked right into the top.', 15],
   ['sourdough', 'The Country Loaf',               'Naturally leavened with the same starter that lifts the focaccia — mixed the day before, left to rise slow, and baked dark.', 15],
   ['sweet',     'Cinnamon Swirl with Vanilla Drizzle', 'A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze.', 15],
-  ['sweet',     'Honey Focaccia Bites',           'Pull-apart bites, boxed and drizzled with Chetco Gold raw honey.', 15],
+  ['sweet',     'Honey Focaccia Bites',           'Pull-apart bites, boxed and drizzled with Chetco Gold raw honey.', 2],
   ['small',     'Jalapeño & Roasted Garlic Muffins', 'Hand-sized, crisp-edged, crowned with jalapeño and toasted garlic.', 2],
   ['small',     'Peppered Pickle Muffins',        'Brookings Pickled Goodies’ spicy bread-and-butter pickles, infused right into the dough.', 2],
   ['small',     'Sea Salt Rolls',                 'Soft pull-apart rounds, olive-oil brushed and salt flaked.', 2],
@@ -188,7 +188,17 @@ async function backfillMenuPrices() {
     `SELECT 1 FROM settings WHERE key = 'menu_prices_backfilled'`
   );
   if (done.rowCount) return;
-  const { rowCount } = await pool.query(
+  // MENU_SEED is the price list, so match the live rows against it by name
+  // rather than deriving a price from the course. The honey bites are $2
+  // despite being a sweet, and a by-course rule would quietly charge $15.
+  const seeded = await pool.query(
+    `UPDATE menu_items m SET price = v.price
+       FROM (SELECT unnest($1::text[]) AS name, unnest($2::numeric[]) AS price) v
+      WHERE m.name = v.name AND m.price IS NULL`,
+    [MENU_SEED.map(([, name]) => name), MENU_SEED.map(([, , , price]) => price)]
+  );
+  // Anything Amanda added herself is not in the seed; fall back to the rule.
+  const rest = await pool.query(
     `UPDATE menu_items SET price = CASE WHEN course = 'small' THEN 2 ELSE 15 END
       WHERE price IS NULL`
   );
@@ -196,7 +206,8 @@ async function backfillMenuPrices() {
     `INSERT INTO settings (key, value, updated_at) VALUES ('menu_prices_backfilled', '1', now())
      ON CONFLICT (key) DO NOTHING`
   );
-  if (rowCount) console.log(`menu: priced ${rowCount} item(s) that had none`);
+  const n = seeded.rowCount + rest.rowCount;
+  if (n) console.log(`menu: priced ${n} item(s) that had none`);
 }
 
 function toIsoDate(d) {
@@ -584,7 +595,7 @@ async function setAdminCredentials(username, passwordHash) {
 }
 
 module.exports = {
-  pool, initSchema, toIsoDate, COURSES, SETTINGS_DEFAULTS,
+  pool, initSchema, toIsoDate, COURSES, SETTINGS_DEFAULTS, MENU_SEED,
   getSettings, setSettings,
   listMenu, getMenuItems, createMenuItem, updateMenuItem, deleteMenuItem,
   listBlocks, getBlockedRanges, isDateBlocked, createBlock, deleteBlock,
