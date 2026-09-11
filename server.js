@@ -79,9 +79,41 @@ app.get('/healthz', (_req, res) => res.status(200).send('ok'));
 function asyncHandler(fn) {
   return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 }
+
+async function deliverOutbox(row) {
+  try {
+    const result = await mail.send({
+      to: row.recipient, replyTo: row.reply_to,
+      subject: row.subject, html: row.html,
+    });
+    if (result.sent) await db.markEmailSent(row.id);
+    else await db.markEmailFailed(row.id, result.reason);
+    return result;
+  } catch (err) {
+    await db.markEmailFailed(row.id, err.message);
+    return { sent: false, reason: err.message };
+  }
+}
+
+async function queueAndDeliver({ orderId = null, kind, to, replyTo, subject, html }) {
+  const row = await db.queueEmail({ orderId, kind, to, replyTo, subject, html });
+  return deliverOutbox(row);
+}
+
+async function processEmailOutbox() {
+  const rows = await db.claimDueEmails(10);
+  await Promise.all(rows.map((row) => deliverOutbox(row)));
+  return rows.length;
+}
 const str = (v) => (typeof v === 'string' ? v.trim() : '');
 const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-const isIsoDate = (v) => /^\d{4}-\d{2}-\d{2}$/.test(String(v)) && !isNaN(new Date(`${v}T00:00:00Z`).getTime());
+function isIsoDate(v) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v));
+  if (!match) return false;
+  const year = Number(match[1]), month = Number(match[2]), day = Number(match[3]);
+  if (year < 1 || month < 1 || month > 12 || day < 1) return false;
+  return day <= new Date(Date.UTC(year, month, 0)).getUTCDate();
+}
 
 function safeEqual(a, b) {
   const ha = crypto.createHash('sha256').update(String(a ?? '')).digest();
@@ -100,12 +132,12 @@ function verifyPassword(password, stored) {
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
-// Today with a day of buffer subtracted, so a visitor in a timezone behind
-// UTC is not refused the earliest date the calendar in front of them allows.
+// Use UTC for the business date so the API and browser calendar agree across
+// time zones. The configured notice window is the actual number of days.
 function minDateIso(noticeDays) {
   const d = new Date();
   d.setUTCHours(0, 0, 0, 0);
-  d.setUTCDate(d.getUTCDate() + Math.max(0, noticeDays) - 1);
+  d.setUTCDate(d.getUTCDate() + Math.max(0, noticeDays));
   return db.toIsoDate(d);
 }
 function isMarketDay(iso) {
@@ -277,7 +309,9 @@ async function prepareOrder(body, { website }) {
     if (!Number.isInteger(id) || !Number.isInteger(qty) || qty < 1 || qty > MAX_QTY) {
       return { error: `Quantities must be whole numbers between 1 and ${MAX_QTY}.` };
     }
-    wanted.set(id, (wanted.get(id) || 0) + qty);
+    const total = (wanted.get(id) || 0) + qty;
+    if (total > MAX_QTY) return { error: `Quantities must be whole numbers between 1 and ${MAX_QTY}.` };
+    wanted.set(id, total);
   }
   const menu = await db.getMenuItems([...wanted.keys()]);
   const byId = new Map(menu.map((m) => [m.id, m]));
@@ -291,6 +325,8 @@ async function prepareOrder(body, { website }) {
 }
 
 app.post('/api/order', writeLimiter, asyncHandler(async (req, res) => {
+  const idempotencyKey = str(req.get('Idempotency-Key'));
+  if (idempotencyKey.length > 128) return res.status(400).json({ error: 'The idempotency key is too long.' });
   const prepared = await prepareOrder(req.body || {}, { website: true });
   if (prepared.error) return res.status(400).json({ error: prepared.error });
   const { order, items } = prepared;
@@ -307,12 +343,13 @@ app.post('/api/order', writeLimiter, asyncHandler(async (req, res) => {
     return res.status(409).json({ error: 'We are not baking that day. Please choose another date.' });
   }
 
-  const saved = await db.createOrder(order, items);
+  const saved = await db.createOrder({ ...order, idempotencyKey: idempotencyKey || null }, items);
+  if (saved.duplicate) return res.status(201).json({ ok: true, orderId: saved.id, emailSent: false, duplicate: true });
   const full = await db.getOrder(saved.id);
   const respondUrl = `${BASE_URL}/respond/${saved.id}?token=${saved.respond_token}`;
   const [notice1, thanks] = await Promise.all([
-    mail.send({ to: mail.BAKERY_INBOX, replyTo: order.email, ...mail.buildBakeryNotice(full, respondUrl) }),
-    mail.send({ to: order.email, replyTo: mail.BAKERY_INBOX, ...mail.buildThankYou(full, settings) }),
+    queueAndDeliver({ orderId: saved.id, kind: 'order_notice', to: mail.ORDERS_INBOX, replyTo: mail.INFO_EMAIL, ...mail.buildBakeryNotice(full, respondUrl) }),
+    queueAndDeliver({ orderId: saved.id, kind: 'order_thank_you', to: order.email, replyTo: mail.INFO_EMAIL, ...mail.buildThankYou(full, settings) }),
   ]);
   res.status(201).json({ ok: true, orderId: saved.id, emailSent: thanks.sent && notice1.sent });
 }));
@@ -323,12 +360,14 @@ app.get('/api/reviews', asyncHandler(async (_req, res) => {
 
 app.post('/api/reviews', writeLimiter, asyncHandler(async (req, res) => {
   const name = str(req.body?.name), review = str(req.body?.review), rating = Number(req.body?.rating);
+  if (str(req.body?.website)) return res.status(400).json({ error: 'That review could not be submitted.' });
   if (!name) return res.status(400).json({ error: 'Please tell us your name.' });
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) return res.status(400).json({ error: 'Pick a rating from 1 to 5.' });
   if (!review) return res.status(400).json({ error: 'Please write a few words.' });
   if (review.length > 2000) return res.status(400).json({ error: 'Reviews are limited to 2000 characters.' });
   const saved = await db.createReview({ name, rating, review });
-  res.status(201).json({ ok: true, review: { id: saved.id } });
+  const notice = await queueAndDeliver({ kind: 'review_notice', to: mail.INFO_EMAIL, replyTo: mail.INFO_EMAIL, ...mail.buildReviewNotice(saved) });
+  res.status(201).json({ ok: true, review: { id: saved.id }, emailSent: notice.sent });
 }));
 
 // ── respond from the email ───────────────────────────────────────────────
@@ -418,7 +457,7 @@ app.patch('/api/admin/orders/:id', asyncHandler(async (req, res) => {
   if (!merged.email && !merged.phone) return res.status(400).json({ error: 'An email address or phone number is required.' });
   if (merged.email && !isEmail(merged.email)) return res.status(400).json({ error: 'That email address does not look right.' });
   if (!FULFILLMENTS.includes(merged.fulfillment)) return res.status(400).json({ error: 'Choose pickup, delivery or shipping.' });
-  if (!isIsoDate(merged.neededDate)) return res.status(400).json({ error: 'Date must be a real YYYY-MM-DD date.' });
+  if (!isIsoDate(merged.neededDate)) return res.status(400).json({ error: 'Date must be a real calendar date.' });
   res.json({ ok: true, order: await db.updateOrder(req.params.id, patch) });
 }));
 
@@ -487,7 +526,7 @@ async function sendForOrder(req, res, build) {
   if (!mail.configured()) return res.status(503).json({ error: 'Email is not set up yet (RESEND_API_KEY is missing).' });
   const built = await build(order);
   if (built.error) return res.status(400).json({ error: built.error });
-  const result = await mail.send({ to: order.email, replyTo: mail.BAKERY_INBOX, ...built });
+  const result = await queueAndDeliver({ orderId: order.id, kind: 'admin_' + built.subject.slice(0, 30), to: order.email, replyTo: mail.INFO_EMAIL, ...built });
   if (!result.sent) return res.status(502).json({ error: `Could not send: ${result.reason}` });
   res.json({ ok: true });
 }
@@ -584,7 +623,12 @@ app.post('/api/admin/reviews/:id/reject', asyncHandler(async (req, res) => {
 }));
 app.delete('/api/admin/reviews/:id', asyncHandler(async (req, res) => { await db.deleteReview(req.params.id); res.json({ ok: true }); }));
 
-app.get('/api/admin/settings', asyncHandler(async (_req, res) => res.json({ settings: await db.getSettings(), emailConfigured: mail.configured() })));
+app.get('/api/admin/settings', asyncHandler(async (_req, res) => res.json({ settings: await db.getSettings(), emailConfigured: mail.configured(), emailOutbox: await db.emailOutboxSummary() })));
+app.post('/api/admin/email-outbox/retry', asyncHandler(async (_req, res) => {
+  const count = await db.retryFailedEmails();
+  await processEmailOutbox();
+  res.json({ ok: true, retried: count, emailOutbox: await db.emailOutboxSummary() });
+}));
 app.put('/api/admin/settings', asyncHandler(async (req, res) => {
   const body = req.body || {};
   const patch = {};
@@ -631,7 +675,7 @@ app.use(express.static(PUBLIC_DIR, {
 
 app.use((req, res) => {
   if (req.path.startsWith('/api/')) return res.status(404).json({ error: 'Not found' });
-  res.status(404).sendFile(path.join(PUBLIC_DIR, 'index.html'));
+  res.status(404).sendFile(path.join(PUBLIC_DIR, '404.html'));
 });
 
 app.use((err, _req, res, next) => {
@@ -642,7 +686,14 @@ app.use((err, _req, res, next) => {
 });
 
 if (require.main === module) {
-  const start = () => app.listen(PORT, () => console.log(`Oh! You Fancy Focaccia listening on ${PORT}`));
+  const start = () => {
+    app.listen(PORT, () => console.log(`Oh! You Fancy Focaccia listening on ${PORT}`));
+    if (process.env.DATABASE_URL) {
+      processEmailOutbox().catch((err) => console.error('Email outbox startup sweep failed:', err));
+      const timer = setInterval(() => processEmailOutbox().catch((err) => console.error('Email outbox sweep failed:', err)), 60_000);
+      timer.unref();
+    }
+  };
   if (process.env.DATABASE_URL) {
     db.initSchema().then(start).catch((err) => {
       console.error('Failed to initialise the database:', err);

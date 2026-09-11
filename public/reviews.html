@@ -24,7 +24,8 @@
 </head>
 <body>
 
-<div style="background:var(--burgundy-ink);color:var(--gold-pale);
+<a class="skip-link" href="#site-content">Skip to content</a>
+<div id="site-content"><div style="background:var(--burgundy-ink);color:var(--gold-pale);
   text-align:center;padding:.55rem" class="caps">
   Brookings-Harbor Farmers Market &#183; Wednesdays &amp; Saturdays &#183; 9am &#8216;til sold out</div>
 <header style="background:var(--paper);border-bottom:1px solid var(--rule);
@@ -62,7 +63,7 @@
 <ellipse cx="130" cy="7" rx="4" ry="5.2" transform="rotate(28 130 7)" opacity=".68"/></g></svg>
     </div>
     <nav class="nav-scroll" style="display:flex;justify-content:center;gap:var(--s8);margin-top:var(--s6);
-      border-top:1px solid var(--rule-soft);padding-block:var(--s4)"><a href="./" style="color:var(--ink);opacity:.72" class="caps">Home</a><a href="./about.html" style="color:var(--ink);opacity:.72" class="caps">About</a><a href="./breads.html" style="color:var(--ink);opacity:.72" class="caps">Our Breads</a><a href="./order.html" style="color:var(--ink);opacity:.72" class="caps">Order</a><a href="./gallery.html" style="color:var(--ink);opacity:.72" class="caps">Gallery</a><a href="./reviews.html" style="color:var(--burgundy);border-bottom:1px solid var(--burgundy)" class="caps">Reviews</a><a href="./contact.html" style="color:var(--ink);opacity:.72" class="caps">Contact</a></nav>
+      border-top:1px solid var(--rule-soft);padding-block:var(--s4)"><a href="./" style="color:var(--ink);opacity:.72" class="caps">Home</a><a href="./about.html" style="color:var(--ink);opacity:.72" class="caps">About</a><a href="./breads.html" style="color:var(--ink);opacity:.72" class="caps">Our Breads</a><a href="./order.html" style="color:var(--ink);opacity:.72" class="caps">Order</a><a href="./gallery.html" style="color:var(--ink);opacity:.72" class="caps">Gallery</a><a href="./reviews.html" style="color:var(--burgundy);border-bottom:1px solid var(--burgundy)" class="caps">Reviews</a><a href="./contact.html" style="color:var(--ink);opacity:.72" class="caps">Contact</a><a href="./policies.html" style="color:var(--ink);opacity:.72" class="caps">Policies</a></nav>
   </div>
 </header><section style="background:var(--paper-3);border-bottom:1px solid var(--rule);
   padding-block:var(--s20);text-align:center;position:relative;overflow:hidden">
@@ -164,7 +165,8 @@
           <option value="3">&#9733;&#9733;&#9733;</option><option value="2">&#9733;&#9733;</option><option value="1">&#9733;</option></select></div>
         <div class="field"><label for="rv-text">A few words</label><textarea id="rv-text" rows="4"></textarea></div>
         <button type="submit" class="btn btn-fill" style="width:100%">Send</button>
-        <div id="review-msg" class="msg"></div>
+        <div id="rv-website-wrap" class="hp" aria-hidden="true"><label for="rv-website">Website</label><input id="rv-website" name="website" autocomplete="off" tabindex="-1"></div>
+        <div id="review-msg" class="msg" role="status" aria-live="polite"></div>
       </form>
     </div>
   </div>
@@ -196,10 +198,10 @@
       <p style="font-size:var(--sm);opacity:.82;max-width:36ch">Artisan focaccia and sourdough baked by hand in Brookings, Oregon. Organic ingredients, a living starter, and small batches that sell out.</p></div>
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">Explore</p>
       <ul style="display:flex;flex-direction:column;gap:.5rem;font-size:var(--sm)">
-      <li><a href="./about.html" style="color:#D8BFA0">About</a></li><li><a href="./breads.html" style="color:#D8BFA0">Our Breads</a></li><li><a href="./order.html" style="color:#D8BFA0">Order</a></li><li><a href="./gallery.html" style="color:#D8BFA0">Gallery</a></li><li><a href="./reviews.html" style="color:#D8BFA0">Reviews</a></li><li><a href="./contact.html" style="color:#D8BFA0">Contact</a></li></ul></div>
+      <li><a href="./about.html" style="color:#D8BFA0">About</a></li><li><a href="./breads.html" style="color:#D8BFA0">Our Breads</a></li><li><a href="./order.html" style="color:#D8BFA0">Order</a></li><li><a href="./gallery.html" style="color:#D8BFA0">Gallery</a></li><li><a href="./reviews.html" style="color:#D8BFA0">Reviews</a></li><li><a href="./contact.html" style="color:#D8BFA0">Contact</a></li><li><a href="./policies.html" style="color:#D8BFA0">Policies</a></li></ul></div>
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">Find Us</p>
       <p style="font-size:var(--sm);opacity:.82">Brookings-Harbor Farmers Market<br>Wednesdays &amp; Saturdays<br>9am &#8216;til sold out</p>
-      <p style="margin-top:var(--s4);font-size:var(--sm)"><a href="mailto:ohyoufancyfocaccia@gmail.com" style="color:#EBD3AE">ohyoufancyfocaccia@gmail.com</a></p>
+      <p style="margin-top:var(--s4);font-size:var(--sm)"><a href="mailto:info@ohyoufancyfocaccia.com" style="color:#EBD3AE">info@ohyoufancyfocaccia.com</a></p>
       <p style="margin-top:var(--s2);font-size:var(--sm)"><a href="https://www.facebook.com/profile.php?id=61584072034572" style="color:#EBD3AE" target="_blank" rel="noopener">Facebook</a></p></div>
   </div>
   <div style="border-top:1px solid oklch(1 0 0/.13);margin-top:var(--s12);padding-top:var(--s6);
@@ -207,7 +209,7 @@
     <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">&#169; 2026 Oh! You Fancy Focaccia</p>
     <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">Pane &#183; Amore &#183; Sempre</p>
   </div>
-</div></footer>
+</div></footer></div>
 <script src="./reviews.js" defer></script>
 </body>
 </html>

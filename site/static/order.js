@@ -8,13 +8,18 @@
   var cart = {};                       // menu item id -> quantity
   var avail = { minNoticeDays: 0, marketDays: [3, 6], blocked: [] };
   var selected = null;
+  var orderIdempotencyKey = null;
   var today = new Date(); today.setHours(0, 0, 0, 0);
   var calMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function money(n) { return Number(n).toLocaleString('en-US', { style: 'currency', currency: 'USD' }); }
   function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
-  function longDate(s) { return new Date(s + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }); }
+  function longDate(s) {
+    var d = new Date(s + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { weekday: 'long' }) + ', ' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') + '-' + d.getFullYear();
+  }
   function fulfillment() { return app.querySelector('input[name="fulfillment"]:checked').value; }
 
   // ── menu ──
@@ -121,8 +126,8 @@
   });
 
   // ── errors ──
-  function showErr(id, msg) { var f = $(id); f.closest('.field').classList.add('is-error'); var e = app.querySelector('.err[data-for="' + id + '"]'); if (e) { e.textContent = msg; e.classList.add('show'); } }
-  function clearErr(id) { var f = $(id); if (!f) return; f.closest('.field').classList.remove('is-error'); var e = app.querySelector('.err[data-for="' + id + '"]'); if (e) e.classList.remove('show'); }
+  function showErr(id, msg) { var f = $(id); f.closest('.field').classList.add('is-error'); f.setAttribute('aria-invalid', 'true'); var e = app.querySelector('.err[data-for="' + id + '"]'); if (e) { e.id = id + '-error'; e.setAttribute('role', 'alert'); f.setAttribute('aria-describedby', e.id); e.textContent = msg; e.classList.add('show'); } }
+  function clearErr(id) { var f = $(id); if (!f) return; f.closest('.field').classList.remove('is-error'); f.removeAttribute('aria-invalid'); f.removeAttribute('aria-describedby'); var e = app.querySelector('.err[data-for="' + id + '"]'); if (e) e.classList.remove('show'); }
   ['first-name', 'last-name', 'email', 'address'].forEach(function (id) { $(id).addEventListener('input', function () { clearErr(id); }); });
   function say(msg, ok) { var m = $('form-msg'); m.textContent = msg; m.className = 'msg show ' + (ok ? 'ok' : 'error'); }
 
@@ -142,8 +147,12 @@
 
     var btn = $('submit'); btn.disabled = true; btn.textContent = 'Sending…';
     try {
+      if (!orderIdempotencyKey) orderIdempotencyKey = window.crypto && window.crypto.randomUUID
+        ? window.crypto.randomUUID()
+        : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
       var res = await fetch('/api/order', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Idempotency-Key': orderIdempotencyKey },
         body: JSON.stringify({
           firstName: $('first-name').value.trim(), lastName: $('last-name').value.trim(),
           email: $('email').value.trim(), phone: $('phone').value.trim(),
@@ -159,7 +168,7 @@
       }
       showConfirmation(data, items);
     } catch (err) {
-      say('We could not reach the bakery just now. Please try again, or email ohyoufancyfocaccia@gmail.com.', false);
+      say('We could not reach the bakery just now. Please try again, or email info@ohyoufancyfocaccia.com.', false);
     } finally { btn.disabled = false; btn.textContent = 'Send the Order'; }
   });
 
@@ -176,6 +185,7 @@
   }
   $('order-again').addEventListener('click', function () {
     cart = {}; selected = null; $('order-form').reset(); $('needed-date').value = '';
+    orderIdempotencyKey = null;
     $('confirmation').hidden = true; app.style.display = ''; renderMenu(); renderCart(); renderCal();
   });
 
@@ -191,7 +201,7 @@
       if (!r.ok) throw new Error();
       menu = await r.json();
     } catch (err) {
-      $('menu').innerHTML = '<p class="empty">Ordering is not available just now. Please email ohyoufancyfocaccia@gmail.com.</p>';
+      $('menu').innerHTML = '<p class="empty">Ordering is not available just now. Please email info@ohyoufancyfocaccia.com.</p>';
       return;
     }
     renderMenu(); renderCart();

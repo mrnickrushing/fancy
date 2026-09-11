@@ -153,12 +153,15 @@ ul{list-style:none}
   font-family:var(--serif);font-size:.64rem;font-weight:600;letter-spacing:.26em;
   text-transform:uppercase;color:oklch(.40 .05 45/.6)}
 
+html{overflow-x:clip}
 img{max-width:100%;height:auto}
 .wrap,.mid,.narrow{width:100%}
 
 /* masthead nav scrolls rather than wrapping into a mess */
 .nav-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .nav-scroll::-webkit-scrollbar{display:none}
+.skip-link{position:fixed;left:var(--s4);top:var(--s4);z-index:1000;transform:translateY(-180%);background:var(--burgundy);color:var(--paper);padding:.7rem 1rem;border-radius:var(--r-sm);font-family:var(--serif);font-weight:600}
+.skip-link:focus{transform:translateY(0)}
 
 @media (max-width:1100px){
   .spine{display:none}
@@ -316,6 +319,7 @@ body.splashing{overflow:hidden}
 .field.is-error input,.field.is-error textarea,.field.is-error select{border-color:var(--burgundy)}
 .err{color:var(--burgundy);font-size:var(--sm);font-style:italic;display:none}
 .err.show{display:block}
+.hp{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s5)}
 .choice{display:grid;gap:var(--s3)}
 .choice label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s4);

@@ -79,10 +79,10 @@ test('images are cached hard, html is not', async () => {
   assert.doesNotMatch(html.headers['cache-control'] || '', /immutable/);
 });
 
-test('unknown paths fall back to the home page, not a crash', async () => {
+test('unknown paths return the customer-friendly 404 page', async () => {
   const res = await request(app).get('/no-such-page');
   assert.strictEqual(res.status, 404);
-  assert.match(res.text, /Oh! You Fancy Focaccia/);
+  assert.match(res.text, /That page wandered off/);
 });
 
 test('canonical redirect stays off until CANONICAL_HOST is set', async () => {

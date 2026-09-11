@@ -10,10 +10,17 @@
 const { Resend } = require('resend');
 
 const BAKERY_NAME = 'Oh! You Fancy Focaccia';
-const BAKERY_INBOX = process.env.BAKERY_INBOX || 'ohyoufancyfocaccia@gmail.com';
+// Keep the public correspondence address separate from the order queue. The
+// latter can be noisy; replies from Amanda should still invite customers to
+// write to the address they see on the site.
+const INFO_EMAIL = process.env.INFO_EMAIL || 'info@ohyoufancyfocaccia.com';
+const ORDERS_INBOX = process.env.ORDERS_INBOX || 'orders@ohyoufancyfocaccia.com';
+// Kept as a read-only compatibility alias for local integrations that used
+// the old name for the public bakery address.
+const BAKERY_INBOX = INFO_EMAIL;
 // Resend will only send from a domain it has verified, so the sender is
 // configurable rather than assumed.
-const FROM_ADDRESS = process.env.EMAIL_FROM || `${BAKERY_NAME} <orders@ohyoufancyfocaccia.com>`;
+const FROM_ADDRESS = process.env.EMAIL_FROM || `${BAKERY_NAME} <${INFO_EMAIL}>`;
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 function configured() { return Boolean(resend); }
@@ -32,7 +39,9 @@ function formatDate(iso) {
   if (!iso) return '';
   const d = new Date(String(iso).slice(0, 10) + 'T00:00:00');
   if (isNaN(d.getTime())) return String(iso);
-  return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${d.toLocaleDateString('en-US', { weekday: 'long' })}, ${month}-${day}-${d.getFullYear()}`;
 }
 
 function formatMoney(value) {
@@ -115,7 +124,7 @@ function buildThankYou(o, settings) {
       ${itemsToHtml(o.items)}
       ${rowsToHtml(orderRows(o).slice(3))}
       <p style="margin-top:18px;">${escapeHtml(settings.payment_instructions)}</p>
-      <p>Questions in the meantime? Reply to this email or write to ${BAKERY_INBOX}.</p>
+      <p>Questions in the meantime? Reply to this email or write to ${INFO_EMAIL}.</p>
       <p>— Amanda</p>`),
   };
 }
@@ -146,7 +155,7 @@ function buildConfirmation(o, settings) {
         <p style="margin:0;">${escapeHtml(settings.payment_instructions)}</p>
       </div>
       ${o.fulfillment === 'pickup' ? `<p style="margin-top:16px;">${escapeHtml(settings.pickup_note)}</p>` : ''}
-      <p>Questions? Reply to this email or write to ${BAKERY_INBOX}.</p>
+      <p>Questions? Reply to this email or write to ${INFO_EMAIL}.</p>
       <p>— Amanda</p>`),
   };
 }
@@ -184,6 +193,17 @@ function buildPlain(subject, message) {
   };
 }
 
+function buildReviewNotice(review) {
+  return {
+    subject: `New review to approve — ${BAKERY_NAME}`,
+    html: shell(`
+      <h2 style="margin:0 0 14px;font-weight:600;">New review</h2>
+      ${rowsToHtml([['Name', review.name], ['Rating', `${review.rating}/5`]])}
+      <p style="margin-top:18px;white-space:pre-wrap;">${escapeHtml(review.review)}</p>
+      <p style="margin-top:18px;">Approve or reject it from the admin Reviews tab.</p>`),
+  };
+}
+
 // Returns { sent: true } or { sent: false, reason }. Never throws: an email
 // that does not go out is a nuisance, an order lost because of one is a sale.
 async function send({ to, replyTo, subject, html }) {
@@ -203,9 +223,9 @@ async function send({ to, replyTo, subject, html }) {
 }
 
 module.exports = {
-  BAKERY_NAME, BAKERY_INBOX, FULFILLMENT_LABELS,
+  BAKERY_NAME, BAKERY_INBOX, INFO_EMAIL, ORDERS_INBOX, FULFILLMENT_LABELS,
   configured, send, escapeHtml, formatDate, formatMoney,
-  buildBakeryNotice, buildThankYou, buildConfirmation, buildReceipt, buildPlain,
+  buildBakeryNotice, buildThankYou, buildConfirmation, buildReceipt, buildPlain, buildReviewNotice,
   // exposed so tests can mock the transport
   get resend() { return resend; },
 };

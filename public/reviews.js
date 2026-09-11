@@ -29,7 +29,7 @@
     try {
       var res = await fetch('/api/reviews', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: document.getElementById('rv-name').value.trim(), rating: Number(document.getElementById('rv-rating').value), review: document.getElementById('rv-text').value.trim() }),
+        body: JSON.stringify({ name: document.getElementById('rv-name').value.trim(), rating: Number(document.getElementById('rv-rating').value), review: document.getElementById('rv-text').value.trim(), website: document.getElementById('rv-website').value }),
       });
       var data = await res.json().catch(function () { return {}; });
       if (!res.ok) { msg.textContent = data.error || 'Could not send that.'; msg.className = 'msg show error'; return; }
