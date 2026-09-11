@@ -19,6 +19,9 @@
   --burgundy-ink:#2A0B0B;
   --olive:#4E6023; --olive-deep:#33401A; --olive-pale:#E4E7D0;
   --gold:#B8862F; --gold-pale:#EFE0BE;
+  /* --gold is an ornament colour: at 2.9:1 on paper it must never carry
+     text you are meant to read. --gold-read is the same hue at 4.9:1. */
+  --gold-read:#8A6420;
   --paper:#F4EFE2; --paper-2:#FBF8EF; --paper-3:#EAE1CB; --paper-4:#DED2B4;
   --rule:#CBBB97; --rule-soft:#DED2B4;
   --ink:#33190F; --ink-soft:#6E4432;
@@ -45,6 +48,15 @@ a{color:var(--burgundy);text-decoration:none}
 a:hover{color:var(--burgundy-deep)}
 ul{list-style:none}
 
+/* ── keyboard focus: one visible ring everywhere, never the UA default ── */
+:focus-visible{outline:2px solid var(--burgundy);outline-offset:3px;border-radius:var(--r-sm)}
+.btn-fill:focus-visible,.enamel :focus-visible,.ribbon :focus-visible,
+footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
+
+/* visually hidden, still read aloud */
+.vh{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+
 /* laid-paper grain, warmer and finer than a flat fill */
 .grain{position:relative}
 .grain::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.55;
@@ -63,6 +75,7 @@ ul{list-style:none}
 /* ── vertical spine rail (label-edge motif) ── */
 .spine{position:absolute;top:0;bottom:0;width:52px;display:flex;
   align-items:center;justify-content:center}
+.spine[aria-hidden="true"]{pointer-events:none}
 .spine span{writing-mode:vertical-rl;font-family:var(--serif);font-size:.68rem;
   font-weight:600;letter-spacing:.44em;text-transform:uppercase;
   color:var(--burgundy);opacity:.42}
@@ -87,6 +100,70 @@ ul{list-style:none}
 .btn-pale{background:transparent;color:var(--gold-pale);border:1px solid oklch(.85 .07 80/.5)}
 .btn-pale:hover{background:var(--gold-pale);color:var(--burgundy-ink);letter-spacing:.32em}
 
+/* ══ masthead ══════════════════════════════════════════════════════
+   The ribbon is one line at every width, and the header shrinks to a
+   slim bar once you start reading. Nothing here is an inline style, so
+   the responsive sheet can restyle it by class. */
+.ribbon{background:var(--burgundy-ink);color:var(--gold-pale);text-align:center;
+  padding:.55rem var(--s5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ribbon-short{display:none}
+
+.mast{background:var(--paper);border-bottom:1px solid var(--rule);
+  padding-block:var(--s6) 0;position:sticky;top:0;z-index:50}
+.mast-in{text-align:center}
+.brand-row{display:flex;align-items:center;justify-content:center;gap:var(--s6);
+  position:relative}
+.brand-mark{width:56px;height:56px;border-radius:50%;flex-shrink:0;
+  transition:width 260ms var(--ease),height 260ms var(--ease)}
+.brand-word{display:block}
+.brand-script{font-family:var(--script);font-size:2.6rem;line-height:.82;
+  color:var(--burgundy);transition:font-size 260ms var(--ease)}
+.brand-caps{font-family:var(--serif);font-size:1.18rem;font-weight:700;
+  letter-spacing:.38em;text-transform:uppercase;color:var(--ink);
+  margin-top:.32rem;padding-left:.38em;transition:font-size 260ms var(--ease)}
+
+.nav-rail{display:flex;justify-content:center;flex-wrap:wrap;gap:var(--s8);
+  margin-top:var(--s6);border-top:1px solid var(--rule-soft)}
+.nav-link{color:var(--ink);opacity:.72;padding-block:.75rem;
+  border-bottom:1px solid transparent;transition:opacity 200ms var(--ease)}
+.nav-link:hover{opacity:1;color:var(--burgundy)}
+.nav-link.is-current{color:var(--burgundy);opacity:1;border-bottom-color:var(--burgundy)}
+
+/* the slim bar: brand and links on one row, ~64px instead of ~185px */
+.mast.is-shrunk{padding-block:0}
+.mast.is-shrunk .mast-in{display:flex;align-items:center;justify-content:space-between;
+  gap:var(--s8);max-width:var(--wide);margin-inline:auto;padding:var(--s2) var(--s10);
+  text-align:left}
+.mast.is-shrunk .brand-row{gap:var(--s4)}
+.mast.is-shrunk .brand-row > svg{display:none}
+.mast.is-shrunk .brand-mark{width:38px;height:38px}
+.mast.is-shrunk .brand-script{font-size:1.6rem}
+.mast.is-shrunk .brand-caps{font-size:.66rem;letter-spacing:.28em;margin-top:.1rem}
+.mast.is-shrunk .nav-rail{margin-top:0;border-top:0;gap:var(--s6);flex-wrap:nowrap}
+.mast.is-shrunk .nav-link{padding-block:1.15rem;font-size:.72rem;letter-spacing:.24em}
+
+/* the hamburger: only ever visible where the rail cannot fit */
+.nav-toggle{display:none;width:44px;height:44px;align-items:center;justify-content:center;
+  background:none;border:1px solid var(--rule);border-radius:var(--r-sm);
+  color:var(--burgundy);cursor:pointer;flex-shrink:0}
+.nav-bars{display:block;width:20px}
+.nav-bars i{display:block;height:1.5px;background:currentColor;border-radius:1px;
+  transition:transform 240ms var(--ease),opacity 200ms var(--ease)}
+.nav-bars i + i{margin-top:5px}
+.nav-toggle[aria-expanded="true"] .nav-bars i:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.nav-toggle[aria-expanded="true"] .nav-bars i:nth-child(2){opacity:0}
+.nav-toggle[aria-expanded="true"] .nav-bars i:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+
+.nav-drawer{display:none;background:var(--paper);border-top:1px solid var(--rule-soft)}
+.drawer-nav{display:grid;grid-template-columns:1fr}
+.drawer-link{display:flex;align-items:center;min-height:52px;padding-inline:var(--s6);
+  color:var(--ink);opacity:.8;border-bottom:1px solid var(--rule-soft)}
+.drawer-link.is-current{color:var(--burgundy);opacity:1;
+  box-shadow:inset 3px 0 0 var(--burgundy);background:var(--paper-2)}
+.drawer-link.is-order{color:var(--burgundy);opacity:1;font-weight:700;
+  background:var(--gold-pale)}
+.drawer-link.is-order::after{content:'\2192';margin-left:auto;font-size:1rem}
+
 /* ── section furniture ── */
 .sec{padding-block:var(--s24);position:relative}
 .kicker{display:flex;align-items:center;gap:var(--s4);justify-content:center;
@@ -109,17 +186,21 @@ ul{list-style:none}
 /* ── bill of fare ── */
 .fare{display:flex;align-items:baseline;gap:var(--s4);padding-block:var(--s5);
   border-bottom:1px solid var(--rule-soft)}
-.fare-n{font-family:var(--serif);font-size:var(--sm);color:var(--gold);
+.fare-n{font-family:var(--serif);font-size:var(--sm);color:var(--gold-read);
   font-weight:600;width:34px;flex-shrink:0;letter-spacing:.1em}
 .fare-b{flex-grow:1}
 .fare-t{font-family:var(--serif);font-size:var(--lg);font-weight:600;
   display:flex;align-items:baseline;gap:var(--s3)}
 .fare-t::after{content:'';flex-grow:1;border-bottom:1.5px dotted var(--rule);
   transform:translateY(-4px)}
-.fare-d{font-size:var(--sm);opacity:.72;max-width:70ch;margin-top:var(--s2);
-  font-style:italic}
+/* the description is read, not decorated: roman, a size up, and lifted
+   out of the low-contrast range italic at .72 opacity put it in */
+.fare-d{font-size:1rem;opacity:.82;max-width:70ch;margin-top:var(--s2);
+  line-height:1.6}
 
 /* ── enamel market sign ── */
+.enamel-lead{font-family:var(--serif);font-size:3.1rem;font-weight:600;
+  line-height:1.18;color:#F6E6C6}
 .enamel{background:var(--burgundy);color:var(--gold-pale);
   border-block:6px double oklch(.85 .07 80/.42);padding-block:var(--s12);
   text-align:center;position:relative;overflow:hidden}
@@ -162,17 +243,125 @@ ul{list-style:none}
 .slot-cap{position:absolute;bottom:15px;left:0;right:0;text-align:center;
   font-family:var(--serif);font-size:.64rem;font-weight:600;letter-spacing:.26em;
   text-transform:uppercase;color:oklch(.40 .05 45/.6)}
+
+/* ══ hero ═════════════════════════════════════════════════════════ */
+.hero{position:relative;background:var(--paper);padding-block:var(--s20);overflow:hidden}
+.hero-grid{position:relative;display:grid;grid-template-columns:1.05fr .95fr;
+  gap:var(--s16);align-items:center}
+.hero-h{font-size:var(--xxxl);font-weight:700;line-height:1.02;margin-bottom:var(--s5)}
+.hero-lede{font-size:var(--lg);opacity:.78;max-width:40ch;margin-bottom:var(--s8);
+  line-height:1.58}
+/* both calls to action on one line, and the order one first — stacked
+   buttons pushed the second below the fold on a 900px-tall laptop */
+.hero-cta{display:flex;gap:var(--s4);flex-wrap:wrap}
+.hero-cta .btn{flex:0 1 auto;min-width:14rem;padding-inline:var(--s6)}
+.hero-shot{position:relative;display:flex;justify-content:center}
+.hero-rule{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%)}
+@media (min-width:641px){.hero-cta{flex-wrap:nowrap}}
+
+/* ══ gallery ═══════════════════════════════════════════════════════ */
+.gal-course{margin-bottom:var(--s16)}
+.gal-head{display:flex;align-items:baseline;gap:var(--s5);margin-bottom:var(--s8);
+  border-bottom:1px solid var(--rule);padding-bottom:var(--s4);flex-wrap:wrap}
+.gal-title{font-size:var(--lg);text-align:left}
+.gal-fill{flex-grow:1}
+.gal-count{opacity:.55;font-size:.66rem;color:var(--ink)}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:var(--s8) var(--s6)}
+.gal-item{display:flex;flex-direction:column;min-width:0}
+.gal-wide{grid-column:span 2}
+.gal-open{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in}
+.gal-shot{display:block;aspect-ratio:4/5}
+.gal-wide .gal-shot{aspect-ratio:8/5}
+.gal-shot img{transition:transform 620ms var(--ease)}
+.gal-open:hover .gal-shot img{transform:scale(1.035)}
+.gal-cap{padding-top:var(--s4);border-top:1px solid var(--rule-soft);margin-top:var(--s3)}
+.gal-name{font-size:.72rem;color:var(--ink)}
+.gal-note{font-size:var(--sm);opacity:.82;margin-top:var(--s1);line-height:1.55}
+@media (max-width:640px){.gal-wide{grid-column:span 1}}
+
+/* ══ bill of fare courses ══════════════════════════════════════ */
+.course{margin-bottom:var(--s20)}
+.course-grid{display:grid;grid-template-columns:1fr;gap:var(--s12);align-items:start}
+.course-grid.has-aside{grid-template-columns:1fr 300px}
+@media (max-width:900px){.course-grid.has-aside{grid-template-columns:1fr}}
+
+/* ══ contact: real directions in place of the map placeholder ════════ */
+.directions{font-style:normal;margin-top:var(--s8);padding-top:var(--s6);
+  border-top:1px solid var(--rule);text-align:center}
+.dir-line{font-size:var(--sm);opacity:.86;line-height:1.7}
+.dir-link{font-size:.7rem;border-bottom:1px solid currentColor;padding-bottom:2px}
+
+/* ══ three voices on the home page, not one ═════════════════════════ */
+.home-quotes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:var(--s6);margin-top:var(--s12)}
+.hq{background:var(--paper-2);border:1px solid var(--rule);padding:var(--s6);
+  border-top:3px solid var(--burgundy)}
+.hq p{font-family:var(--serif);font-size:1.06rem;font-style:italic;line-height:1.55}
+.hq cite{display:block;margin-top:var(--s4);color:var(--burgundy);font-style:normal;
+  font-size:.66rem}
+@media (max-width:820px){.home-quotes{grid-template-columns:1fr;gap:var(--s4)}}
+
+/* ══ footer ═══════════════════════════════════════════════════════ */
+.ftr-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s12);
+  border-top:1px solid oklch(1 0 0/.13);padding-top:var(--s12)}
+.ftr-bot{border-top:1px solid oklch(1 0 0/.13);margin-top:var(--s12);padding-top:var(--s6);
+  display:flex;justify-content:space-between;gap:var(--s6)}
+/* ══ two-column compositions ══════════════════════════════════════ */
+.duo{display:grid;gap:var(--s16)}
+.duo-a{grid-template-columns:1.15fr .85fr}
+.duo-top{align-items:start}
+.duo-b{grid-template-columns:.9fr 1.1fr;align-items:center}
+.duo-c{grid-template-columns:1fr 1fr;align-items:start}
+
+.ftr-script{font-family:var(--script);font-size:2.9rem;line-height:.8;color:#EBD3AE}
+.ftr-caps{font-family:var(--serif);font-size:1.05rem;font-weight:700;letter-spacing:.36em;
+  text-transform:uppercase;color:#D8BFA0;margin-top:.4rem;padding-left:.36em}
+
+/* ══ lightbox ═════════════════════════════════════════════════════ */
+/* The dialog fills the viewport and stays transparent; the plate itself is
+   the panel inside it. Centring a <dialog> by its own box fights the UA
+   margin rules the moment the content is taller than max-height. */
+.lb{width:100%;max-width:100%;height:100%;max-height:100%;inset:0;margin:0;
+  border:0;padding:0;background:none;overflow:hidden}
+.lb::backdrop{background:oklch(.14 .04 30/.86)}
+/* the dim lives on the stage as well as on ::backdrop, so it is painted
+   even where the backdrop pseudo-element is not honoured */
+.lb-stage{display:grid;place-items:center;width:100%;height:100%;padding:var(--s10);
+  background:oklch(.14 .04 30/.86)}
+.lb-panel{position:relative;width:min(1040px,100%);background:var(--paper-2);
+  box-shadow:var(--sh-lg);max-height:100%;display:flex;flex-direction:column}
+.lb-fig{display:flex;flex-direction:column;min-height:0}
+.lb-fig img{display:block;width:100%;min-height:0;max-height:70vh;object-fit:contain;
+  background:var(--burgundy-ink)}
+.lb-cap{padding:var(--s5) var(--s6);border-top:1px solid var(--rule);text-align:left}
+.lb-note{font-size:var(--sm);opacity:.82;margin-top:var(--s1)}
+.lb-close,.lb-nav{position:absolute;z-index:2;display:flex;align-items:center;
+  justify-content:center;width:44px;height:44px;background:var(--paper-2);
+  border:1px solid var(--rule);border-radius:50%;font-family:var(--serif);
+  font-size:1.4rem;line-height:1;color:var(--burgundy);cursor:pointer;
+  box-shadow:var(--sh-md)}
+.lb-close{top:-16px;right:-16px;font-size:1.5rem}
+.lb-nav{top:50%;transform:translateY(-50%)}
+.lb-prev{left:-16px}
+.lb-next{right:-16px}
+@media (max-width:720px){
+  .lb-stage{padding:0}
+  .lb-panel{width:100%;height:100%;justify-content:center}
+  .lb-fig img{max-height:62vh}
+  .lb-close{top:var(--s3);right:var(--s3)}
+  .lb-prev{left:var(--s3)}
+  .lb-next{right:var(--s3)}
+}
 </style>
 </helmet>
 <div class="grain">
-<div style="background:var(--burgundy-ink);color:var(--gold-pale);
-  text-align:center;padding:.55rem" class="caps">
-  Brookings-Harbor Farmers Market &#183; Wednesdays &amp; Saturdays &#183; 9am &#8216;til sold out</div>
-<header style="background:var(--paper);border-bottom:1px solid var(--rule);
-  padding-block:var(--s8) 0;position:sticky;top:0;z-index:50;
-  backdrop-filter:blur(12px)">
-  <div style="text-align:center">
-    <div style="display:flex;align-items:center;justify-content:center;gap:var(--s6)">
+<div class="ribbon caps">
+  <span class="ribbon-full">Brookings-Harbor Farmers Market &#183; Wednesdays &amp; Saturdays &#183; 9am &#8216;til sold out</span>
+  <span class="ribbon-short">Wed &amp; Sat &#183; from 9am</span></div>
+<header class="mast">
+  <div class="mast-in">
+    <div class="brand-row">
       <svg width="120" height="34" viewBox="0 0 190 34" aria-hidden="true">
 <g fill="none" stroke="#4E6023" stroke-width="1.2" stroke-linecap="round">
 <path d="M2 17C40 17 82 14 126 9"/>
@@ -184,11 +373,10 @@ ul{list-style:none}
 <g fill="#4E6023">
 <ellipse cx="116" cy="10" rx="4" ry="5.2" transform="rotate(28 116 10)"/>
 <ellipse cx="130" cy="7" rx="4" ry="5.2" transform="rotate(28 130 7)" opacity=".68"/></g></svg>
-      <img src="logo.webp" alt="" style="width:62px;height:62px;border-radius:50%;flex-shrink:0">
-      <a href="#" style="display:block">
-        <p style="font-family:var(--script);font-size:2.9rem;line-height:.76;color:var(--burgundy)">Oh! You Fancy</p>
-        <p style="font-family:var(--serif);font-size:1.18rem;font-weight:700;letter-spacing:.38em;
-          text-transform:uppercase;color:var(--ink);margin-top:.32rem;padding-left:.38em">Focaccia</p>
+      <img src="logo.webp" alt="" class="brand-mark" width="56" height="56">
+      <a href="#" class="brand-word">
+        <p class="brand-script">Oh! You Fancy</p>
+        <p class="brand-caps">Focaccia</p>
       </a>
       <svg width="120" height="34" viewBox="0 0 190 34" aria-hidden="true">
 <g transform="scale(-1,1) translate(-190,0)" fill="none" stroke="#4E6023" stroke-width="1.2" stroke-linecap="round">
@@ -201,9 +389,13 @@ ul{list-style:none}
 <g transform="scale(-1,1) translate(-190,0)" fill="#4E6023">
 <ellipse cx="116" cy="10" rx="4" ry="5.2" transform="rotate(28 116 10)"/>
 <ellipse cx="130" cy="7" rx="4" ry="5.2" transform="rotate(28 130 7)" opacity=".68"/></g></svg>
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false"
+        aria-controls="nav-drawer"><span class="nav-bars" aria-hidden="true"><i></i><i></i><i></i></span><span class="vh">Menu</span></button>
     </div>
-    <nav style="display:flex;justify-content:center;gap:var(--s8);margin-top:var(--s6);
-      border-top:1px solid var(--rule-soft);padding-block:var(--s4)"><a href="#" style="color:var(--ink);opacity:.72" class="caps">Home</a><a href="#" style="color:var(--ink);opacity:.72" class="caps">About</a><a href="#" style="color:var(--ink);opacity:.72" class="caps">Our Breads</a><a href="#" style="color:var(--ink);opacity:.72" class="caps">Order</a><a href="#" style="color:var(--ink);opacity:.72" class="caps">Gallery</a><a href="#" style="color:var(--ink);opacity:.72" class="caps">Reviews</a><a href="#" style="color:var(--burgundy);border-bottom:1px solid var(--burgundy)" class="caps">Contact</a><a href="#" style="color:var(--ink);opacity:.72" class="caps">Policies</a></nav>
+    <nav class="nav-rail" aria-label="Main"><a href="#" class="nav-link caps">Home</a><a href="#" class="nav-link caps">About</a><a href="#" class="nav-link caps">Our Breads</a><a href="#" class="nav-link caps">Order</a><a href="#" class="nav-link caps">Gallery</a><a href="#" class="nav-link caps">Reviews</a><a href="#" class="nav-link is-current caps" aria-current="page">Contact</a><a href="#" class="nav-link caps">Policies</a></nav>
+  </div>
+  <div class="nav-drawer" id="nav-drawer" hidden>
+    <nav class="drawer-nav" aria-label="Main menu"><a href="#" class="drawer-link caps">Home</a><a href="#" class="drawer-link caps">About</a><a href="#" class="drawer-link caps">Our Breads</a><a href="#" class="drawer-link is-order caps">Order</a><a href="#" class="drawer-link caps">Gallery</a><a href="#" class="drawer-link caps">Reviews</a><a href="#" class="drawer-link is-current caps" aria-current="page">Contact</a><a href="#" class="drawer-link caps">Policies</a></nav>
   </div>
 </header><section style="background:var(--paper-3);border-bottom:1px solid var(--rule);
   padding-block:var(--s20);text-align:center;position:relative;overflow:hidden">
@@ -227,7 +419,7 @@ ul{list-style:none}
   </div>
 </section>
 <section class="sec" style="background:var(--paper)">
-  <div class="wrap" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s16);align-items:start">
+  <div class="wrap duo duo-c">
     <div>
       <p class="caps kicker kicker-l">Get in Touch</p>
       <div style="margin-top:var(--s4)">
@@ -278,9 +470,16 @@ ul{list-style:none}
             line-height:1.2">Wednesdays<br><span style="font-style:italic;font-weight:400">&amp;</span> Saturdays</p>
           <p class="caps" style="color:var(--olive);margin-top:var(--s4);font-size:.7rem">9am &#8216;til sold out</p>
         </div>
-        <p style="opacity:.74;font-size:var(--sm);margin-top:var(--s6);font-style:italic">
+        <p style="opacity:.8;font-size:var(--sm);margin-top:var(--s6)">
           Port of Brookings Harbor. Come early and come hungry &#8212; there are always samples, and we do sell out.</p>
-        <div class="slot" style="height:180px"><span class="slot-cap">Map &#183; Port of Brookings Harbor</span></div>
+        <address class="directions">
+          <p class="caps" style="color:var(--olive);margin-bottom:var(--s3)">Finding the market</p>
+          <p class="dir-line">Brookings-Harbor Farmers Market<br>
+            15786 US Highway 101 South<br>Brookings, Oregon 97415</p>
+          <p style="margin-top:var(--s5)"><a class="caps dir-link"
+            href="https://www.google.com/maps/search/?api=1&amp;query=Brookings-Harbor+Farmers+Market%2C+15786+US+101+S%2C+Brookings%2C+OR+97415"
+            target="_blank" rel="noopener">Open in Maps</a></p>
+        </address>
       </div>
     </div>
   </div>
@@ -311,12 +510,10 @@ ul{list-style:none}
         style="width:104px;height:104px;border-radius:50%;
         box-shadow:0 0 0 1px oklch(.82 .09 75/.35),0 0 0 7px oklch(.82 .09 75/.10)">
     </div>
-    <p style="font-family:var(--script);font-size:2.9rem;line-height:.8;color:#EBD3AE">Oh! You Fancy</p>
-    <p style="font-family:var(--serif);font-size:1.05rem;font-weight:700;letter-spacing:.36em;
-      text-transform:uppercase;color:#D8BFA0;margin-top:.4rem;padding-left:.36em">Focaccia</p>
+    <p class="ftr-script">Oh! You Fancy</p>
+    <p class="ftr-caps">Focaccia</p>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s12);
-    border-top:1px solid oklch(1 0 0/.13);padding-top:var(--s12)">
+  <div class="ftr-cols">
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">The Bakery</p>
       <p style="font-size:var(--sm);opacity:.82;max-width:36ch">Artisan focaccia and sourdough baked by hand in Brookings, Oregon. Organic ingredients, a living starter, and small batches that sell out.</p></div>
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">Explore</p>
@@ -327,8 +524,7 @@ ul{list-style:none}
       <p style="margin-top:var(--s4);font-size:var(--sm)"><a href="#" style="color:#EBD3AE">info@ohyoufancyfocaccia.com</a></p>
       <p style="margin-top:var(--s2);font-size:var(--sm)"><a href="#" style="color:#EBD3AE">Facebook</a></p></div>
   </div>
-  <div style="border-top:1px solid oklch(1 0 0/.13);margin-top:var(--s12);padding-top:var(--s6);
-    display:flex;justify-content:space-between;gap:var(--s6)">
+  <div class="ftr-bot">
     <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">&#169; 2026 Oh! You Fancy Focaccia</p>
     <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">Pane &#183; Amore &#183; Sempre</p>
   </div>

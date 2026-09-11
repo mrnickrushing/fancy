@@ -25,14 +25,12 @@
 <body>
 
 <a class="skip-link" href="#site-content">Skip to content</a>
-<div id="site-content"><div style="background:var(--burgundy-ink);color:var(--gold-pale);
-  text-align:center;padding:.55rem" class="caps">
-  Brookings-Harbor Farmers Market &#183; Wednesdays &amp; Saturdays &#183; 9am &#8216;til sold out</div>
-<header style="background:var(--paper);border-bottom:1px solid var(--rule);
-  padding-block:var(--s8) 0;position:sticky;top:0;z-index:50;
-  backdrop-filter:blur(12px)">
-  <div style="text-align:center">
-    <div class="brand-row" style="display:flex;align-items:center;justify-content:center;gap:var(--s6)">
+<div id="site-content"><div class="ribbon caps">
+  <span class="ribbon-full">Brookings-Harbor Farmers Market &#183; Wednesdays &amp; Saturdays &#183; 9am &#8216;til sold out</span>
+  <span class="ribbon-short">Wed &amp; Sat &#183; from 9am</span></div>
+<header class="mast">
+  <div class="mast-in">
+    <div class="brand-row">
       <svg width="120" height="34" viewBox="0 0 190 34" aria-hidden="true">
 <g fill="none" stroke="#4E6023" stroke-width="1.2" stroke-linecap="round">
 <path d="M2 17C40 17 82 14 126 9"/>
@@ -44,11 +42,10 @@
 <g fill="#4E6023">
 <ellipse cx="116" cy="10" rx="4" ry="5.2" transform="rotate(28 116 10)"/>
 <ellipse cx="130" cy="7" rx="4" ry="5.2" transform="rotate(28 130 7)" opacity=".68"/></g></svg>
-      <img src="./img/logo.webp" alt="" style="width:62px;height:62px;border-radius:50%;flex-shrink:0">
-      <a href="./" style="display:block">
-        <p style="font-family:var(--script);font-size:2.9rem;line-height:.76;color:var(--burgundy)">Oh! You Fancy</p>
-        <p style="font-family:var(--serif);font-size:1.18rem;font-weight:700;letter-spacing:.38em;
-          text-transform:uppercase;color:var(--ink);margin-top:.32rem;padding-left:.38em">Focaccia</p>
+      <img src="./img/logo.webp" alt="" class="brand-mark" width="56" height="56">
+      <a href="./" class="brand-word">
+        <p class="brand-script">Oh! You Fancy</p>
+        <p class="brand-caps">Focaccia</p>
       </a>
       <svg width="120" height="34" viewBox="0 0 190 34" aria-hidden="true">
 <g transform="scale(-1,1) translate(-190,0)" fill="none" stroke="#4E6023" stroke-width="1.2" stroke-linecap="round">
@@ -61,9 +58,13 @@
 <g transform="scale(-1,1) translate(-190,0)" fill="#4E6023">
 <ellipse cx="116" cy="10" rx="4" ry="5.2" transform="rotate(28 116 10)"/>
 <ellipse cx="130" cy="7" rx="4" ry="5.2" transform="rotate(28 130 7)" opacity=".68"/></g></svg>
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false"
+        aria-controls="nav-drawer"><span class="nav-bars" aria-hidden="true"><i></i><i></i><i></i></span><span class="vh">Menu</span></button>
     </div>
-    <nav class="nav-scroll" style="display:flex;justify-content:center;gap:var(--s8);margin-top:var(--s6);
-      border-top:1px solid var(--rule-soft);padding-block:var(--s4)"><a href="./" style="color:var(--ink);opacity:.72" class="caps">Home</a><a href="./about.html" style="color:var(--ink);opacity:.72" class="caps">About</a><a href="./breads.html" style="color:var(--burgundy);border-bottom:1px solid var(--burgundy)" class="caps">Our Breads</a><a href="./order.html" style="color:var(--ink);opacity:.72" class="caps">Order</a><a href="./gallery.html" style="color:var(--ink);opacity:.72" class="caps">Gallery</a><a href="./reviews.html" style="color:var(--ink);opacity:.72" class="caps">Reviews</a><a href="./contact.html" style="color:var(--ink);opacity:.72" class="caps">Contact</a><a href="./policies.html" style="color:var(--ink);opacity:.72" class="caps">Policies</a></nav>
+    <nav class="nav-rail" aria-label="Main"><a href="./" class="nav-link caps">Home</a><a href="./about.html" class="nav-link caps">About</a><a href="./breads.html" class="nav-link is-current caps" aria-current="page">Our Breads</a><a href="./order.html" class="nav-link caps">Order</a><a href="./gallery.html" class="nav-link caps">Gallery</a><a href="./reviews.html" class="nav-link caps">Reviews</a><a href="./contact.html" class="nav-link caps">Contact</a><a href="./policies.html" class="nav-link caps">Policies</a></nav>
+  </div>
+  <div class="nav-drawer" id="nav-drawer" hidden>
+    <nav class="drawer-nav" aria-label="Main menu"><a href="./" class="drawer-link caps">Home</a><a href="./about.html" class="drawer-link caps">About</a><a href="./breads.html" class="drawer-link is-current caps" aria-current="page">Our Breads</a><a href="./order.html" class="drawer-link is-order caps">Order</a><a href="./gallery.html" class="drawer-link caps">Gallery</a><a href="./reviews.html" class="drawer-link caps">Reviews</a><a href="./contact.html" class="drawer-link caps">Contact</a><a href="./policies.html" class="drawer-link caps">Policies</a></nav>
   </div>
 </header><section style="background:var(--paper-3);border-bottom:1px solid var(--rule);
   padding-block:var(--s20);text-align:center;position:relative;overflow:hidden">
@@ -88,8 +89,8 @@
 </section>
 <section class="sec" style="background:var(--paper)">
   <div class="wrap">
-    <div style="margin-bottom:var(--s20)">
-  <div style="display:grid;grid-template-columns:1fr 300px;gap:var(--s12);align-items:start">
+    <div class="course">
+  <div class="course-grid has-aside">
     <div>
       <p class="caps" style="color:var(--olive);margin-bottom:var(--s2)">I Salati</p>
       <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">Savory</h2>
@@ -100,11 +101,11 @@
       <p class="fare-t"><span>Roasted Garlic &amp; Sea Salt</span></p><p class="fare-d">Simple and perfect. Olive oil, roasted garlic and flaky salt on a pillowy sourdough crumb.</p></div></div><div class="fare"><span class="fare-n">IV</span><div class="fare-b">
       <p class="fare-t"><span>Cheesy Jalape&#241;o</span></p><p class="fare-d">Melted and bubbling, with jalape&#241;o baked right into the top.</p></div></div>
     </div>
-    <figure class="shot " style="height:360px;"><img src="./img/savory-round.webp" alt="Jalapeno, olive and red onion focaccia"></figure>
+    <figure class="shot " style="height:360px;"><img src="./img/savory-round.webp" alt="Jalapeno, olive and red onion focaccia" width="600" height="600" loading="lazy" decoding="async"></figure>
   </div>
 </div>
-    <div style="margin-bottom:var(--s20)">
-  <div style="display:grid;grid-template-columns:1fr;gap:var(--s12);align-items:start">
+    <div class="course">
+  <div class="course-grid">
     <div>
       <p class="caps" style="color:var(--olive);margin-bottom:var(--s2)">Il Pane</p>
       <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">Sourdough</h2>
@@ -116,8 +117,8 @@
     
   </div>
 </div>
-    <div style="margin-bottom:var(--s20)">
-  <div style="display:grid;grid-template-columns:1fr 300px;gap:var(--s12);align-items:start">
+    <div class="course">
+  <div class="course-grid has-aside">
     <div>
       <p class="caps" style="color:var(--olive);margin-bottom:var(--s2)">I Dolci</p>
       <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">Sweet</h2>
@@ -126,11 +127,11 @@
       <p class="fare-t"><span>Cinnamon Swirl with Vanilla Drizzle</span></p><p class="fare-d">A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze.</p></div></div><div class="fare"><span class="fare-n">VIII</span><div class="fare-b">
       <p class="fare-t"><span>Honey Focaccia Bites</span></p><p class="fare-d">Pull-apart bites, boxed and drizzled with award-winning Chetco Gold raw honey from right here on the Chetco River.</p></div></div>
     </div>
-    <figure class="shot " style="height:360px;"><img src="./img/sweet-cinnamon.webp" alt="Cinnamon swirl focaccia with vanilla drizzle"></figure>
+    <figure class="shot " style="height:360px;"><img src="./img/sweet-cinnamon.webp" alt="Cinnamon swirl focaccia with vanilla drizzle" width="448" height="657" loading="lazy" decoding="async"></figure>
   </div>
 </div>
-    <div style="margin-bottom:var(--s20)">
-  <div style="display:grid;grid-template-columns:1fr 300px;gap:var(--s12);align-items:start">
+    <div class="course">
+  <div class="course-grid has-aside">
     <div>
       <p class="caps" style="color:var(--olive);margin-bottom:var(--s2)">I Piccoli</p>
       <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">Muffins &amp; Rolls</h2>
@@ -140,11 +141,11 @@
       <p class="fare-t"><span>Peppered Pickle</span></p><p class="fare-d">Made with Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles infused right into the dough. Organic ingredients only.</p></div></div><div class="fare"><span class="fare-n">XI</span><div class="fare-b">
       <p class="fare-t"><span>Sea Salt Rolls</span></p><p class="fare-d">Soft pull-apart rounds, olive-oil brushed and salt flaked.</p></div></div>
     </div>
-    <figure class="shot " style="height:360px;"><img src="./img/muffins-jalapeno.webp" alt="Jalapeno and roasted garlic focaccia muffins"></figure>
+    <figure class="shot " style="height:360px;"><img src="./img/muffins-jalapeno.webp" alt="Jalapeno and roasted garlic focaccia muffins" width="600" height="600" loading="lazy" decoding="async"></figure>
   </div>
 </div>
-    <div style="margin-bottom:var(--s20)">
-  <div style="display:grid;grid-template-columns:1fr 300px;gap:var(--s12);align-items:start">
+    <div class="course">
+  <div class="course-grid has-aside">
     <div>
       <p class="caps" style="color:var(--olive);margin-bottom:var(--s2)">L&#8217;Arte</p>
       <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">Focaccia Art</h2>
@@ -154,7 +155,7 @@
       <p class="fare-t"><span>Flower Gardens</span></p><p class="fare-d">Hand-painted in vegetables and herbs &#8212; a whole garden across the top of the dough.</p></div></div><div class="fare"><span class="fare-n">XIV</span><div class="fare-b">
       <p class="fare-t"><span>Seasonal &amp; Custom</span></p><p class="fare-d">Tell us the occasion. We have made a great many things that were never on a list.</p></div></div>
     </div>
-    <figure class="shot " style="height:360px;"><img src="./img/heart-loaf.webp" alt="A hand-shaped focaccia heart"></figure>
+    <figure class="shot " style="height:360px;"><img src="./img/heart-loaf.webp" alt="A hand-shaped focaccia heart" width="510" height="510" loading="lazy" decoding="async"></figure>
   </div>
 </div>
   </div>
@@ -166,7 +167,7 @@
     <h2 class="h-sec">Our customers are more<br>inventive than we are</h2>
     <div class="dimples"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <div class="grid g4">
-      <div class="plate"><h3>As pizza</h3><p style="font-style:italic">&#8220;It was delicious the way it is, but turning it into a pizza was super fast and easy.&#8221;</p></div>
+      <div class="plate"><h3>As pizza</h3><p>&#8220;It was delicious the way it is, but turning it into a pizza was super fast and easy.&#8221;</p></div>
       <div class="plate"><h3>As a sandwich</h3><p>Go see Monica at The Dawg House &#8212; she builds hers on our focaccia at the market.</p></div>
       <div class="plate"><h3>As toast</h3><p>Avocado, feta and heirloom tomatoes on a thick slice. A customer sent us that one.</p></div>
       <div class="plate"><h3>As it comes</h3><p>Warm, torn by hand, with good olive oil. Honestly the best way.</p></div>
@@ -174,7 +175,7 @@
     <div style="max-width:660px;margin:var(--s16) auto 0;padding:var(--s10);
       background:var(--paper-2);border:1px solid var(--rule);text-align:center">
       <p class="caps" style="color:var(--burgundy);margin-bottom:var(--s3)">Ordina</p>
-      <p style="opacity:.76;font-style:italic;margin-bottom:var(--s6)">Order ahead for market pickup, local delivery or shipping. We confirm every order by email.</p>
+      <p style="opacity:.8;margin-bottom:var(--s6)">Order ahead for market pickup, local delivery or shipping. We confirm every order by email.</p>
       <a href="./order.html" class="btn btn-fill">Place an Order</a>
     </div>
   </div>
@@ -187,12 +188,10 @@
         style="width:104px;height:104px;border-radius:50%;
         box-shadow:0 0 0 1px oklch(.82 .09 75/.35),0 0 0 7px oklch(.82 .09 75/.10)">
     </div>
-    <p style="font-family:var(--script);font-size:2.9rem;line-height:.8;color:#EBD3AE">Oh! You Fancy</p>
-    <p style="font-family:var(--serif);font-size:1.05rem;font-weight:700;letter-spacing:.36em;
-      text-transform:uppercase;color:#D8BFA0;margin-top:.4rem;padding-left:.36em">Focaccia</p>
+    <p class="ftr-script">Oh! You Fancy</p>
+    <p class="ftr-caps">Focaccia</p>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s12);
-    border-top:1px solid oklch(1 0 0/.13);padding-top:var(--s12)">
+  <div class="ftr-cols">
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">The Bakery</p>
       <p style="font-size:var(--sm);opacity:.82;max-width:36ch">Artisan focaccia and sourdough baked by hand in Brookings, Oregon. Organic ingredients, a living starter, and small batches that sell out.</p></div>
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">Explore</p>
@@ -203,12 +202,11 @@
       <p style="margin-top:var(--s4);font-size:var(--sm)"><a href="mailto:info@ohyoufancyfocaccia.com" style="color:#EBD3AE">info@ohyoufancyfocaccia.com</a></p>
       <p style="margin-top:var(--s2);font-size:var(--sm)"><a href="https://www.facebook.com/profile.php?id=61584072034572" style="color:#EBD3AE" target="_blank" rel="noopener">Facebook</a></p></div>
   </div>
-  <div style="border-top:1px solid oklch(1 0 0/.13);margin-top:var(--s12);padding-top:var(--s6);
-    display:flex;justify-content:space-between;gap:var(--s6)">
+  <div class="ftr-bot">
     <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">&#169; 2026 Oh! You Fancy Focaccia</p>
     <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">Pane &#183; Amore &#183; Sempre</p>
   </div>
 </div></footer></div>
-
+<script src="./nav.js" defer></script>
 </body>
 </html>

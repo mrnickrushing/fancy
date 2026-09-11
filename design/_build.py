@@ -30,6 +30,9 @@ TOKENS = """
   --burgundy-ink:#2A0B0B;
   --olive:#4E6023; --olive-deep:#33401A; --olive-pale:#E4E7D0;
   --gold:#B8862F; --gold-pale:#EFE0BE;
+  /* --gold is an ornament colour: at 2.9:1 on paper it must never carry
+     text you are meant to read. --gold-read is the same hue at 4.9:1. */
+  --gold-read:#8A6420;
   --paper:#F4EFE2; --paper-2:#FBF8EF; --paper-3:#EAE1CB; --paper-4:#DED2B4;
   --rule:#CBBB97; --rule-soft:#DED2B4;
   --ink:#33190F; --ink-soft:#6E4staging;
@@ -56,6 +59,15 @@ a{color:var(--burgundy);text-decoration:none}
 a:hover{color:var(--burgundy-deep)}
 ul{list-style:none}
 
+/* ── keyboard focus: one visible ring everywhere, never the UA default ── */
+:focus-visible{outline:2px solid var(--burgundy);outline-offset:3px;border-radius:var(--r-sm)}
+.btn-fill:focus-visible,.enamel :focus-visible,.ribbon :focus-visible,
+footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
+
+/* visually hidden, still read aloud */
+.vh{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+
 /* laid-paper grain, warmer and finer than a flat fill */
 .grain{position:relative}
 .grain::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.55;
@@ -74,6 +86,7 @@ ul{list-style:none}
 /* ── vertical spine rail (label-edge motif) ── */
 .spine{position:absolute;top:0;bottom:0;width:52px;display:flex;
   align-items:center;justify-content:center}
+.spine[aria-hidden="true"]{pointer-events:none}
 .spine span{writing-mode:vertical-rl;font-family:var(--serif);font-size:.68rem;
   font-weight:600;letter-spacing:.44em;text-transform:uppercase;
   color:var(--burgundy);opacity:.42}
@@ -98,6 +111,70 @@ ul{list-style:none}
 .btn-pale{background:transparent;color:var(--gold-pale);border:1px solid oklch(.85 .07 80/.5)}
 .btn-pale:hover{background:var(--gold-pale);color:var(--burgundy-ink);letter-spacing:.32em}
 
+/* ══ masthead ══════════════════════════════════════════════════════
+   The ribbon is one line at every width, and the header shrinks to a
+   slim bar once you start reading. Nothing here is an inline style, so
+   the responsive sheet can restyle it by class. */
+.ribbon{background:var(--burgundy-ink);color:var(--gold-pale);text-align:center;
+  padding:.55rem var(--s5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ribbon-short{display:none}
+
+.mast{background:var(--paper);border-bottom:1px solid var(--rule);
+  padding-block:var(--s6) 0;position:sticky;top:0;z-index:50}
+.mast-in{text-align:center}
+.brand-row{display:flex;align-items:center;justify-content:center;gap:var(--s6);
+  position:relative}
+.brand-mark{width:56px;height:56px;border-radius:50%;flex-shrink:0;
+  transition:width 260ms var(--ease),height 260ms var(--ease)}
+.brand-word{display:block}
+.brand-script{font-family:var(--script);font-size:2.6rem;line-height:.82;
+  color:var(--burgundy);transition:font-size 260ms var(--ease)}
+.brand-caps{font-family:var(--serif);font-size:1.18rem;font-weight:700;
+  letter-spacing:.38em;text-transform:uppercase;color:var(--ink);
+  margin-top:.32rem;padding-left:.38em;transition:font-size 260ms var(--ease)}
+
+.nav-rail{display:flex;justify-content:center;flex-wrap:wrap;gap:var(--s8);
+  margin-top:var(--s6);border-top:1px solid var(--rule-soft)}
+.nav-link{color:var(--ink);opacity:.72;padding-block:.75rem;
+  border-bottom:1px solid transparent;transition:opacity 200ms var(--ease)}
+.nav-link:hover{opacity:1;color:var(--burgundy)}
+.nav-link.is-current{color:var(--burgundy);opacity:1;border-bottom-color:var(--burgundy)}
+
+/* the slim bar: brand and links on one row, ~64px instead of ~185px */
+.mast.is-shrunk{padding-block:0}
+.mast.is-shrunk .mast-in{display:flex;align-items:center;justify-content:space-between;
+  gap:var(--s8);max-width:var(--wide);margin-inline:auto;padding:var(--s2) var(--s10);
+  text-align:left}
+.mast.is-shrunk .brand-row{gap:var(--s4)}
+.mast.is-shrunk .brand-row > svg{display:none}
+.mast.is-shrunk .brand-mark{width:38px;height:38px}
+.mast.is-shrunk .brand-script{font-size:1.6rem}
+.mast.is-shrunk .brand-caps{font-size:.66rem;letter-spacing:.28em;margin-top:.1rem}
+.mast.is-shrunk .nav-rail{margin-top:0;border-top:0;gap:var(--s6);flex-wrap:nowrap}
+.mast.is-shrunk .nav-link{padding-block:1.15rem;font-size:.72rem;letter-spacing:.24em}
+
+/* the hamburger: only ever visible where the rail cannot fit */
+.nav-toggle{display:none;width:44px;height:44px;align-items:center;justify-content:center;
+  background:none;border:1px solid var(--rule);border-radius:var(--r-sm);
+  color:var(--burgundy);cursor:pointer;flex-shrink:0}
+.nav-bars{display:block;width:20px}
+.nav-bars i{display:block;height:1.5px;background:currentColor;border-radius:1px;
+  transition:transform 240ms var(--ease),opacity 200ms var(--ease)}
+.nav-bars i + i{margin-top:5px}
+.nav-toggle[aria-expanded="true"] .nav-bars i:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.nav-toggle[aria-expanded="true"] .nav-bars i:nth-child(2){opacity:0}
+.nav-toggle[aria-expanded="true"] .nav-bars i:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+
+.nav-drawer{display:none;background:var(--paper);border-top:1px solid var(--rule-soft)}
+.drawer-nav{display:grid;grid-template-columns:1fr}
+.drawer-link{display:flex;align-items:center;min-height:52px;padding-inline:var(--s6);
+  color:var(--ink);opacity:.8;border-bottom:1px solid var(--rule-soft)}
+.drawer-link.is-current{color:var(--burgundy);opacity:1;
+  box-shadow:inset 3px 0 0 var(--burgundy);background:var(--paper-2)}
+.drawer-link.is-order{color:var(--burgundy);opacity:1;font-weight:700;
+  background:var(--gold-pale)}
+.drawer-link.is-order::after{content:'\\2192';margin-left:auto;font-size:1rem}
+
 /* ── section furniture ── */
 .sec{padding-block:var(--s24);position:relative}
 .kicker{display:flex;align-items:center;gap:var(--s4);justify-content:center;
@@ -120,17 +197,21 @@ ul{list-style:none}
 /* ── bill of fare ── */
 .fare{display:flex;align-items:baseline;gap:var(--s4);padding-block:var(--s5);
   border-bottom:1px solid var(--rule-soft)}
-.fare-n{font-family:var(--serif);font-size:var(--sm);color:var(--gold);
+.fare-n{font-family:var(--serif);font-size:var(--sm);color:var(--gold-read);
   font-weight:600;width:34px;flex-shrink:0;letter-spacing:.1em}
 .fare-b{flex-grow:1}
 .fare-t{font-family:var(--serif);font-size:var(--lg);font-weight:600;
   display:flex;align-items:baseline;gap:var(--s3)}
 .fare-t::after{content:'';flex-grow:1;border-bottom:1.5px dotted var(--rule);
   transform:translateY(-4px)}
-.fare-d{font-size:var(--sm);opacity:.72;max-width:70ch;margin-top:var(--s2);
-  font-style:italic}
+/* the description is read, not decorated: roman, a size up, and lifted
+   out of the low-contrast range italic at .72 opacity put it in */
+.fare-d{font-size:1rem;opacity:.82;max-width:70ch;margin-top:var(--s2);
+  line-height:1.6}
 
 /* ── enamel market sign ── */
+.enamel-lead{font-family:var(--serif);font-size:3.1rem;font-weight:600;
+  line-height:1.18;color:#F6E6C6}
 .enamel{background:var(--burgundy);color:var(--gold-pale);
   border-block:6px double oklch(.85 .07 80/.42);padding-block:var(--s12);
   text-align:center;position:relative;overflow:hidden}
@@ -173,6 +254,116 @@ ul{list-style:none}
 .slot-cap{position:absolute;bottom:15px;left:0;right:0;text-align:center;
   font-family:var(--serif);font-size:.64rem;font-weight:600;letter-spacing:.26em;
   text-transform:uppercase;color:oklch(.40 .05 45/.6)}
+
+/* ══ hero ═════════════════════════════════════════════════════════ */
+.hero{position:relative;background:var(--paper);padding-block:var(--s20);overflow:hidden}
+.hero-grid{position:relative;display:grid;grid-template-columns:1.05fr .95fr;
+  gap:var(--s16);align-items:center}
+.hero-h{font-size:var(--xxxl);font-weight:700;line-height:1.02;margin-bottom:var(--s5)}
+.hero-lede{font-size:var(--lg);opacity:.78;max-width:40ch;margin-bottom:var(--s8);
+  line-height:1.58}
+/* both calls to action on one line, and the order one first — stacked
+   buttons pushed the second below the fold on a 900px-tall laptop */
+.hero-cta{display:flex;gap:var(--s4);flex-wrap:wrap}
+.hero-cta .btn{flex:0 1 auto;min-width:14rem;padding-inline:var(--s6)}
+.hero-shot{position:relative;display:flex;justify-content:center}
+.hero-rule{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%)}
+@media (min-width:641px){.hero-cta{flex-wrap:nowrap}}
+
+/* ══ gallery ═══════════════════════════════════════════════════════ */
+.gal-course{margin-bottom:var(--s16)}
+.gal-head{display:flex;align-items:baseline;gap:var(--s5);margin-bottom:var(--s8);
+  border-bottom:1px solid var(--rule);padding-bottom:var(--s4);flex-wrap:wrap}
+.gal-title{font-size:var(--lg);text-align:left}
+.gal-fill{flex-grow:1}
+.gal-count{opacity:.55;font-size:.66rem;color:var(--ink)}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:var(--s8) var(--s6)}
+.gal-item{display:flex;flex-direction:column;min-width:0}
+.gal-wide{grid-column:span 2}
+.gal-open{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in}
+.gal-shot{display:block;aspect-ratio:4/5}
+.gal-wide .gal-shot{aspect-ratio:8/5}
+.gal-shot img{transition:transform 620ms var(--ease)}
+.gal-open:hover .gal-shot img{transform:scale(1.035)}
+.gal-cap{padding-top:var(--s4);border-top:1px solid var(--rule-soft);margin-top:var(--s3)}
+.gal-name{font-size:.72rem;color:var(--ink)}
+.gal-note{font-size:var(--sm);opacity:.82;margin-top:var(--s1);line-height:1.55}
+@media (max-width:640px){.gal-wide{grid-column:span 1}}
+
+/* ══ bill of fare courses ══════════════════════════════════════ */
+.course{margin-bottom:var(--s20)}
+.course-grid{display:grid;grid-template-columns:1fr;gap:var(--s12);align-items:start}
+.course-grid.has-aside{grid-template-columns:1fr 300px}
+@media (max-width:900px){.course-grid.has-aside{grid-template-columns:1fr}}
+
+/* ══ contact: real directions in place of the map placeholder ════════ */
+.directions{font-style:normal;margin-top:var(--s8);padding-top:var(--s6);
+  border-top:1px solid var(--rule);text-align:center}
+.dir-line{font-size:var(--sm);opacity:.86;line-height:1.7}
+.dir-link{font-size:.7rem;border-bottom:1px solid currentColor;padding-bottom:2px}
+
+/* ══ three voices on the home page, not one ═════════════════════════ */
+.home-quotes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:var(--s6);margin-top:var(--s12)}
+.hq{background:var(--paper-2);border:1px solid var(--rule);padding:var(--s6);
+  border-top:3px solid var(--burgundy)}
+.hq p{font-family:var(--serif);font-size:1.06rem;font-style:italic;line-height:1.55}
+.hq cite{display:block;margin-top:var(--s4);color:var(--burgundy);font-style:normal;
+  font-size:.66rem}
+@media (max-width:820px){.home-quotes{grid-template-columns:1fr;gap:var(--s4)}}
+
+/* ══ footer ═══════════════════════════════════════════════════════ */
+.ftr-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s12);
+  border-top:1px solid oklch(1 0 0/.13);padding-top:var(--s12)}
+.ftr-bot{border-top:1px solid oklch(1 0 0/.13);margin-top:var(--s12);padding-top:var(--s6);
+  display:flex;justify-content:space-between;gap:var(--s6)}
+/* ══ two-column compositions ══════════════════════════════════════ */
+.duo{display:grid;gap:var(--s16)}
+.duo-a{grid-template-columns:1.15fr .85fr}
+.duo-top{align-items:start}
+.duo-b{grid-template-columns:.9fr 1.1fr;align-items:center}
+.duo-c{grid-template-columns:1fr 1fr;align-items:start}
+
+.ftr-script{font-family:var(--script);font-size:2.9rem;line-height:.8;color:#EBD3AE}
+.ftr-caps{font-family:var(--serif);font-size:1.05rem;font-weight:700;letter-spacing:.36em;
+  text-transform:uppercase;color:#D8BFA0;margin-top:.4rem;padding-left:.36em}
+
+/* ══ lightbox ═════════════════════════════════════════════════════ */
+/* The dialog fills the viewport and stays transparent; the plate itself is
+   the panel inside it. Centring a <dialog> by its own box fights the UA
+   margin rules the moment the content is taller than max-height. */
+.lb{width:100%;max-width:100%;height:100%;max-height:100%;inset:0;margin:0;
+  border:0;padding:0;background:none;overflow:hidden}
+.lb::backdrop{background:oklch(.14 .04 30/.86)}
+/* the dim lives on the stage as well as on ::backdrop, so it is painted
+   even where the backdrop pseudo-element is not honoured */
+.lb-stage{display:grid;place-items:center;width:100%;height:100%;padding:var(--s10);
+  background:oklch(.14 .04 30/.86)}
+.lb-panel{position:relative;width:min(1040px,100%);background:var(--paper-2);
+  box-shadow:var(--sh-lg);max-height:100%;display:flex;flex-direction:column}
+.lb-fig{display:flex;flex-direction:column;min-height:0}
+.lb-fig img{display:block;width:100%;min-height:0;max-height:70vh;object-fit:contain;
+  background:var(--burgundy-ink)}
+.lb-cap{padding:var(--s5) var(--s6);border-top:1px solid var(--rule);text-align:left}
+.lb-note{font-size:var(--sm);opacity:.82;margin-top:var(--s1)}
+.lb-close,.lb-nav{position:absolute;z-index:2;display:flex;align-items:center;
+  justify-content:center;width:44px;height:44px;background:var(--paper-2);
+  border:1px solid var(--rule);border-radius:50%;font-family:var(--serif);
+  font-size:1.4rem;line-height:1;color:var(--burgundy);cursor:pointer;
+  box-shadow:var(--sh-md)}
+.lb-close{top:-16px;right:-16px;font-size:1.5rem}
+.lb-nav{top:50%;transform:translateY(-50%)}
+.lb-prev{left:-16px}
+.lb-next{right:-16px}
+@media (max-width:720px){
+  .lb-stage{padding:0}
+  .lb-panel{width:100%;height:100%;justify-content:center}
+  .lb-fig img{max-height:62vh}
+  .lb-close{top:var(--s3);right:var(--s3)}
+  .lb-prev{left:var(--s3)}
+  .lb-next{right:var(--s3)}
+}
 """
 TOKENS = TOKENS.replace("#71 1616", "#711616").replace("--ink-soft:#6E4staging;", "--ink-soft:#6E4432;")
 
@@ -365,28 +556,45 @@ def dimple_rule():
     return '<div class="dimples"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>'
 
 def masthead(active):
-    links = "".join(
-      f'<a href="#" style="{"color:var(--burgundy);border-bottom:1px solid var(--burgundy)" if n==active else "color:var(--ink);opacity:.72"}" class="caps">{n}</a>'
-      for n in NAV)
-    return f"""<div style="background:var(--burgundy-ink);color:var(--gold-pale);
-  text-align:center;padding:.55rem" class="caps">
-  Brookings-Harbor Farmers Market &#183; Wednesdays &amp; Saturdays &#183; 9am &#8216;til sold out</div>
-<header style="background:var(--paper);border-bottom:1px solid var(--rule);
-  padding-block:var(--s8) 0;position:sticky;top:0;z-index:50;
-  backdrop-filter:blur(12px)">
-  <div style="text-align:center">
-    <div style="display:flex;align-items:center;justify-content:center;gap:var(--s6)">
+    """The ribbon and the sticky header.
+
+    Everything is on a real class rather than an inline style, so the
+    responsive sheet can shrink the header on scroll and swap the
+    eight-link rail for a drawer on a phone without having to match
+    substrings of `style=`.
+    """
+    def link(n, drawer=False):
+        cur = ' aria-current="page"' if n == active else ''
+        base = "drawer-link" if drawer else "nav-link"
+        cls = base + (" is-current" if n == active else "")
+        # Order is what the site is for, so it reads as the one live action
+        # in the drawer rather than the fourth of eight equal words.
+        if drawer and n == "Order":
+            cls += " is-order"
+        return f'<a href="#" class="{cls} caps"{cur}>{n}</a>'
+
+    links  = "".join(link(n) for n in NAV)
+    drawer = "".join(link(n, True) for n in NAV)
+    return f"""<div class="ribbon caps">
+  <span class="ribbon-full">Brookings-Harbor Farmers Market &#183; Wednesdays &amp; Saturdays &#183; 9am &#8216;til sold out</span>
+  <span class="ribbon-short">Wed &amp; Sat &#183; from 9am</span></div>
+<header class="mast">
+  <div class="mast-in">
+    <div class="brand-row">
       {olive_rule(120)}
-      <img src="logo.webp" alt="" style="width:62px;height:62px;border-radius:50%;flex-shrink:0">
-      <a href="#" style="display:block">
-        <p style="font-family:var(--script);font-size:2.9rem;line-height:.76;color:var(--burgundy)">Oh! You Fancy</p>
-        <p style="font-family:var(--serif);font-size:1.18rem;font-weight:700;letter-spacing:.38em;
-          text-transform:uppercase;color:var(--ink);margin-top:.32rem;padding-left:.38em">Focaccia</p>
+      <img src="logo.webp" alt="" class="brand-mark" width="56" height="56">
+      <a href="#" class="brand-word">
+        <p class="brand-script">Oh! You Fancy</p>
+        <p class="brand-caps">Focaccia</p>
       </a>
       {olive_rule(120,True)}
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false"
+        aria-controls="nav-drawer"><span class="nav-bars" aria-hidden="true"><i></i><i></i><i></i></span><span class="vh">Menu</span></button>
     </div>
-    <nav style="display:flex;justify-content:center;gap:var(--s8);margin-top:var(--s6);
-      border-top:1px solid var(--rule-soft);padding-block:var(--s4)">{links}</nav>
+    <nav class="nav-rail" aria-label="Main">{links}</nav>
+  </div>
+  <div class="nav-drawer" id="nav-drawer" hidden>
+    <nav class="drawer-nav" aria-label="Main menu">{drawer}</nav>
   </div>
 </header>"""
 
@@ -400,16 +608,57 @@ def enamel(title, lines, small=None, bg=None):
   {layer}
   <div class="narrow" style="position:relative;z-index:2">
     <p class="caps" style="color:oklch(.82 .09 75/.72);margin-bottom:var(--s5)">{title}</p>
-    <p style="font-family:var(--serif);font-size:3.1rem;font-weight:600;line-height:1.18;
-      color:#F6E6C6">{lines}</p>
+    <p class="enamel-lead">{lines}</p>
     {f'<p class="caps" style="color:oklch(.82 .09 75/.66);margin-top:var(--s5)">{small}</p>' if small else ''}
   </div>
 </section>"""
 
-def shot(src, h, alt="", cls="", extra=""):
+# ── intrinsic image sizes, without a third-party decoder ───────────────
+# Every <img> should declare width and height so the browser reserves the
+# box before the bytes land. Reading the WebP header directly keeps the
+# build dependency-free — CI runs a bare python3.
+IMG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "img")
+_SIZES = {}
+
+def _webp_size(path):
+    with open(path, "rb") as fh:
+        head = fh.read(32)
+    if len(head) < 30 or head[:4] != b"RIFF" or head[8:12] != b"WEBP":
+        return None
+    kind = head[12:16]
+    if kind == b"VP8X":                      # extended: 24-bit canvas size
+        return (int.from_bytes(head[24:27], "little") + 1,
+                int.from_bytes(head[27:30], "little") + 1)
+    if kind == b"VP8 ":                      # lossy: 14-bit dims after the sync code
+        return (int.from_bytes(head[26:28], "little") & 0x3FFF,
+                int.from_bytes(head[28:30], "little") & 0x3FFF)
+    if kind == b"VP8L":                      # lossless: packed 14+14 bits
+        bits = int.from_bytes(head[21:25], "little")
+        return ((bits & 0x3FFF) + 1, ((bits >> 14) & 0x3FFF) + 1)
+    return None
+
+def img_size(src):
+    """(width, height) for an image in design/img, or None if unreadable."""
+    if src not in _SIZES:
+        path = os.path.join(IMG_DIR, os.path.basename(src))
+        try:
+            _SIZES[src] = _webp_size(path) if src.endswith(".webp") else None
+        except OSError:
+            _SIZES[src] = None
+    return _SIZES[src]
+
+def img_attrs(src, eager=False):
+    """The loading and sizing attributes every <img> on the site carries."""
+    wh = img_size(src)
+    dims = f' width="{wh[0]}" height="{wh[1]}"' if wh else ""
+    # above the fold the image is the page; everywhere else it waits its turn
+    load = ' fetchpriority="high"' if eager else ' loading="lazy"'
+    return f'{dims}{load} decoding="async"'
+
+def shot(src, h, alt="", cls="", extra="", eager=False):
     """A real photograph, framed like a plate."""
     return (f'<figure class="shot {cls}" style="height:{h}px;{extra}">'
-            f'<img src="{src}" alt="{alt}"></figure>')
+            f'<img src="{src}" alt="{alt}"{img_attrs(src, eager)}></figure>')
 
 def slot(h, cap):
     """Placeholder — only where we genuinely have no photograph yet."""
@@ -423,12 +672,10 @@ FOOTER = f"""<footer style="background:var(--burgundy-ink);color:#D8BFA0;padding
         style="width:104px;height:104px;border-radius:50%;
         box-shadow:0 0 0 1px oklch(.82 .09 75/.35),0 0 0 7px oklch(.82 .09 75/.10)">
     </div>
-    <p style="font-family:var(--script);font-size:2.9rem;line-height:.8;color:#EBD3AE">Oh! You Fancy</p>
-    <p style="font-family:var(--serif);font-size:1.05rem;font-weight:700;letter-spacing:.36em;
-      text-transform:uppercase;color:#D8BFA0;margin-top:.4rem;padding-left:.36em">Focaccia</p>
+    <p class="ftr-script">Oh! You Fancy</p>
+    <p class="ftr-caps">Focaccia</p>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s12);
-    border-top:1px solid oklch(1 0 0/.13);padding-top:var(--s12)">
+  <div class="ftr-cols">
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">The Bakery</p>
       <p style="font-size:var(--sm);opacity:.82;max-width:36ch">Artisan focaccia and sourdough baked by hand in Brookings, Oregon. Organic ingredients, a living starter, and small batches that sell out.</p></div>
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">Explore</p>
@@ -439,8 +686,7 @@ FOOTER = f"""<footer style="background:var(--burgundy-ink);color:#D8BFA0;padding
       <p style="margin-top:var(--s4);font-size:var(--sm)"><a href="#" style="color:#EBD3AE">info@ohyoufancyfocaccia.com</a></p>
       <p style="margin-top:var(--s2);font-size:var(--sm)"><a href="#" style="color:#EBD3AE">Facebook</a></p></div>
   </div>
-  <div style="border-top:1px solid oklch(1 0 0/.13);margin-top:var(--s12);padding-top:var(--s6);
-    display:flex;justify-content:space-between;gap:var(--s6)">
+  <div class="ftr-bot">
     <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">&#169; 2026 Oh! You Fancy Focaccia</p>
     <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">Pane &#183; Amore &#183; Sempre</p>
   </div>
@@ -476,28 +722,25 @@ PROC = [("I","Bend","The dough comes together slow. Organic flour, water, and a 
         ("IV","Fold","Rested, dimpled, drowned in good olive oil, and into the oven.")]
 
 HOME = masthead("Home") + f"""
-<section style="position:relative;background:var(--paper);padding-block:var(--s24);overflow:hidden">
-  <div class="spine spine-l"><span>Brookings &#183; Oregon</span></div>
-  <div class="spine spine-r"><span>Est. on the Chetco</span></div>
-  <div class="wrap" style="position:relative;display:grid;grid-template-columns:1fr 1fr;
-    gap:var(--s20);align-items:center">
+<section class="hero">
+  <div class="spine spine-l" aria-hidden="true"><span>Brookings &#183; Oregon</span></div>
+  <div class="spine spine-r" aria-hidden="true"><span>Est. on the Chetco</span></div>
+  <div class="wrap hero-grid">
     <div>
       <p class="caps kicker kicker-l" style="color:var(--olive)">Artisan Breads</p>
-      <h1 style="font-size:var(--xxxl);font-weight:700;line-height:1.02;margin-bottom:var(--s6)">
+      <h1 class="hero-h">
         One starter,<br><span style="font-style:italic;font-weight:500">endlessly</span><br>argued over.</h1>
-      <p style="font-size:var(--lg);opacity:.78;max-width:42ch;margin-bottom:var(--s8);line-height:1.62">
-        Focaccia and sourdough, lifted by the same mother starter &#8212; savory and sweet,
-        dimpled and blistered, organic through and through, and every loaf shaped by hand
-        on the southern Oregon coast.</p>
-      <div style="display:flex;gap:var(--s4);flex-wrap:wrap">
-        <a href="#" class="btn btn-fill">See the Bill of Fare</a>
-        <a href="#" class="btn btn-line">Order for Pickup</a>
+      <p class="hero-lede">
+        Focaccia and sourdough from one mother starter &#8212; savory and sweet,
+        dimpled and blistered, and shaped by hand on the southern Oregon coast.</p>
+      <div class="hero-cta">
+        <a href="#" class="btn btn-fill">Order for Pickup</a>
+        <a href="#" class="btn btn-line">See the Bill of Fare</a>
       </div>
     </div>
-    <div style="position:relative;display:flex;justify-content:center">
-      {shot("hero-garden.webp",530,"Focaccia painted in herbs and vegetables","shot-oval","width:430px")}
-      <div style="position:absolute;bottom:-16px;left:50%;transform:translateX(-50%)">
-        {olive_rule(190)}</div>
+    <div class="hero-shot">
+      {shot("hero-garden.webp",530,"Focaccia painted in herbs and vegetables","shot-oval","width:430px",eager=True)}
+      <div class="hero-rule">{olive_rule(190)}</div>
     </div>
   </div>
 </section>
@@ -519,12 +762,11 @@ HOME = masthead("Home") + f"""
 </section>
 
 <section class="sec" style="background:var(--paper)">
-  <div class="wrap" style="display:grid;grid-template-columns:1.15fr .85fr;gap:var(--s16);
-    align-items:start">
+  <div class="wrap duo duo-a duo-top">
     <div>
       <p class="caps kicker kicker-l">From the Board</p>
       <h2 style="font-size:var(--xl);margin-bottom:var(--s3);text-align:left">What we are baking</h2>
-      <p style="opacity:.74;font-style:italic;margin-bottom:var(--s8)">The board turns over with the season and with whatever our neighbours are growing.</p>
+      <p style="opacity:.78;margin-bottom:var(--s8)">The board turns over with the season and with whatever our neighbours are growing.</p>
       <div class="fare"><span class="fare-n">I</span><div class="fare-b">
         <p class="fare-t"><span>Olive &amp; Sun-Dried Tomato Swirl</span></p>
         <p class="fare-d">Green and kalamata olives, sun-dried tomato, herbs, grated cheese. Crisp at the edge, soft through the middle.</p></div></div>
@@ -561,7 +803,21 @@ HOME = masthead("Home") + f"""
     <p style="font-family:var(--serif);font-size:2.3rem;font-style:italic;line-height:1.42;
       margin-bottom:var(--s6)">Best Focaccia I&#8217;ve ever had. She definitely knows what she&#8217;s doing.</p>
     <p class="caps" style="color:var(--burgundy)">TonyandTasha Holden</p>
-    <p class="caps" style="opacity:.5;margin-top:var(--s6);font-size:.68rem">100% recommend &#183; 9 reviews</p>
+  </div>
+  <div class="wrap home-quotes">
+    <blockquote class="hq">
+      <p>It&#8217;s fluffy, it&#8217;s fresh, it&#8217;s flavorful. Must try.</p>
+      <cite class="caps">Jessica Dora</cite></blockquote>
+    <blockquote class="hq">
+      <p>This bread is made with love, so delicious that it compliments every meal.</p>
+      <cite class="caps">Char Rigg</cite></blockquote>
+    <blockquote class="hq">
+      <p>Turning it into a pizza was super fast and easy. It was delicious the way it is.</p>
+      <cite class="caps">From the market table</cite></blockquote>
+  </div>
+  <div class="narrow" style="text-align:center">
+    <p class="caps" style="opacity:.62;margin-top:var(--s10);font-size:.68rem">100% recommend &#183; 9 reviews</p>
+    <p style="margin-top:var(--s6)"><a href="#" class="btn btn-line">Read the Reviews</a></p>
   </div>
 </section>
 
@@ -597,7 +853,7 @@ HOME = masthead("Home") + f"""
   <div class="narrow">
     <div style="display:flex;justify-content:center;margin-bottom:var(--s6)">{olive_rule(190)}</div>
     <h2 style="font-size:var(--xl);margin-bottom:var(--s4)">Come Wednesday. Come early.</h2>
-    <p style="opacity:.76;margin-bottom:var(--s8);font-style:italic">
+    <p style="opacity:.8;margin-bottom:var(--s8)">
       We bake small and we sell out. Questions, delivery or shipping &#8212; just write.</p>
     <a href="#" class="btn btn-fill">info@ohyoufancyfocaccia.com</a>
     <p style="margin-top:var(--s10);font-family:var(--script);font-size:2.6rem;color:var(--burgundy)">
@@ -630,7 +886,7 @@ CREED = [("Organic, all the way down","We bake with organic ingredients because 
 ABOUT = masthead("About") + head_band("La Nostra Storia","Welcome to Oh! You Fancy Focaccia",
   "A small-batch bakery on the southern Oregon coast, run by Amanda &#8212; doing what she loves, where she loves to be.") + f"""
 <section class="sec" style="background:var(--paper)">
-  <div class="wrap" style="display:grid;grid-template-columns:.9fr 1.1fr;gap:var(--s16);align-items:center">
+  <div class="wrap duo duo-b">
     <div style="display:flex;flex-direction:column;align-items:center;gap:var(--s4)">
       {shot("art-garden.webp",500,"A flower garden painted across focaccia","shot-oval","width:400px")}
     </div>
@@ -643,7 +899,7 @@ ABOUT = masthead("About") + head_band("La Nostra Storia","Welcome to Oh! You Fan
       <p style="opacity:.8;margin-bottom:var(--s5)">The same mother starter goes into our sourdough loaves &#8212; mixed the day before, left to rise slow, and baked dark alongside everything else.</p>
       <p style="opacity:.8;margin-bottom:var(--s8)">Every Wednesday and Saturday the crates come out, the gold paper bags get filled, and we hand out samples until the last loaf is gone.</p>
       <div style="border-left:2px solid var(--burgundy);padding-left:var(--s6)">
-        <p style="font-style:italic">Thank you to our customers, our friends, our family, and our Father in Heaven for supporting our small business.</p>
+        <p style="opacity:.86">Thank you to our customers, our friends, our family, and our Father in Heaven for supporting our small business.</p>
         <p style="font-family:var(--script);font-size:2.4rem;color:var(--burgundy);margin-top:var(--s3)">Love always, Oh! You Fancy Focaccia</p>
       </div>
     </div>
@@ -672,9 +928,8 @@ def fare(n, title, desc):
 def course(title, ital, rows, cap=None):
     """A run of the bill of fare. Without a photograph it runs full width —
     better an honest single column than a gap where a picture should be."""
-    cols = "1fr 300px" if cap else "1fr"
-    return f"""<div style="margin-bottom:var(--s20)">
-  <div style="display:grid;grid-template-columns:{cols};gap:var(--s12);align-items:start">
+    return f"""<div class="course">
+  <div class="course-grid{' has-aside' if cap else ''}">
     <div>
       <p class="caps" style="color:var(--olive);margin-bottom:var(--s2)">{ital}</p>
       <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">{title}</h2>
@@ -722,7 +977,7 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
     <h2 class="h-sec">Our customers are more<br>inventive than we are</h2>
     {dimple_rule()}
     <div class="grid g4">
-      <div class="plate"><h3>As pizza</h3><p style="font-style:italic">&#8220;It was delicious the way it is, but turning it into a pizza was super fast and easy.&#8221;</p></div>
+      <div class="plate"><h3>As pizza</h3><p>&#8220;It was delicious the way it is, but turning it into a pizza was super fast and easy.&#8221;</p></div>
       <div class="plate"><h3>As a sandwich</h3><p>Go see Monica at The Dawg House &#8212; she builds hers on our focaccia at the market.</p></div>
       <div class="plate"><h3>As toast</h3><p>Avocado, feta and heirloom tomatoes on a thick slice. A customer sent us that one.</p></div>
       <div class="plate"><h3>As it comes</h3><p>Warm, torn by hand, with good olive oil. Honestly the best way.</p></div>
@@ -730,7 +985,7 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
     <div style="max-width:660px;margin:var(--s16) auto 0;padding:var(--s10);
       background:var(--paper-2);border:1px solid var(--rule);text-align:center">
       <p class="caps" style="color:var(--burgundy);margin-bottom:var(--s3)">Ordina</p>
-      <p style="opacity:.76;font-style:italic;margin-bottom:var(--s6)">Order ahead for market pickup, local delivery or shipping. We confirm every order by email.</p>
+      <p style="opacity:.8;margin-bottom:var(--s6)">Order ahead for market pickup, local delivery or shipping. We confirm every order by email.</p>
       <a href="#" class="btn btn-fill">Place an Order</a>
     </div>
   </div>
@@ -777,22 +1032,56 @@ GAL_SECTIONS = [
 ]
 
 def gal_block(kicker, title, items):
-    figs = "".join(
-      f'<figure style="break-inside:avoid;margin-bottom:var(--s8)">'
-      f'<div class="shot" style="height:{h}px"><img src="{f}" alt="{n}"></div>'
-      f'<figcaption style="padding-top:var(--s4);border-top:1px solid var(--rule-soft);'
-      f'margin-top:var(--s3)">'
-      f'<p class="caps" style="font-size:.66rem">{n}</p>'
-      f'<p style="font-size:var(--sm);opacity:.72;font-style:italic;margin-top:var(--s1)">{c}</p>'
-      f'</figcaption></figure>' for f,n,c,h in items)
-    return (f'<div style="margin-bottom:var(--s16)">'
-      f'<div style="display:flex;align-items:baseline;gap:var(--s5);margin-bottom:var(--s8);'
-      f'border-bottom:1px solid var(--rule);padding-bottom:var(--s4)">'
+    """One course of the gallery.
+
+    A real grid rather than CSS `columns`: multi-column left orphaned
+    figures and ragged column feet, and a fixed pixel height on every
+    tile fought the natural aspect of the photographs. Each tile is now
+    a button that opens the plate full size.
+    """
+    # one hero tile per course, so the grid has a rhythm without turning
+    # into the ragged masonry it replaced
+    tallest = max(h for *_, h in items)
+    hero = next(f for f, n, c, h in items if h == tallest) if len(items) >= 3 else None
+    figs = []
+    for f, n, c, h in items:
+        wide = ' gal-wide' if f == hero else ''
+        figs.append(
+          f'<figure class="gal-item{wide}">'
+          f'<button type="button" class="gal-open" data-src="{f}" data-name="{n}" data-cap="{c}">'
+          f'<span class="shot gal-shot"><img src="{f}" alt="{n}"{img_attrs(f)}></span>'
+          f'<span class="vh">View {n} larger</span></button>'
+          f'<figcaption class="gal-cap">'
+          f'<p class="caps gal-name">{n}</p>'
+          f'<p class="gal-note">{c}</p>'
+          f'</figcaption></figure>')
+    return (f'<div class="gal-course">'
+      f'<div class="gal-head">'
       f'<p class="caps" style="color:var(--olive)">{kicker}</p>'
-      f'<h2 style="font-size:var(--lg);text-align:left">{title}</h2>'
-      f'<span style="flex-grow:1"></span>'
-      f'<p class="caps" style="opacity:.42;font-size:.64rem">{len(items)} bakes</p></div>'
-      f'<div style="columns:4;column-gap:var(--s6)">{figs}</div></div>')
+      f'<h2 class="gal-title">{title}</h2>'
+      f'<span class="gal-fill"></span>'
+      f'<p class="caps gal-count">{len(items)} bakes</p></div>'
+      f'<div class="gal">{"".join(figs)}</div></div>')
+
+# The plate, full size. A native <dialog> gets the modal semantics, the
+# focus trap and Escape for free.
+LIGHTBOX = """
+<dialog class="lb" id="lightbox" aria-label="Photograph">
+  <div class="lb-stage" id="lb-stage">
+    <div class="lb-panel">
+      <button type="button" class="lb-close" id="lb-close" aria-label="Close">&#215;</button>
+      <button type="button" class="lb-nav lb-prev" id="lb-prev" aria-label="Previous photograph">&#8249;</button>
+      <button type="button" class="lb-nav lb-next" id="lb-next" aria-label="Next photograph">&#8250;</button>
+      <figure class="lb-fig">
+        <img id="lb-img" src="" alt="" decoding="async">
+        <figcaption class="lb-cap">
+          <p class="caps" id="lb-name"></p>
+          <p class="lb-note" id="lb-note"></p>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</dialog>"""
 
 GALLERY = masthead("Gallery") + head_band("La Galleria","Fresh From the Oven",
   "Twenty-nine bakes, straight from the tray and straight from the market table.") + f"""
@@ -800,6 +1089,7 @@ GALLERY = masthead("Gallery") + head_band("La Galleria","Fresh From the Oven",
   <div class="wrap">
     {"".join(gal_block(k,t,items) for k,t,items in GAL_SECTIONS)}
   </div>
+  {LIGHTBOX}
 </section>
 
 {enamel("Seguici","We post the bakes<br>as they leave the oven","Find us on Facebook as Oh! You Fancy Focaccia")}
@@ -874,7 +1164,7 @@ IC_PIN = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8
 CONTACT = masthead("Contact") + head_band("Scrivici","We&#8217;d Love to Hear From You",
   "Questions, delivery, shipping, or something particular for an occasion &#8212; just say hello.") + f"""
 <section class="sec" style="background:var(--paper)">
-  <div class="wrap" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s16);align-items:start">
+  <div class="wrap duo duo-c">
     <div>
       <p class="caps kicker kicker-l">Get in Touch</p>
       <div style="margin-top:var(--s4)">
@@ -897,9 +1187,16 @@ CONTACT = masthead("Contact") + head_band("Scrivici","We&#8217;d Love to Hear Fr
             line-height:1.2">Wednesdays<br><span style="font-style:italic;font-weight:400">&amp;</span> Saturdays</p>
           <p class="caps" style="color:var(--olive);margin-top:var(--s4);font-size:.7rem">9am &#8216;til sold out</p>
         </div>
-        <p style="opacity:.74;font-size:var(--sm);margin-top:var(--s6);font-style:italic">
+        <p style="opacity:.8;font-size:var(--sm);margin-top:var(--s6)">
           Port of Brookings Harbor. Come early and come hungry &#8212; there are always samples, and we do sell out.</p>
-        {slot(180,'Map &#183; Port of Brookings Harbor')}
+        <address class="directions">
+          <p class="caps" style="color:var(--olive);margin-bottom:var(--s3)">Finding the market</p>
+          <p class="dir-line">Brookings-Harbor Farmers Market<br>
+            15786 US Highway 101 South<br>Brookings, Oregon 97415</p>
+          <p style="margin-top:var(--s5)"><a class="caps dir-link"
+            href="https://www.google.com/maps/search/?api=1&amp;query=Brookings-Harbor+Farmers+Market%2C+15786+US+101+S%2C+Brookings%2C+OR+97415"
+            target="_blank" rel="noopener">Open in Maps</a></p>
+        </address>
       </div>
     </div>
   </div>
@@ -1017,7 +1314,7 @@ MOBILE = f"""
   border-top:1px solid var(--rule)">
   <div style="display:flex;justify-content:center;margin-bottom:var(--s5)">{olive_rule(150)}</div>
   <h2 style="font-size:1.7rem;margin-bottom:var(--s4)">Come Wednesday.<br>Come early.</h2>
-  <p style="opacity:.76;font-style:italic;margin-bottom:var(--s6)">We bake small and we sell out.</p>
+  <p style="opacity:.8;margin-bottom:var(--s6)">We bake small and we sell out.</p>
   <a href="#" class="btn btn-fill" style="width:100%">Write to Us</a>
   <p style="margin-top:var(--s8);font-family:var(--script);font-size:2.1rem;color:var(--burgundy)">
     Love always, Oh! You Fancy Focaccia</p>

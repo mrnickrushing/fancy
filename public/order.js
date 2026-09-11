@@ -23,27 +23,71 @@
   function fulfillment() { return app.querySelector('input[name="fulfillment"]:checked').value; }
 
   // ── menu ──
+  // Each course is a <details> so a phone is not asked to scroll twenty-nine
+  // rows before it reaches step II. Wide screens keep every course open and
+  // the summary behaves as a plain heading.
+  var narrow = window.matchMedia('(max-width:900px)');
+
   function renderMenu() {
     var byCourse = {};
     menu.items.forEach(function (it) { (byCourse[it.course] = byCourse[it.course] || []).push(it); });
     var html = '';
     Object.keys(menu.courses).forEach(function (key) {
       var items = byCourse[key]; if (!items || !items.length) return;
-      html += '<div class="menu-course"><p class="caps" style="color:var(--olive)">' + esc(menu.courses[key]) + '</p>' +
-        '<div style="width:64px;height:2px;background:var(--burgundy);margin-block:var(--s2) var(--s2)"></div>';
-      items.forEach(function (it) {
+      var rows = items.map(function (it) {
         var q = cart[it.id] || 0;
-        html += '<div class="menu-item" data-id="' + it.id + '"><div>' +
+        return '<div class="menu-item' + (q ? ' is-chosen' : '') + '" data-id="' + it.id + '"><div>' +
           '<p class="fare-t"><span>' + esc(it.name) + '</span></p>' +
           (it.description ? '<p class="fare-d">' + esc(it.description) + '</p>' : '') + '</div>' +
-          '<div style="display:flex;align-items:center;gap:var(--s5)">' +
+          '<div class="fare-buy">' +
           (it.price != null ? '<span class="price">' + money(it.price) + '</span>' : '<span class="price tbq">quoted on confirmation</span>') +
-          '<div class="qty"><button type="button" data-delta="-1" aria-label="Fewer">&minus;</button><output>' + q + '</output><button type="button" data-delta="1" aria-label="More">+</button></div>' +
+          '<div class="qty"><button type="button" data-delta="-1" aria-label="Fewer ' + esc(it.name) + '">&minus;</button>' +
+          '<output aria-label="Quantity">' + q + '</output>' +
+          '<button type="button" data-delta="1" aria-label="More ' + esc(it.name) + '">+</button></div>' +
           '</div></div>';
-      });
-      html += '</div>';
+      }).join('');
+      html += '<details class="course-fold" data-course="' + esc(key) + '" open>' +
+        '<summary><span class="fold-name">' + esc(menu.courses[key]) + '</span>' +
+        '<span class="fold-n" data-n="' + items.length + '">' + items.length + (items.length === 1 ? ' bake' : ' bakes') + '</span></summary>' +
+        '<div class="course-fold-body">' + rows + '</div></details>';
     });
     $('menu').innerHTML = html || '<p class="empty">The bill of fare is empty right now. Please write to us instead.</p>';
+    syncFolds();
+  }
+
+  // On a phone, only the first course starts open.
+  function syncFolds() {
+    var folds = $('menu').querySelectorAll('.course-fold');
+    for (var i = 0; i < folds.length; i++) {
+      folds[i].open = narrow.matches ? i === 0 : true;
+    }
+  }
+  if (narrow.addEventListener) narrow.addEventListener('change', syncFolds);
+
+  // A wide screen must not be able to collapse a course.
+  $('menu').addEventListener('click', function (e) {
+    if (narrow.matches) return;
+    if (e.target.closest('summary')) e.preventDefault();
+  });
+
+  // Each course label carries its own tally, so a collapsed course still says
+  // what is inside it.
+  function syncFoldTallies() {
+    var folds = $('menu').querySelectorAll('.course-fold');
+    for (var i = 0; i < folds.length; i++) {
+      var label = folds[i].querySelector('.fold-n');
+      var chosen = 0;
+      var outs = folds[i].querySelectorAll('.menu-item');
+      for (var j = 0; j < outs.length; j++) chosen += Number(cart[outs[j].dataset.id] || 0);
+      if (chosen) {
+        label.textContent = chosen + (chosen === 1 ? ' chosen' : ' chosen');
+        label.className = 'fold-n fold-chosen';
+      } else {
+        var n = Number(label.dataset.n);
+        label.textContent = n + (n === 1 ? ' bake' : ' bakes');
+        label.className = 'fold-n';
+      }
+    }
   }
 
   $('menu').addEventListener('click', function (e) {
@@ -52,6 +96,8 @@
     var next = Math.max(0, Math.min(50, (cart[id] || 0) + Number(btn.dataset.delta)));
     if (next) cart[id] = next; else delete cart[id];
     row.querySelector('output').textContent = next;
+    row.classList.toggle('is-chosen', next > 0);
+    syncFoldTallies();
     renderCart();
   });
 
@@ -68,6 +114,7 @@
     if (!items.length) {
       lines.innerHTML = '<p class="cart-empty">Nothing chosen yet.</p>';
       $('cart-total').textContent = '—'; $('cart-note').textContent = '';
+      syncBar(0, '—');
       return;
     }
     lines.innerHTML = items.map(function (it) {
@@ -76,8 +123,26 @@
       else { unpriced = true; line = 'quoted'; }
       return '<div class="cart-line"><span>' + esc(it.name) + ' <span style="opacity:.6">&times; ' + it.quantity + '</span></span><span>' + line + '</span></div>';
     }).join('');
-    $('cart-total').textContent = unpriced ? (total ? money(total) + ' +' : 'Quoted') : money(total);
+    var shown = unpriced ? (total ? money(total) + ' +' : 'Quoted') : money(total);
+    $('cart-total').textContent = shown;
     $('cart-note').textContent = unpriced ? 'Some items are quoted when we confirm; the total will follow by email.' : '';
+    var loaves = items.reduce(function (n, it) { return n + it.quantity; }, 0);
+    syncBar(loaves, shown);
+  }
+
+  // ── the sticky tally ──
+  function syncBar(loaves, shown) {
+    var bar = $('order-bar'); if (!bar) return;
+    bar.hidden = loaves === 0;
+    $('bar-count').textContent = loaves + (loaves === 1 ? ' loaf' : ' loaves');
+    $('bar-total').textContent = shown;
+  }
+  var review = $('bar-review');
+  if (review) {
+    review.addEventListener('click', function () {
+      var s = document.querySelector('.order-summary');
+      if (s) s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   }
 
   // ── calendar ──

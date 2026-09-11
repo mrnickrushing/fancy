@@ -32,26 +32,27 @@ FORMS_CSS = """
 .choice label:has(input:checked){border-color:var(--burgundy);box-shadow:inset 0 0 0 1px var(--burgundy)}
 .choice input{margin-top:.35rem;accent-color:var(--burgundy)}
 .choice b{font-family:var(--serif);font-weight:600;display:block}
-.choice small{display:block;font-size:var(--sm);opacity:.72;font-style:italic}
+.choice small{display:block;font-size:var(--sm);opacity:.8}
 .msg{padding:var(--s4) var(--s5);border:1px solid var(--rule);background:var(--paper-2);
   font-size:var(--sm);display:none;margin-top:var(--s4)}
 .msg.show{display:block}
 .msg.ok{border-color:var(--olive);color:var(--olive-deep)}
 .msg.error{border-color:var(--burgundy);color:var(--burgundy-deep)}
-.btn:disabled{opacity:.55;cursor:wait;letter-spacing:.28em}
+.btn:disabled{opacity:.55;cursor:not-allowed;letter-spacing:.28em}
 .btn-sm{min-height:36px;padding:.45rem 1rem;font-size:.62rem;letter-spacing:.2em}
 
 /* ── the menu with quantities ── */
 .menu-course{margin-bottom:var(--s12)}
 .menu-course h2{font-size:var(--xl);text-align:left;margin-bottom:var(--s2)}
 .menu-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s5);align-items:center;
-  padding-block:var(--s5);border-bottom:1px solid var(--rule-soft)}
+  padding:var(--s5) var(--s4);border-bottom:1px solid var(--rule-soft);
+  transition:background .18s ease}
 .menu-item .fare-t{margin-bottom:var(--s1)}
 .price{font-family:var(--serif);font-weight:600;white-space:nowrap}
-.price.tbq{font-weight:400;font-style:italic;opacity:.6;font-size:var(--sm);white-space:normal;max-width:9em;text-align:right;line-height:1.3}
+.price.tbq{font-weight:400;opacity:.72;font-size:var(--sm);white-space:normal;max-width:9em;text-align:right;line-height:1.3}
 .qty{display:inline-flex;align-items:center;border:1px solid var(--rule);background:var(--paper-2);flex-shrink:0}
 .qty button{flex-shrink:0}
-.qty button{width:40px;height:40px;background:none;border:none;font-family:var(--serif);
+.qty button{width:44px;height:44px;background:none;border:none;font-family:var(--serif);
   font-size:1.2rem;color:var(--burgundy);cursor:pointer}
 .qty button:hover{background:var(--paper-3)}
 .qty output{width:36px;text-align:center;font-family:var(--serif);font-weight:600}
@@ -67,12 +68,12 @@ FORMS_CSS = """
 .cart-line span:last-child{white-space:nowrap}
 .cart-total{display:flex;justify-content:space-between;font-family:var(--serif);font-weight:600;
   padding-top:var(--s3);border-top:1px solid var(--rule)}
-.cart-empty{font-style:italic;opacity:.6;font-size:var(--sm)}
+.cart-empty{opacity:.7;font-size:var(--sm)}
 
 /* ── calendar ── */
 .cal{border:1px solid var(--rule);background:var(--paper-2);padding:var(--s4)}
 .cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s3)}
-.cal-head button{background:none;border:1px solid var(--rule);width:34px;height:34px;
+.cal-head button{background:none;border:1px solid var(--rule);width:44px;height:44px;
   font-family:var(--serif);color:var(--burgundy);cursor:pointer}
 .cal-head button:disabled{opacity:.3;cursor:default}
 .cal-month{font-family:var(--serif);font-weight:600;letter-spacing:.06em}
@@ -87,7 +88,7 @@ FORMS_CSS = """
   border-radius:50%;background:var(--gold)}
 .cal-day.selected{background:var(--burgundy);color:var(--paper-2);border-color:var(--burgundy)}
 .cal-day.selected::after{background:var(--gold-pale)}
-.cal-note{font-size:var(--xs);font-style:italic;opacity:.65;margin-top:var(--s3)}
+.cal-note{font-size:var(--xs);opacity:.78;margin-top:var(--s3);line-height:1.5}
 
 /* ── confirmation ── */
 .confirm{background:var(--paper-2);border:1px solid var(--rule);padding:var(--s12);text-align:center;
@@ -103,24 +104,65 @@ FORMS_CSS = """
 .order-step-head{display:flex;align-items:baseline;gap:var(--s4);margin-bottom:var(--s6);padding-bottom:var(--s4);border-bottom:1px solid var(--rule-soft)}
 .order-step-num{font-family:var(--serif);font-size:var(--lg);font-weight:600;color:var(--gold);min-width:1.4em}
 .order-step h2{font-size:var(--lg);text-align:left;margin:0}
-.order-step-intro{font-size:var(--sm);font-style:italic;opacity:.72;margin:-var(--s3) 0 var(--s6)}
+.order-step-intro{font-size:var(--sm);opacity:.8;margin:calc(var(--s3) * -1) 0 var(--s6);max-width:56ch}
 .order-summary{position:sticky;top:120px;background:var(--paper-2);border:1px solid var(--rule);padding:var(--s8);box-shadow:var(--sh-md)}
 .order-summary::before{content:'';position:absolute;inset:7px;border:1px solid var(--rule);opacity:.45;pointer-events:none}
 .order-summary>*{position:relative}
 .order-summary h2{font-size:var(--lg);text-align:left;margin:var(--s2) 0 0}
-.order-summary .summary-note{font-size:var(--sm);font-style:italic;opacity:.7;line-height:1.55}
+.order-summary .summary-note{font-size:var(--sm);opacity:.78;line-height:1.55}
 .order-summary .btn{width:100%;margin-top:var(--s5)}
 .order-reassurance{margin-top:var(--s8);padding-top:var(--s6);border-top:1px solid var(--rule-soft);font-size:var(--sm);line-height:1.6;opacity:.76}
 .order-reassurance strong{display:block;color:var(--olive);font-family:var(--serif);font-weight:600;margin-bottom:var(--s2)}
 .order-submit{display:flex;align-items:center;gap:var(--s5);padding-top:var(--s2)}
 .order-submit .cal-note{margin:0}
 
+/* ── the courses collapse into accordions on small screens, so the whole
+      bill of fare is not one endless scroll before step II ── */
+.course-fold{border-bottom:1px solid var(--rule-soft)}
+.course-fold:last-of-type{border-bottom:0}
+.course-fold>summary{display:flex;align-items:center;justify-content:space-between;gap:var(--s4);
+  min-height:56px;padding:var(--s4) 0;cursor:pointer;list-style:none;
+  font-family:var(--serif);font-size:.72rem;font-weight:600;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--burgundy)}
+.course-fold>summary::-webkit-details-marker{display:none}
+.course-fold>summary::after{content:'\002B';font-size:1.1rem;letter-spacing:0;color:var(--gold-read);flex:0 0 auto}
+.course-fold[open]>summary::after{content:'\2212'}
+.course-fold>summary .fold-n{font-family:var(--body);font-size:var(--sm);letter-spacing:.04em;
+  text-transform:none;color:var(--ink);opacity:.6}
+.course-fold>summary .fold-chosen{font-family:var(--body);font-size:var(--sm);letter-spacing:.04em;
+  text-transform:none;color:var(--olive-deep)}
+.course-fold-body{padding-bottom:var(--s5)}
+/* wide screens read every course at once: the summary is a heading, not a control */
+@media (min-width:901px){
+  .course-fold>summary{cursor:default}
+  .course-fold>summary::after{display:none}
+}
+.fare-buy{display:flex;align-items:center;gap:var(--s5);flex-wrap:wrap;justify-content:flex-end}
+
+/* a row with something in the basket earns a visible mark */
+.menu-item.is-chosen{background:var(--olive-pale);box-shadow:inset 3px 0 0 var(--olive)}
+.course-fold-body>.menu-item:last-child{border-bottom:0}
+
+/* ── the sticky tally: on a phone the summary is far below the fold, so the
+      running total follows the thumb instead ── */
+.order-bar{position:fixed;inset:auto 0 0 0;z-index:60;display:none;
+  background:var(--paper-2);border-top:1px solid var(--rule);box-shadow:0 -6px 24px oklch(.2 .04 30/.14);
+  padding:var(--s3) var(--s5) calc(var(--s3) + env(safe-area-inset-bottom))}
+.order-bar-in{display:flex;align-items:center;gap:var(--s4);max-width:640px;margin-inline:auto}
+.order-bar-tally{display:grid;gap:.1rem;flex:1 1 auto;min-width:0}
+.order-bar-count,.order-bar-total{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.order-bar-count{font-family:var(--serif);font-size:.6rem;font-weight:600;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--olive-deep)}
+.order-bar-total{font-family:var(--serif);font-size:var(--sm);font-weight:600;color:var(--ink)}
+.order-bar .btn{flex:0 0 auto;width:auto;margin:0;min-height:44px;
+  padding:.7rem 1.1rem;font-size:.62rem;letter-spacing:.16em;white-space:nowrap}
+
 /* ── admin ── */
 .adm-bar{display:flex;justify-content:space-between;align-items:center;gap:var(--s5);flex-wrap:wrap;
   padding-block:var(--s8);border-bottom:1px solid var(--rule)}
 .adm-tabs{display:flex;gap:var(--s2);flex-wrap:wrap;margin-block:var(--s6) var(--s8)}
 .adm-tab{font-family:var(--serif);font-size:.68rem;font-weight:600;letter-spacing:.26em;text-transform:uppercase;
-  padding:.7rem 1.1rem;border:1px solid var(--rule);background:var(--paper-2);color:var(--ink);cursor:pointer}
+  min-height:44px;padding:.7rem 1.1rem;border:1px solid var(--rule);background:var(--paper-2);color:var(--ink);cursor:pointer}
 .adm-tab.active{background:var(--burgundy);border-color:var(--burgundy);color:var(--paper-2)}
 .adm-tab .n{display:inline-block;min-width:1.3em;padding:0 .35em;margin-left:.5em;border-radius:1em;
   background:var(--gold);color:var(--burgundy-ink);font-size:.62rem;text-align:center}
@@ -138,7 +180,7 @@ FORMS_CSS = """
 .adm textarea{width:100%}
 .actions{display:flex;flex-wrap:wrap;gap:var(--s2)}
 .actions button,.adm button.act{font-family:var(--serif);font-size:.6rem;font-weight:600;letter-spacing:.18em;
-  text-transform:uppercase;padding:.45rem .7rem;border:1px solid var(--rule);background:var(--paper-2);
+  text-transform:uppercase;min-height:44px;padding:.45rem .9rem;border:1px solid var(--rule);background:var(--paper-2);
   color:var(--ink);cursor:pointer;white-space:nowrap}
 .actions button:hover{border-color:var(--burgundy);color:var(--burgundy)}
 .actions button.good{border-color:var(--olive);color:var(--olive-deep)}
@@ -155,27 +197,36 @@ FORMS_CSS = """
 .detail-grid dd{margin:0}
 .detail-cols{display:grid;grid-template-columns:1fr 1fr;gap:var(--s8)}
 .chips{display:flex;gap:var(--s2);flex-wrap:wrap;margin-bottom:var(--s5)}
-.chip{font-family:var(--serif);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;padding:.4rem .8rem;
+.chip{font-family:var(--serif);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;min-height:44px;padding:.4rem .9rem;
   border:1px solid var(--rule);background:none;cursor:pointer;color:var(--ink)}
 .chip.active{background:var(--ink);color:var(--paper-2);border-color:var(--ink)}
-.empty{font-style:italic;opacity:.6;padding:var(--s5) 0}
+.empty{opacity:.7;padding:var(--s5) 0}
 .modal{position:fixed;inset:0;background:oklch(.15 .05 30/.6);display:none;align-items:center;justify-content:center;z-index:200;padding:var(--s5)}
 .modal.show{display:flex}
 .modal-box{background:var(--paper-2);border:1px solid var(--rule);padding:var(--s8);width:100%;max-width:560px}
 .table-wrap{overflow-x:auto}
 @media (max-width:900px){
   .row2,.detail-cols{grid-template-columns:1fr}
-  .order-layout{grid-template-columns:1fr}
-  .order-summary{position:static;grid-row:1}
+  /* one column, and the summary keeps its DOM position AFTER the steps —
+     nobody wants to read a summary of an order they have not made yet */
+  .order-layout{grid-template-columns:1fr;gap:var(--s8)}
+  .order-summary{position:static}
+  .order-summary .summary-note{display:none}
+  /* the sticky tally replaces the sidebar as the running total */
+  .order-bar{display:block}
+  .order-bar[hidden]{display:none}
+  /* room so the fixed bar never covers the submit button */
+  .order-layout{padding-bottom:var(--s16)}
 }
 @media (max-width:640px){
-  header nav{justify-content:flex-start!important;gap:var(--s4)!important;overflow-x:auto;scrollbar-width:none;padding-inline:var(--s4)}
-  header nav::-webkit-scrollbar{display:none}
-  header nav a{flex:0 0 auto}
   .menu-item{grid-template-columns:1fr;gap:var(--s3)}
+  /* price on the left, stepper on the right, both on one line */
+  .fare-buy{justify-content:space-between;flex-wrap:nowrap;gap:var(--s4)}
+  .price.tbq{text-align:left;max-width:11em}
   .adm-section{padding:var(--s5)}
   .order-step,.order-summary{padding:var(--s5)}
   .order-submit{display:block}
+  .order-submit .btn{width:100%}
   .order-submit .cal-note{margin-top:var(--s4);text-align:center}
 }
 """
@@ -253,6 +304,16 @@ ORDER = D.masthead("Order") + D.head_band("Ordina", "Place an Order",
           <div class="order-reassurance"><strong>Made for your table</strong>Every order is baked in small batches and confirmed by Amanda before anything is final.</div>
         </aside>
       </form>
+
+      <div class="order-bar" id="order-bar" hidden>
+        <div class="order-bar-in">
+          <div class="order-bar-tally">
+            <span class="order-bar-count" id="bar-count">Nothing chosen</span>
+            <span class="order-bar-total" id="bar-total">&#8212;</span>
+          </div>
+          <button type="button" class="btn btn-fill" id="bar-review">Review order</button>
+        </div>
+      </div>
     </div>
 
     <div id="confirmation" hidden>
@@ -291,7 +352,7 @@ ORDER = D.masthead("Order") + D.head_band("Ordina", "Place an Order",
     <p class="caps kicker">Prima di ordinare</p>
     <h2 class="h-sec">A few useful things to know</h2>
     {D.dimple_rule()}
-    <ul style="display:grid;gap:var(--s4);font-style:italic;opacity:.82">
+    <ul style="display:grid;gap:var(--s4);opacity:.86">
       <li>Orders are requests until Amanda confirms availability and the final total.</li>
       <li>For changes or cancellations, email <a href="#">info@ohyoufancyfocaccia.com</a> as soon as possible.</li>
       <li>Delivery and shipping availability, timing, and cost depend on the destination.</li>
@@ -349,7 +410,7 @@ ADMIN = D.masthead("Order") + f"""
           <button type="button" class="btn btn-line btn-sm" id="toggle-manual">Add an order by hand</button>
         </div>
         <form id="manual-form" hidden style="margin-block:var(--s5) var(--s8);padding:var(--s6);background:var(--paper);border:1px dashed var(--rule)" novalidate>
-          <p style="font-size:var(--sm);font-style:italic;opacity:.72;margin-bottom:var(--s5)">For orders taken at the stall, by phone or by message. Nothing is emailed until you send it.</p>
+          <p style="font-size:var(--sm);opacity:.82;margin-bottom:var(--s5)">For orders taken at the stall, by phone or by message. Nothing is emailed until you send it.</p>
           <div class="row2">
             <div class="field"><label for="mo-first">First name</label><input id="mo-first"></div>
             <div class="field"><label for="mo-last">Last name</label><input id="mo-last"></div>
@@ -382,7 +443,7 @@ ADMIN = D.masthead("Order") + f"""
     <div class="adm-panel" data-panel="menu">
       <div class="adm-section">
         <h2>The Bill of Fare</h2>
-        <p style="font-size:var(--sm);font-style:italic;opacity:.72;margin-bottom:var(--s5)">What customers can order, and what it costs. An item without a price is still orderable &#8212; you quote it when you confirm. Untick <em>available</em> to take something off the menu for a while.</p>
+        <p style="font-size:var(--sm);opacity:.82;margin-bottom:var(--s5)">What customers can order, and what it costs. An item without a price is still orderable &#8212; you quote it when you confirm. Untick <em>available</em> to take something off the menu for a while.</p>
         <div class="table-wrap"><table class="adm" id="menu-table">
           <thead><tr><th>Course</th><th>Name</th><th>Description</th><th>Price</th><th>Available</th><th></th></tr></thead>
           <tbody id="menu-body"></tbody></table></div>
@@ -413,7 +474,7 @@ ADMIN = D.masthead("Order") + f"""
     <div class="adm-panel" data-panel="blocks">
       <div class="adm-section">
         <h2>Days Off</h2>
-        <p style="font-size:var(--sm);font-style:italic;opacity:.72;margin-bottom:var(--s5)">Dates you are not baking. They are greyed out on the order page, and an order for one of them cannot be accepted.</p>
+        <p style="font-size:var(--sm);opacity:.82;margin-bottom:var(--s5)">Dates you are not baking. They are greyed out on the order page, and an order for one of them cannot be accepted.</p>
         <form id="block-form" novalidate>
           <div class="row2" style="grid-template-columns:1fr 1fr 2fr auto;align-items:end">
             <div class="field"><label for="block-start">From</label><input id="block-start" type="date"></div>
@@ -431,7 +492,7 @@ ADMIN = D.masthead("Order") + f"""
     <div class="adm-panel" data-panel="reviews">
       <div class="adm-section">
         <h2>Reviews</h2>
-        <p style="font-size:var(--sm);font-style:italic;opacity:.72;margin-bottom:var(--s5)">Reviews left on the website wait here until you approve them.</p>
+        <p style="font-size:var(--sm);opacity:.82;margin-bottom:var(--s5)">Reviews left on the website wait here until you approve them.</p>
         <div class="table-wrap"><table class="adm"><thead><tr><th>Submitted</th><th>Name</th><th>Rating</th><th>Review</th><th>Status</th><th></th></tr></thead><tbody id="reviews-body"></tbody></table></div>
         <p class="empty" id="reviews-empty" hidden>No reviews submitted yet.</p>
       </div>
@@ -538,7 +599,7 @@ NOT_FOUND = D.masthead("Lost") + f"""
   <div class="narrow">
     <p class="caps kicker">404</p>
     <h1 class="h-sec">That page wandered off.</h1>
-    <p style="font-style:italic;opacity:.75;margin-bottom:var(--s8)">The bread is still here. Try the bill of fare or send us a note.</p>
+    <p style="opacity:.82;margin-bottom:var(--s8)">The bread is still here. Try the bill of fare or send us a note.</p>
     <div style="display:flex;gap:var(--s4);justify-content:center;flex-wrap:wrap">
       <a href="#" class="btn btn-fill">Back to the bakery</a>
       <a href="#" class="btn btn-line">Place an order</a>
