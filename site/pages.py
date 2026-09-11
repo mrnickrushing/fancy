@@ -93,6 +93,27 @@ FORMS_CSS = """
   position:relative;max-width:640px;margin:0 auto}
 .confirm::before{content:'';position:absolute;inset:8px;border:1px solid var(--rule);opacity:.45;pointer-events:none}
 
+/* ── the order flow: clear stages on the left, a living summary on the right ── */
+.order-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:var(--s12);align-items:start}
+.order-main{display:grid;gap:var(--s8);min-width:0}
+.order-step{background:var(--paper-2);border:1px solid var(--rule);padding:var(--s8);position:relative}
+.order-step::before{content:'';position:absolute;inset:7px;border:1px solid var(--rule);opacity:.35;pointer-events:none}
+.order-step>*{position:relative}
+.order-step-head{display:flex;align-items:baseline;gap:var(--s4);margin-bottom:var(--s6);padding-bottom:var(--s4);border-bottom:1px solid var(--rule-soft)}
+.order-step-num{font-family:var(--serif);font-size:var(--lg);font-weight:600;color:var(--gold);min-width:1.4em}
+.order-step h2{font-size:var(--lg);text-align:left;margin:0}
+.order-step-intro{font-size:var(--sm);font-style:italic;opacity:.72;margin:-var(--s3) 0 var(--s6)}
+.order-summary{position:sticky;top:120px;background:var(--paper-2);border:1px solid var(--rule);padding:var(--s8);box-shadow:var(--sh-md)}
+.order-summary::before{content:'';position:absolute;inset:7px;border:1px solid var(--rule);opacity:.45;pointer-events:none}
+.order-summary>*{position:relative}
+.order-summary h2{font-size:var(--lg);text-align:left;margin:var(--s2) 0 0}
+.order-summary .summary-note{font-size:var(--sm);font-style:italic;opacity:.7;line-height:1.55}
+.order-summary .btn{width:100%;margin-top:var(--s5)}
+.order-reassurance{margin-top:var(--s8);padding-top:var(--s6);border-top:1px solid var(--rule-soft);font-size:var(--sm);line-height:1.6;opacity:.76}
+.order-reassurance strong{display:block;color:var(--olive);font-family:var(--serif);font-weight:600;margin-bottom:var(--s2)}
+.order-submit{display:flex;align-items:center;gap:var(--s5);padding-top:var(--s2)}
+.order-submit .cal-note{margin:0}
+
 /* ── admin ── */
 .adm-bar{display:flex;justify-content:space-between;align-items:center;gap:var(--s5);flex-wrap:wrap;
   padding-block:var(--s8);border-bottom:1px solid var(--rule)}
@@ -143,12 +164,18 @@ FORMS_CSS = """
 .table-wrap{overflow-x:auto}
 @media (max-width:900px){
   .row2,.detail-cols{grid-template-columns:1fr}
-  .cart{position:static}
-  .order-grid{grid-template-columns:1fr!important}
+  .order-layout{grid-template-columns:1fr}
+  .order-summary{position:static;grid-row:1}
 }
 @media (max-width:640px){
+  header nav{justify-content:flex-start!important;gap:var(--s4)!important;overflow-x:auto;scrollbar-width:none;padding-inline:var(--s4)}
+  header nav::-webkit-scrollbar{display:none}
+  header nav a{flex:0 0 auto}
   .menu-item{grid-template-columns:1fr;gap:var(--s3)}
   .adm-section{padding:var(--s5)}
+  .order-step,.order-summary{padding:var(--s5)}
+  .order-submit{display:block}
+  .order-submit .cal-note{margin-top:var(--s4);text-align:center}
 }
 """
 
@@ -157,62 +184,72 @@ ORDER = D.masthead("Order") + D.head_band("Ordina", "Place an Order",
   "Choose from the bill of fare, tell us when you need it, and we will confirm and let you know the total.") + f"""
 <section class="sec" style="background:var(--paper)">
   <div class="wrap">
-    <div id="order-app" class="order-grid" style="display:grid;grid-template-columns:1.15fr .85fr;gap:var(--s16);align-items:start">
-      <div>
-        <p class="caps kicker kicker-l">I &#8212; La Lista</p>
-        <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s3)">Choose your bread</h2>
-        <p style="opacity:.74;font-style:italic;margin-bottom:var(--s8)">Everything is baked to order in small batches.
-          Where a price is not shown yet, we will quote it when we confirm.</p>
-        <div id="menu"><p class="empty">Loading the bill of fare&#8230;</p></div>
-      </div>
+    <div id="order-app">
+      <form id="order-form" class="order-layout" novalidate>
+        <div class="order-main">
+          <section class="order-step">
+            <div class="order-step-head"><span class="order-step-num">I</span><h2>Choose your bread</h2></div>
+            <p class="order-step-intro">Everything is baked to order in small batches. Where a price is not shown yet, we will quote it when we confirm.</p>
+            <div id="menu"><p class="empty">Loading the bill of fare&#8230;</p></div>
+          </section>
 
-      <form id="order-form" class="cart" novalidate>
-        <p class="caps" style="color:var(--olive)">II &#8212; Your Order</p>
-        <div id="cart-lines" class="cart-lines"><p class="cart-empty">Nothing chosen yet.</p></div>
-        <div class="cart-total"><span>Total</span><span id="cart-total">&#8212;</span></div>
-        <p id="cart-note" class="cal-note"></p>
-
-        <div style="height:var(--s6)"></div>
-        <p class="caps" style="color:var(--olive);margin-bottom:var(--s3)">III &#8212; How &amp; When</p>
-        <div class="choice" style="margin-bottom:var(--s5)">
+          <section class="order-step">
+            <div class="order-step-head"><span class="order-step-num">II</span><h2>How and when</h2></div>
+            <div class="choice" style="margin-bottom:var(--s5)">
           <label><input type="radio" name="fulfillment" value="pickup" checked>
             <span><b>Market pickup</b><small id="pickup-note">Brookings-Harbor Farmers Market, Wednesdays and Saturdays.</small></span></label>
           <label><input type="radio" name="fulfillment" value="delivery">
             <span><b>Local delivery</b><small>Around Brookings and Harbor. We will confirm the details.</small></span></label>
           <label><input type="radio" name="fulfillment" value="shipping">
             <span><b>Shipping</b><small>Tell us where it is going and we will let you know the cost.</small></span></label>
-        </div>
-        <div class="field">
-          <span class="caps" id="date-label">Pickup day</span>
-          <div class="cal" id="cal">
-            <div class="cal-head"><button type="button" id="cal-prev" aria-label="Previous month">&#8249;</button>
-              <span class="cal-month" id="cal-month"></span>
-              <button type="button" id="cal-next" aria-label="Next month">&#8250;</button></div>
-            <div class="cal-grid" id="cal-grid"></div>
-            <p class="cal-note" id="cal-note">Gold dot &#8212; a market day.</p>
-          </div>
-          <input type="hidden" id="needed-date" name="neededDate">
-          <p class="err" data-for="needed-date"></p>
-        </div>
-        <div class="field" id="address-field" hidden>
-          <label for="address">Address</label>
-          <textarea id="address" name="address" rows="3"></textarea>
-          <p class="err" data-for="address"></p>
-        </div>
+            </div>
+            <div class="field">
+              <span class="caps" id="date-label">Pickup day</span>
+              <div class="cal" id="cal">
+                <div class="cal-head"><button type="button" id="cal-prev" aria-label="Previous month">&#8249;</button>
+                  <span class="cal-month" id="cal-month"></span>
+                  <button type="button" id="cal-next" aria-label="Next month">&#8250;</button></div>
+                <div class="cal-grid" id="cal-grid"></div>
+                <p class="cal-note" id="cal-note">Gold dot &#8212; a market day.</p>
+              </div>
+              <input type="hidden" id="needed-date" name="neededDate">
+              <p class="err" data-for="needed-date"></p>
+            </div>
+            <div class="field" id="address-field" hidden>
+              <label for="address">Address</label>
+              <textarea id="address" name="address" rows="3"></textarea>
+              <p class="err" data-for="address"></p>
+            </div>
+          </section>
 
-        <p class="caps" style="color:var(--olive);margin-bottom:var(--s3)">IV &#8212; Who</p>
-        <div class="row2">
+          <section class="order-step">
+            <div class="order-step-head"><span class="order-step-num">III</span><h2>Tell us who it is for</h2></div>
+            <p class="order-step-intro">We will use these details to confirm the order and send the final total.</p>
+          <div class="row2">
           <div class="field"><label for="first-name">First name</label><input id="first-name" name="firstName" autocomplete="given-name"><p class="err" data-for="first-name"></p></div>
           <div class="field"><label for="last-name">Last name</label><input id="last-name" name="lastName" autocomplete="family-name"><p class="err" data-for="last-name"></p></div>
         </div>
-        <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email"><p class="err" data-for="email"></p></div>
-        <div class="field"><label for="phone">Phone <span style="opacity:.5;letter-spacing:.1em">(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel"></div>
-        <div class="field"><label for="notes">Anything we should know? <span style="opacity:.5;letter-spacing:.1em">(optional)</span></label>
-          <textarea id="notes" name="notes" rows="3" placeholder="An occasion, an allergy, a favourite&#8230;"></textarea></div>
+            <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email"><p class="err" data-for="email"></p></div>
+            <div class="field"><label for="phone">Phone <span style="opacity:.5;letter-spacing:.1em">(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel"></div>
+            <div class="field"><label for="notes">Anything we should know? <span style="opacity:.5;letter-spacing:.1em">(optional)</span></label>
+              <textarea id="notes" name="notes" rows="3" placeholder="An occasion, an allergy, a favourite&#8230;"></textarea></div>
+            <div class="order-submit">
+              <button type="submit" class="btn btn-fill" id="submit">Send the Order</button>
+              <p class="cal-note">Nothing is charged online. We confirm every order by email.</p>
+            </div>
+            <div id="form-msg" class="msg"></div>
+          </section>
+        </div>
 
-        <button type="submit" class="btn btn-fill" style="width:100%" id="submit">Send the Order</button>
-        <p class="cal-note" style="text-align:center">Nothing is charged online. We confirm every order by email.</p>
-        <div id="form-msg" class="msg"></div>
+        <aside class="order-summary">
+          <p class="caps" style="color:var(--olive)">Your order</p>
+          <h2>From the tray</h2>
+          <div id="cart-lines" class="cart-lines"><p class="cart-empty">Nothing chosen yet.</p></div>
+          <div class="cart-total"><span>Total</span><span id="cart-total">&#8212;</span></div>
+          <p id="cart-note" class="cal-note"></p>
+          <p class="summary-note">Choose your loaves on the left, then tell us how and when you would like them.</p>
+          <div class="order-reassurance"><strong>Made for your table</strong>Every order is baked in small batches and confirmed by Amanda before anything is final.</div>
+        </aside>
       </form>
     </div>
 
