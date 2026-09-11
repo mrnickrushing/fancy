@@ -2,7 +2,8 @@
 
 Claude Design canvas: https://claude.ai/code/artifact/5d1189ca-a7c9-44df-8bb8-09626aadff5d
 
-Seven artboards — Home, Home (mobile), About, Our Breads, Gallery, Reviews, Contact.
+Nine artboards — **Loading screen** (desktop + phone), Home (desktop + phone),
+About, Bill of Fare, Gallery, Reviews, Contact.
 
 ## Files
 
@@ -28,22 +29,41 @@ Rebuild with `python3 _build.py`, then re-seed and republish to the same URL.
 | `--offset` | `#EFE4C8` | Alternating section bands |
 | `--text` | `#3B1A14` | Body copy, deep espresso with a red undertone |
 
-Type: **Playfair Display** (display + letterspaced micro-labels), **Lora** (body),
-**Pinyon Script** (the "Oh! You Fancy" wordmark only).
+Type: **Bodoni Moda** (display — the Italian didone, matching the logo's high-contrast
+FOCACCIA lettering), **EB Garamond** (body), **Italianno** (the "Oh! You Fancy" flourish).
 
-## What came from Sugar Haus
+## Its own identity — where it departs from Sugar Haus
 
-Structure and system values were lifted from `mrnickrushing/sugarhaus`
-(`public/style.css`, `public/base.css`) rather than invented:
+Sugar Haus is the quality bar, not the template. Deliberate divergences:
 
-- Spacing scale, `0.375 / 0.625 / 1 / 1.5rem` radii, `cubic-bezier(.16,1,.3,1)` easing
-- Warm `oklch` shadow ramp, 1200px content width
-- The eyebrow label with flanking hairlines, card lift on hover, page-hero radial glow,
-  sticky blurred header, full-width ribbon banner, pill tags
-- Page anatomy: hero → four-step block → six category cards → proof → CTA → footer
+| | Sugar Haus | Oh! You Fancy Focaccia |
+|---|---|---|
+| Type | Playfair Display / Lora / Work Sans | Bodoni Moda / EB Garamond / Italianno |
+| Masthead | Left logo, right nav bar | Centred label masthead, nav on a rule beneath |
+| Cards | Rounded surfaces, soft shadow | Square `.plate` with a hairline inset frame |
+| Menu | Priced product cards | Bill of fare with dotted leaders and roman numerals |
+| Section mark | Eyebrow with flanking rules | Dimple rule — the focaccia motif |
+| Edges | — | Vertical spine rails with rotated letterspaced type |
+| Shape | Rounded rectangles | Oval cartouches echoing the logo's ring |
+| Dark band | — | Enamel market sign, double-ruled |
+| Loading | Typewriter terminal | Ingredients proving while dimples press in |
 
-Its rose/sage/chocolate palette was replaced with the logo's burgundy/olive/gold, and
-the ordering flow was dropped per the client.
+What was taken is the *standard*: staged reveal on load, a considered type ramp,
+motion that is orchestrated rather than scattered, and copy written for this business
+rather than filled in.
+
+## Loading screen
+
+`Loader.dc.html` / `LoaderPhone.dc.html` — animates live on a 9-second loop.
+
+1. The ring strokes itself on (`stroke-dashoffset`), like a stamp pressed into a label
+2. The wordmark rises
+3. The five things focaccia is made of arrive in turn — **Farina, Acqua, Olio d'Oliva,
+   Sale, Tempo** — each with its English gloss
+4. A dimple presses into the dough for each one. That row of dimples *is* the progress bar
+5. `Pane · Amore · Sempre` settles, then **Entra**
+
+Honours `prefers-reduced-motion`: animation is disabled and the resolved state shown.
 
 ## Deliberate gaps
 

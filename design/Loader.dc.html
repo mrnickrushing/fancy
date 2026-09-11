@@ -1,0 +1,311 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&amp;family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=Italianno&amp;display=swap">
+<style>
+:root{
+  --xs:.78rem; --sm:.94rem; --base:1.08rem; --lg:1.35rem;
+  --xl:2.1rem; --xxl:3.2rem; --xxxl:4.6rem;
+  --s1:.25rem;--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.25rem;--s6:1.5rem;
+  --s8:2rem;--s10:2.5rem;--s12:3rem;--s16:4rem;--s20:5rem;--s24:6rem;--s32:8rem;
+
+  --burgundy:#8E1B1B; --burgundy-mid:#711616; --burgundy-deep:#4A0E0E;
+  --burgundy-ink:#2A0B0B;
+  --olive:#4E6023; --olive-deep:#33401A; --olive-pale:#E4E7D0;
+  --gold:#B8862F; --gold-pale:#EFE0BE;
+  --paper:#F4EFE2; --paper-2:#FBF8EF; --paper-3:#EAE1CB; --paper-4:#DED2B4;
+  --rule:#CBBB97; --rule-soft:#DED2B4;
+  --ink:#33190F; --ink-soft:#6E4432;
+  --crust:#C98A45;
+
+  --r-sm:2px; --r-md:3px; --r-lg:4px; --r-oval:50%;
+  --ease:cubic-bezier(.19,1,.22,1);
+  --sh-sm:0 1px 2px oklch(.25 .05 40/.10);
+  --sh-md:0 6px 22px oklch(.25 .05 40/.13);
+  --sh-lg:0 18px 52px oklch(.25 .05 40/.18);
+  --wide:1240px; --mid:900px; --narrow:680px;
+  --serif:'Bodoni Moda',Didot,'Bodoni MT',Georgia,serif;
+  --body:'EB Garamond',Garamond,Georgia,serif;
+  --script:'Italianno','Snell Roundhand',cursive;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);
+  font-size:var(--base);line-height:1.72;-webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;font-feature-settings:"liga","kern"}
+h1,h2,h3,h4{font-family:var(--serif);line-height:1.1;font-weight:600;text-wrap:balance}
+p{text-wrap:pretty}
+img,svg{display:block;max-width:100%}
+a{color:var(--burgundy);text-decoration:none}
+a:hover{color:var(--burgundy-deep)}
+ul{list-style:none}
+
+/* laid-paper grain, warmer and finer than a flat fill */
+.grain{position:relative}
+.grain::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.55;
+  background-image:radial-gradient(oklch(.42 .07 45/.05) .5px,transparent .5px),
+    repeating-linear-gradient(93deg,oklch(.42 .07 45/.022) 0 1px,transparent 1px 4px);
+  background-size:3px 3px,auto}
+
+.wrap{max-width:var(--wide);margin:0 auto;padding-inline:var(--s10)}
+.mid{max-width:var(--mid);margin:0 auto;padding-inline:var(--s10)}
+.narrow{max-width:var(--narrow);margin:0 auto;padding-inline:var(--s8)}
+
+/* ── small caps label, the house voice ── */
+.caps{font-family:var(--serif);font-size:var(--xs);font-weight:600;
+  letter-spacing:.34em;text-transform:uppercase}
+
+/* ── vertical spine rail (label-edge motif) ── */
+.spine{position:absolute;top:0;bottom:0;width:52px;display:flex;
+  align-items:center;justify-content:center}
+.spine span{writing-mode:vertical-rl;font-family:var(--serif);font-size:.68rem;
+  font-weight:600;letter-spacing:.44em;text-transform:uppercase;
+  color:var(--burgundy);opacity:.42}
+.spine-l{left:0}
+.spine-r{right:0;transform:rotate(180deg)}
+
+/* ── oval cartouche, echoing the logo's ring ── */
+.oval{border-radius:50%/50%;border:2px solid var(--burgundy);position:relative}
+.oval::before{content:'';position:absolute;inset:7px;border:1px solid var(--burgundy);
+  opacity:.45;border-radius:50%/50%;pointer-events:none}
+
+/* ── buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;
+  min-height:52px;padding:.9rem 2.3rem;font-family:var(--serif);font-size:var(--xs);
+  font-weight:600;letter-spacing:.28em;text-transform:uppercase;
+  border-radius:var(--r-sm);transition:all 280ms var(--ease);cursor:pointer}
+.btn-fill{background:var(--burgundy);color:var(--paper-2);border:1px solid var(--burgundy)}
+.btn-fill:hover{background:var(--burgundy-deep);border-color:var(--burgundy-deep);
+  color:var(--paper-2);letter-spacing:.32em}
+.btn-line{background:transparent;color:var(--burgundy);border:1px solid var(--burgundy)}
+.btn-line:hover{background:var(--burgundy);color:var(--paper-2);letter-spacing:.32em}
+.btn-pale{background:transparent;color:var(--gold-pale);border:1px solid oklch(.85 .07 80/.5)}
+.btn-pale:hover{background:var(--gold-pale);color:var(--burgundy-ink);letter-spacing:.32em}
+
+/* ── section furniture ── */
+.sec{padding-block:var(--s24);position:relative}
+.kicker{display:flex;align-items:center;gap:var(--s4);justify-content:center;
+  color:var(--burgundy);margin-bottom:var(--s5)}
+.kicker::before,.kicker::after{content:'';display:block;height:1px;width:54px;
+  background:currentColor;opacity:.4}
+.kicker-l{justify-content:flex-start}
+.kicker-l::before{display:none}
+.h-sec{font-size:var(--xl);text-align:center;margin-bottom:var(--s5)}
+.lede{font-size:var(--lg);color:var(--ink);opacity:.72;max-width:52ch;margin:0 auto;
+  text-align:center;line-height:1.62;font-style:italic}
+
+/* ── dimple rule: the focaccia motif as a divider ── */
+.dimples{display:flex;justify-content:center;align-items:center;gap:11px;
+  margin-block:var(--s10)}
+.dimples i{display:block;width:7px;height:7px;border-radius:50%;
+  background:var(--burgundy);opacity:.3}
+.dimples i:nth-child(4){width:11px;height:11px;opacity:.62;background:var(--gold)}
+
+/* ── bill of fare ── */
+.fare{display:flex;align-items:baseline;gap:var(--s4);padding-block:var(--s5);
+  border-bottom:1px solid var(--rule-soft)}
+.fare-n{font-family:var(--serif);font-size:var(--sm);color:var(--gold);
+  font-weight:600;width:34px;flex-shrink:0;letter-spacing:.1em}
+.fare-b{flex-grow:1}
+.fare-t{font-family:var(--serif);font-size:var(--lg);font-weight:600;
+  display:flex;align-items:baseline;gap:var(--s3)}
+.fare-t::after{content:'';flex-grow:1;border-bottom:1.5px dotted var(--rule);
+  transform:translateY(-4px)}
+.fare-d{font-size:var(--sm);opacity:.72;max-width:70ch;margin-top:var(--s2);
+  font-style:italic}
+
+/* ── enamel market sign ── */
+.enamel{background:var(--burgundy);color:var(--gold-pale);
+  border-block:6px double oklch(.85 .07 80/.42);padding-block:var(--s12);
+  text-align:center;position:relative;overflow:hidden}
+.enamel::before{content:'';position:absolute;inset:0;opacity:.09;
+  background-image:radial-gradient(#fff .7px,transparent .7px);background-size:5px 5px}
+
+/* ── plate: framed card with a hairline inset, not a rounded box ── */
+.plate{background:var(--paper-2);border:1px solid var(--rule);padding:var(--s8);
+  position:relative;transition:transform 320ms var(--ease),box-shadow 320ms var(--ease)}
+.plate::before{content:'';position:absolute;inset:6px;border:1px solid var(--rule);
+  opacity:.4;pointer-events:none}
+.plate:hover{transform:translateY(-5px);box-shadow:var(--sh-lg)}
+.plate h3{font-size:var(--lg);margin-bottom:var(--s3)}
+.plate p{font-size:var(--sm);opacity:.76;line-height:1.74}
+.grid{display:grid;gap:var(--s6)}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+
+/* roman numeral */
+.roman{font-family:var(--serif);font-size:2.6rem;font-weight:400;color:var(--gold);
+  line-height:1;margin-bottom:var(--s4);font-style:italic}
+
+/* photo slot */
+.slot{position:relative;background:linear-gradient(152deg,#EDE2C6,#E3D4B0 52%,#D8C69C);
+  border:1px solid var(--rule);overflow:hidden;display:flex;
+  align-items:center;justify-content:center}
+.slot::before{content:'';position:absolute;inset:9px;border:1px solid oklch(.42 .07 45/.2);
+  pointer-events:none}
+.slot-cap{position:absolute;bottom:15px;left:0;right:0;text-align:center;
+  font-family:var(--serif);font-size:.64rem;font-weight:600;letter-spacing:.26em;
+  text-transform:uppercase;color:oklch(.40 .05 45/.6)}
+
+.stage{position:relative;min-height:900px;display:flex;align-items:center;
+  justify-content:center;overflow:hidden;
+  background:radial-gradient(ellipse 92% 80% at 50% 42%,#5C1414 0%,#3A0C0C 46%,#240808 100%)}
+.stage::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.4;
+  background-image:radial-gradient(oklch(.9 .08 75/.10) .6px,transparent .6px);
+  background-size:4px 4px}
+.vig{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 68% 60% at 50% 46%,transparent 40%,oklch(.12 .05 30/.62) 100%)}
+.corner{position:absolute;opacity:.4}
+.c-tl{top:42px;left:42px} .c-tr{top:42px;right:42px;transform:scaleX(-1)}
+.c-bl{bottom:42px;left:42px;transform:scaleY(-1)}
+.c-br{bottom:42px;right:42px;transform:scale(-1)}
+.frame{position:absolute;inset:30px;border:1px solid oklch(.85 .07 80/.22);pointer-events:none}
+.frame::before{content:'';position:absolute;inset:9px;
+  border:1px solid oklch(.85 .07 80/.11)}
+
+.load-in{position:relative;text-align:center;z-index:2;padding-inline:var(--s8)}
+
+/* ring strokes itself on, like a stamp pressed into the label */
+.ring circle.draw,.ring path.draw{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);
+  animation:draw 9.0s var(--ease) infinite}
+@keyframes draw{0%{stroke-dashoffset:var(--len)}
+  14.44%,100%{stroke-dashoffset:0}}
+
+.mark{opacity:0;animation:mark 9.0s var(--ease) infinite}
+@keyframes mark{0%,9.44%{opacity:0;transform:translateY(9px)}
+  18.89%,100%{opacity:1;transform:none}}
+
+.ing-rail{position:relative;height:96px;margin-top:var(--s8)}
+.ing{position:absolute;inset:0;opacity:0}
+.ing:nth-child(1){animation:ing0 9.0s var(--ease) infinite}.ing:nth-child(2){animation:ing1 9.0s var(--ease) infinite}.ing:nth-child(3){animation:ing2 9.0s var(--ease) infinite}.ing:nth-child(4){animation:ing3 9.0s var(--ease) infinite}.ing:nth-child(5){animation:ing4 9.0s var(--ease) infinite}
+.ing-w{font-family:var(--serif);font-size:2.5rem;font-weight:500;font-style:italic;
+  color:#F2DFC0;line-height:1.15}
+.ing-g{font-family:var(--serif);font-size:.66rem;font-weight:600;letter-spacing:.4em;
+  text-transform:uppercase;color:oklch(.78 .08 70/.62);margin-top:var(--s2)}
+
+.dim-rail{display:flex;justify-content:center;gap:16px;color:#D9A94E;margin-top:var(--s6)}
+.dim-rail i{display:block;width:12px;height:12px;border-radius:50%}
+.dim-rail i:nth-child(1){animation:dim0 9.0s var(--ease) infinite;animation-fill-mode:both}.dim-rail i:nth-child(2){animation:dim1 9.0s var(--ease) infinite;animation-fill-mode:both}.dim-rail i:nth-child(3){animation:dim2 9.0s var(--ease) infinite;animation-fill-mode:both}.dim-rail i:nth-child(4){animation:dim3 9.0s var(--ease) infinite;animation-fill-mode:both}.dim-rail i:nth-child(5){animation:dim4 9.0s var(--ease) infinite;animation-fill-mode:both}
+
+.tag-line{opacity:0;animation:tagl 9.0s var(--ease) infinite}
+@keyframes tagl{0%,64.44%{opacity:0;transform:translateY(8px)}
+  72.22%,100%{opacity:1;transform:none}}
+.enter{opacity:0;animation:ent 9.0s var(--ease) infinite}
+@keyframes ent{0%,71.11%{opacity:0;transform:translateY(8px)}
+  78.89%,100%{opacity:1;transform:none}}
+.skip{position:absolute;bottom:46px;left:0;right:0;text-align:center;opacity:0;
+  animation:ent 9.0s var(--ease) infinite}
+
+@media (prefers-reduced-motion:reduce){
+  .ring circle.draw,.ring path.draw,.mark,.ing,.dim-rail i,.tag-line,.enter,.skip
+    {animation:none!important;opacity:1!important;stroke-dashoffset:0!important;
+     transform:none!important}
+  .ing{position:relative;display:none} .ing:last-child{display:block}
+  .dim-rail i{background:currentColor}
+}
+@keyframes ing0{0%,17.78%{opacity:0;transform:translateY(7px)}20.22%,25.33%{opacity:1;transform:none}26.67%,100%{opacity:0;transform:translateY(-7px)}}
+@keyframes ing1{0%,26.67%{opacity:0;transform:translateY(7px)}29.11%,34.22%{opacity:1;transform:none}35.56%,100%{opacity:0;transform:translateY(-7px)}}
+@keyframes ing2{0%,35.56%{opacity:0;transform:translateY(7px)}38.0%,43.11%{opacity:1;transform:none}44.44%,100%{opacity:0;transform:translateY(-7px)}}
+@keyframes ing3{0%,44.44%{opacity:0;transform:translateY(7px)}46.89%,52.0%{opacity:1;transform:none}53.33%,100%{opacity:0;transform:translateY(-7px)}}
+@keyframes ing4{0%,53.33%{opacity:0;transform:translateY(7px)}55.78%,60.89%{opacity:1;transform:none}}
+@keyframes dim0{0%,20.0%{transform:scale(.4);opacity:.22;background:transparent;box-shadow:inset 0 0 0 1px currentColor}23.33%,100%{transform:scale(1);opacity:1;background:currentColor;box-shadow:inset 0 1px 2px oklch(0 0 0/.35)}}
+@keyframes dim1{0%,28.89%{transform:scale(.4);opacity:.22;background:transparent;box-shadow:inset 0 0 0 1px currentColor}32.22%,100%{transform:scale(1);opacity:1;background:currentColor;box-shadow:inset 0 1px 2px oklch(0 0 0/.35)}}
+@keyframes dim2{0%,37.78%{transform:scale(.4);opacity:.22;background:transparent;box-shadow:inset 0 0 0 1px currentColor}41.11%,100%{transform:scale(1);opacity:1;background:currentColor;box-shadow:inset 0 1px 2px oklch(0 0 0/.35)}}
+@keyframes dim3{0%,46.67%{transform:scale(.4);opacity:.22;background:transparent;box-shadow:inset 0 0 0 1px currentColor}50.0%,100%{transform:scale(1);opacity:1;background:currentColor;box-shadow:inset 0 1px 2px oklch(0 0 0/.35)}}
+@keyframes dim4{0%,55.56%{transform:scale(.4);opacity:.22;background:transparent;box-shadow:inset 0 0 0 1px currentColor}58.89%,100%{transform:scale(1);opacity:1;background:currentColor;box-shadow:inset 0 1px 2px oklch(0 0 0/.35)}}
+</style>
+</helmet>
+<div class="grain">
+
+<div class="stage">
+  <div class="frame"></div>
+  <svg class="corner c-tl" width="96" height="96" viewBox="0 0 96 96" aria-hidden="true">
+<path d="M6 54V14a8 8 0 018-8h40" fill="none" stroke="#D9A94E" stroke-width="1.2"/>
+<path d="M6 62V14a14 14 0 0114-14h42" fill="none" stroke="#D9A94E" stroke-width=".6" opacity=".55"/>
+<g fill="none" stroke="#8FA05E" stroke-width="1.15" stroke-linecap="round">
+<path d="M20 20c14 0 26 4 36 11"/>
+<path d="M28 20c-2-5 0-9 4-11 2 4 1 8-4 11z"/>
+<path d="M40 24c-2-5 0-9 4-11 2 4 1 8-4 11z"/>
+<path d="M34 24c3-4 8-4 11-1-3 3-8 4-11 1z"/></g>
+<ellipse cx="58" cy="33" rx="3.6" ry="4.8" transform="rotate(30 58 33)" fill="#8FA05E"/>
+<circle cx="6" cy="6" r="2.6" fill="#D9A94E" opacity=".8"/></svg><svg class="corner c-tr" width="96" height="96" viewBox="0 0 96 96" aria-hidden="true">
+<path d="M6 54V14a8 8 0 018-8h40" fill="none" stroke="#D9A94E" stroke-width="1.2"/>
+<path d="M6 62V14a14 14 0 0114-14h42" fill="none" stroke="#D9A94E" stroke-width=".6" opacity=".55"/>
+<g fill="none" stroke="#8FA05E" stroke-width="1.15" stroke-linecap="round">
+<path d="M20 20c14 0 26 4 36 11"/>
+<path d="M28 20c-2-5 0-9 4-11 2 4 1 8-4 11z"/>
+<path d="M40 24c-2-5 0-9 4-11 2 4 1 8-4 11z"/>
+<path d="M34 24c3-4 8-4 11-1-3 3-8 4-11 1z"/></g>
+<ellipse cx="58" cy="33" rx="3.6" ry="4.8" transform="rotate(30 58 33)" fill="#8FA05E"/>
+<circle cx="6" cy="6" r="2.6" fill="#D9A94E" opacity=".8"/></svg><svg class="corner c-bl" width="96" height="96" viewBox="0 0 96 96" aria-hidden="true">
+<path d="M6 54V14a8 8 0 018-8h40" fill="none" stroke="#D9A94E" stroke-width="1.2"/>
+<path d="M6 62V14a14 14 0 0114-14h42" fill="none" stroke="#D9A94E" stroke-width=".6" opacity=".55"/>
+<g fill="none" stroke="#8FA05E" stroke-width="1.15" stroke-linecap="round">
+<path d="M20 20c14 0 26 4 36 11"/>
+<path d="M28 20c-2-5 0-9 4-11 2 4 1 8-4 11z"/>
+<path d="M40 24c-2-5 0-9 4-11 2 4 1 8-4 11z"/>
+<path d="M34 24c3-4 8-4 11-1-3 3-8 4-11 1z"/></g>
+<ellipse cx="58" cy="33" rx="3.6" ry="4.8" transform="rotate(30 58 33)" fill="#8FA05E"/>
+<circle cx="6" cy="6" r="2.6" fill="#D9A94E" opacity=".8"/></svg><svg class="corner c-br" width="96" height="96" viewBox="0 0 96 96" aria-hidden="true">
+<path d="M6 54V14a8 8 0 018-8h40" fill="none" stroke="#D9A94E" stroke-width="1.2"/>
+<path d="M6 62V14a14 14 0 0114-14h42" fill="none" stroke="#D9A94E" stroke-width=".6" opacity=".55"/>
+<g fill="none" stroke="#8FA05E" stroke-width="1.15" stroke-linecap="round">
+<path d="M20 20c14 0 26 4 36 11"/>
+<path d="M28 20c-2-5 0-9 4-11 2 4 1 8-4 11z"/>
+<path d="M40 24c-2-5 0-9 4-11 2 4 1 8-4 11z"/>
+<path d="M34 24c3-4 8-4 11-1-3 3-8 4-11 1z"/></g>
+<ellipse cx="58" cy="33" rx="3.6" ry="4.8" transform="rotate(30 58 33)" fill="#8FA05E"/>
+<circle cx="6" cy="6" r="2.6" fill="#D9A94E" opacity=".8"/></svg>
+  <div class="vig"></div>
+  <div class="load-in">
+    <svg class="ring" width="132" height="132" viewBox="0 0 140 140" aria-hidden="true"
+  style="margin:0 auto">
+<circle cx="70" cy="70" r="58" class="draw" style="--len:365" fill="none" stroke="#D9A94E" stroke-width="1.6"
+  transform="rotate(-90 70 70)" stroke-linecap="round"/>
+<circle cx="70" cy="70" r="50" fill="none" stroke="#D9A94E" stroke-width=".6" opacity=".45"/>
+<g class="mark">
+<path d="M70 45c-9 5.5-14 12.6-14 21.4 0 8.2 5.8 14.8 14 20.6 8.2-5.8 14-12.4 14-20.6C84 57.6 79 50.5 70 45z"
+  fill="none" stroke="#8FA05E" stroke-width="1.5"/>
+<path d="M70 51v36" stroke="#8FA05E" stroke-width="1.1" opacity=".7"/>
+<ellipse cx="60.5" cy="65" rx="4" ry="5.2" transform="rotate(-24 60.5 65)" fill="#8FA05E"/>
+<ellipse cx="79.5" cy="71" rx="4" ry="5.2" transform="rotate(-24 79.5 71)" fill="#8FA05E"/>
+</g></svg>
+    <div class="mark" style="margin-top:var(--s6)">
+      <p style="font-family:var(--script);font-size:4.6rem;line-height:.78;color:#F2DFC0">Oh! You Fancy</p>
+      <p style="font-family:var(--serif);font-size:2.2rem;font-weight:700;letter-spacing:.3em;
+        text-transform:uppercase;color:#F2DFC0;margin-top:.55rem;padding-left:.3em">Focaccia</p>
+    </div>
+
+    <div class="ing-rail">
+      <div class="ing"><p class="ing-w">Farina</p><p class="ing-g">flour</p></div><div class="ing"><p class="ing-w">Acqua</p><p class="ing-g">water</p></div><div class="ing"><p class="ing-w">Olio d&#8217;Oliva</p><p class="ing-g">olive oil</p></div><div class="ing"><p class="ing-w">Sale</p><p class="ing-g">salt</p></div><div class="ing"><p class="ing-w">Tempo</p><p class="ing-g">time</p></div>
+    </div>
+
+    <div class="dim-rail"><i></i><i></i><i></i><i></i><i></i></div>
+
+    <div class="tag-line" style="margin-top:var(--s10)">
+      <p style="font-family:var(--serif);font-size:.78rem;font-weight:600;letter-spacing:.46em;
+        text-transform:uppercase;color:#D9A94E">Pane &#183; Amore &#183; Sempre</p>
+    </div>
+
+    <div class="enter" style="margin-top:var(--s8)">
+      <a href="#" class="btn btn-pale">Entra</a>
+    </div>
+  </div>
+  <div class="skip"><p style="font-family:var(--serif);font-size:.62rem;font-weight:600;
+    letter-spacing:.34em;text-transform:uppercase;color:oklch(.78 .08 70/.4)">
+    Press any key to skip</p></div>
+</div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {}
+</script>
+</body>
+</html>

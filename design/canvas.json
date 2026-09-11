@@ -1,90 +1,108 @@
 {
   "artboards": [
     {
-      "file": "Main.dc.html",
+      "file": "Loader.dc.html",
       "x": 0,
       "y": 0,
       "w": 1440,
-      "h": 5900,
+      "h": 900,
+      "title": "Loading screen",
+      "print": "fixed"
+    },
+    {
+      "file": "LoaderPhone.dc.html",
+      "x": 1560,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Loading - phone",
+      "print": "fixed"
+    },
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 1060,
+      "w": 1440,
+      "h": 5100,
       "title": "Home",
       "print": "flow"
     },
     {
-      "file": "Mobile.dc.html",
+      "file": "Phone.dc.html",
       "x": 1560,
-      "y": 0,
+      "y": 1060,
       "w": 390,
-      "h": 3250,
-      "title": "Home - mobile",
+      "h": 3550,
+      "title": "Home - phone",
       "print": "flow"
     },
     {
       "file": "About.dc.html",
       "x": 0,
-      "y": 6060,
+      "y": 6320,
       "w": 1440,
-      "h": 3850,
+      "h": 3900,
       "title": "About",
       "print": "flow"
     },
     {
       "file": "Breads.dc.html",
       "x": 1560,
-      "y": 6060,
+      "y": 6320,
       "w": 1440,
-      "h": 4750,
-      "title": "Our Breads",
+      "h": 4900,
+      "title": "Bill of Fare",
       "print": "flow"
     },
     {
       "file": "Gallery.dc.html",
       "x": 0,
-      "y": 10970,
+      "y": 11380,
       "w": 1440,
-      "h": 3300,
+      "h": 3400,
       "title": "Gallery",
       "print": "flow"
     },
     {
       "file": "Reviews.dc.html",
       "x": 1560,
-      "y": 10970,
+      "y": 11380,
       "w": 1440,
-      "h": 3250,
+      "h": 3300,
       "title": "Reviews",
       "print": "flow"
     },
     {
       "file": "Contact.dc.html",
       "x": 0,
-      "y": 14430,
+      "y": 14940,
       "w": 1440,
-      "h": 3650,
+      "h": 3700,
       "title": "Contact",
       "print": "flow"
     }
   ],
   "annotations": [
     {
-      "id": "brief",
-      "x": -460,
+      "id": "loader",
+      "x": -480,
       "y": 0,
-      "w": 380,
-      "text": "Oh! You Fancy Focaccia\n\nPalette lifted from the logo: burgundy #8E1B1B, olive #4E6023, gold #C08A2E, parchment #F5EDD8.\n\nStructure follows Sugar Haus (home / about / menu / gallery / reviews / contact) with the ordering flow removed.\n\nType: Playfair Display + Lora + Pinyon Script for the wordmark."
+      "w": 400,
+      "text": "LOADING SCREEN \u2014 animates live, on a 9s loop.\n\nThe ring strokes itself on like a stamp pressed into a label, then the five things focaccia is made of arrive in turn \u2014 Farina, Acqua, Olio d'Oliva, Sale, Tempo \u2014 while a dimple presses into the dough for each one. That row of dimples IS the progress bar.\n\nSugar Haus types a terminal; this proofs dough."
     },
     {
-      "id": "photos",
-      "x": -460,
-      "y": 380,
-      "w": 380,
-      "text": "Every tan panel is a photo slot with an engraved placeholder. Swap in Amanda's real photography before this goes anywhere near a client."
+      "id": "identity",
+      "x": -480,
+      "y": 330,
+      "w": 400,
+      "text": "OWN IDENTITY, not a Sugar Haus reskin.\n\nType: Bodoni Moda \u2014 the Italian didone \u2014 with EB Garamond and Italianno. Sugar Haus uses Playfair/Lora/Work Sans.\n\nAnatomy: centred label masthead, oval cartouches, an enamel market sign, a bill of fare with dotted leaders, vertical spine rails. Sugar Haus uses a left-logo navbar and centred card grids."
     },
     {
       "id": "gaps",
-      "x": -460,
-      "y": 620,
-      "w": 380,
-      "text": "Bracketed placeholders mark the two facts we do not have: prices (Our Breads) and a phone number (Contact). Nothing was invented."
+      "x": -480,
+      "y": 700,
+      "w": 400,
+      "text": "Palette is the logo's: burgundy #8E1B1B, olive #4E6023, gold #B8862F, paper #F4EFE2.\n\nEvery tan panel is a photo slot. Bracketed text marks the two facts we do not have \u2014 prices and a phone number. Nothing invented."
     }
   ],
   "launch": {
