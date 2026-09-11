@@ -255,7 +255,7 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
   border-bottom:1px solid var(--rule);padding-bottom:var(--s4);flex-wrap:wrap}
 .gal-title{font-size:var(--lg);text-align:left}
 .gal-fill{flex-grow:1}
-.gal-count{opacity:.55;font-size:.66rem;color:var(--ink)}
+.gal-count{opacity:.72;font-size:.66rem;color:var(--ink)}
 .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
   gap:var(--s8) var(--s6)}
 .gal-item{display:flex;flex-direction:column;min-width:0}
@@ -324,8 +324,12 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
 .lb-fig{display:flex;flex-direction:column;min-height:0}
 .lb-fig img{display:block;width:100%;min-height:0;max-height:70vh;object-fit:contain;
   background:var(--burgundy-ink)}
-.lb-cap{padding:var(--s5) var(--s6);border-top:1px solid var(--rule);text-align:left}
-.lb-note{font-size:var(--sm);opacity:.82;margin-top:var(--s1)}
+.lb-cap{padding:var(--s5) var(--s6);border-top:1px solid var(--rule);text-align:left;
+  display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:var(--s8)}
+.lb-cap > .caps{grid-column:1;grid-row:1}
+.lb-note{font-size:var(--sm);opacity:.82;margin-top:var(--s1);grid-column:1;grid-row:2}
+/* the point of the gallery: you can order the thing you are looking at */
+.lb-order{grid-column:2;grid-row:1 / 3;white-space:nowrap;align-self:center}
 .lb-close,.lb-nav{position:absolute;z-index:2;display:flex;align-items:center;
   justify-content:center;width:44px;height:44px;background:var(--paper-2);
   border:1px solid var(--rule);border-radius:50%;font-family:var(--serif);
@@ -338,10 +342,12 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
 @media (max-width:720px){
   .lb-stage{padding:0}
   .lb-panel{width:100%;height:100%;justify-content:center}
-  .lb-fig img{max-height:62vh}
+  .lb-fig img{max-height:56vh}
   .lb-close{top:var(--s3);right:var(--s3)}
   .lb-prev{left:var(--s3)}
   .lb-next{right:var(--s3)}
+  .lb-cap{grid-template-columns:1fr;row-gap:var(--s4);padding:var(--s4) var(--s5)}
+  .lb-order{grid-column:1;grid-row:auto;width:100%;text-align:center}
 }
 
 html{overflow-x:clip}
@@ -597,7 +603,10 @@ body.splashing{overflow:hidden}
 .order-step::before{content:'';position:absolute;inset:7px;border:1px solid var(--rule);opacity:.35;pointer-events:none}
 .order-step>*{position:relative}
 .order-step-head{display:flex;align-items:baseline;gap:var(--s4);margin-bottom:var(--s6);padding-bottom:var(--s4);border-bottom:1px solid var(--rule-soft)}
-.order-step-num{font-family:var(--serif);font-size:var(--lg);font-weight:600;color:var(--gold);min-width:1.4em}
+/* --gold is an ornament colour (2.8:1 on paper); numerals are read, so they
+   take the readable gold instead */
+.order-step-num{font-family:var(--serif);font-size:var(--lg);font-weight:600;color:var(--gold-read);min-width:1.4em}
+.opt{opacity:.68;letter-spacing:.1em;font-weight:400}
 .order-step h2{font-size:var(--lg);text-align:left;margin:0}
 .order-step-intro{font-size:var(--sm);opacity:.8;margin:calc(var(--s3) * -1) 0 var(--s6);max-width:56ch}
 .order-summary{position:sticky;top:120px;background:var(--paper-2);border:1px solid var(--rule);padding:var(--s8);box-shadow:var(--sh-md)}
@@ -636,6 +645,11 @@ body.splashing{overflow:hidden}
 
 /* a row with something in the basket earns a visible mark */
 .menu-item.is-chosen{background:var(--olive-pale);box-shadow:inset 3px 0 0 var(--olive)}
+/* arriving from a gallery photograph: say what happened, and show where */
+.order-flash{font-size:var(--sm);color:var(--burgundy-deep);background:var(--gold-pale);
+  border-left:3px solid var(--gold-read);padding:var(--s3) var(--s4);
+  margin:var(--s4) 0 var(--s5);max-width:64ch;border-radius:0 var(--r-sm) var(--r-sm) 0}
+.menu-item.is-target,textarea.is-target{outline:2px solid var(--burgundy);outline-offset:2px}
 .course-fold-body>.menu-item:last-child{border-bottom:0}
 
 /* ── the sticky tally: on a phone the summary is far below the fold, so the

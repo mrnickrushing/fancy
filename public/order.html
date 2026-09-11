@@ -18,7 +18,7 @@
 <link rel="apple-touch-icon" href="./img/logo.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Italianno&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..500&family=EB+Garamond:ital,wght@0,400..600;1,400..500&family=Italianno&display=swap">
 <link rel="stylesheet" href="./style.css">
 
 </head>
@@ -95,6 +95,7 @@
           <section class="order-step">
             <div class="order-step-head"><span class="order-step-num">I</span><h2>Choose your bread</h2></div>
             <p class="order-step-intro">Everything is baked to order in small batches. Where a price is not shown yet, this is a quote request; Amanda confirms availability, any delivery or shipping cost, and the final total before payment.</p>
+            <p class="order-flash" id="order-flash" role="status" hidden></p>
             <div id="menu"><p class="empty">Loading the bill of fare&#8230;</p></div>
           </section>
 
@@ -135,8 +136,8 @@
           <div class="field"><label for="last-name">Last name</label><input id="last-name" name="lastName" autocomplete="family-name"><p class="err" data-for="last-name"></p></div>
         </div>
             <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email"><p class="err" data-for="email"></p></div>
-            <div class="field"><label for="phone">Phone <span style="opacity:.5;letter-spacing:.1em">(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel"></div>
-            <div class="field"><label for="notes">Anything we should know? <span style="opacity:.5;letter-spacing:.1em">(optional)</span></label>
+            <div class="field"><label for="phone">Phone <span class="opt">(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel"></div>
+            <div class="field"><label for="notes">Anything we should know? <span class="opt">(optional)</span></label>
               <textarea id="notes" name="notes" rows="3" placeholder="An occasion, an allergy, a favourite&#8230;"></textarea></div>
             <div class="order-submit">
               <button type="submit" class="btn btn-fill" id="submit">Send the Order</button>
