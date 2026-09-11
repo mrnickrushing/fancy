@@ -1,0 +1,308 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&amp;family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=Pinyon+Script&amp;display=swap">
+<style>
+:root{
+  --text-xs:0.8125rem; --text-sm:0.9375rem; --text-base:1.0625rem; --text-lg:1.375rem;
+  --text-xl:2rem; --text-2xl:3rem; --text-3xl:4.25rem; --text-hero:6rem;
+  --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-5:1.25rem;
+  --space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;--space-12:3rem;--space-16:4rem;
+  --space-20:5rem;--space-24:6rem;--space-32:8rem;
+  --bg:#F5EDD8; --surface:#FBF5E6; --surface-2:#FDFAF1;
+  --offset:#EFE4C8; --offset-2:#E7D8B6; --divider:#DCC9A0; --border:#CFBA8E;
+  --text:#3B1A14; --muted:#7A4A3A; --faint:#A88A72; --inverse:#FBF5E6;
+  --burgundy:#8E1B1B; --burgundy-hover:#731414; --burgundy-deep:#5C0F0F; --burgundy-tint:#F2DED6;
+  --olive:#4E6023; --olive-hover:#3D4B1B; --olive-tint:#E3E7CE;
+  --gold:#C08A2E; --terracotta:#B5643C;
+  --radius-sm:.375rem;--radius-md:.625rem;--radius-lg:1rem;--radius-xl:1.5rem;--radius-full:9999px;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --shadow-sm:0 1px 3px oklch(.2 .04 35/.08);
+  --shadow-md:0 4px 16px oklch(.2 .04 35/.10);
+  --shadow-lg:0 12px 40px oklch(.2 .04 35/.14);
+  --wide:1200px;--default:960px;--narrow:640px;
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'Lora',Georgia,serif;
+  --font-script:'Pinyon Script','Snell Roundhand',cursive;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);
+  font-size:var(--text-base);line-height:1.7;-webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility}
+h1,h2,h3,h4{font-family:var(--font-display);line-height:1.14;text-wrap:balance;font-weight:600}
+p{text-wrap:pretty}
+img,svg{display:block;max-width:100%}
+a{color:var(--burgundy);text-decoration:none}
+a:hover{color:var(--burgundy-hover)}
+ul{list-style:none}
+
+/* paper grain */
+.paper{position:relative}
+.paper::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(oklch(.45 .09 35/.055) .5px,transparent .5px);
+  background-size:3px 3px}
+
+.wrap{max-width:var(--wide);margin:0 auto;padding-inline:var(--space-8)}
+.wrap-narrow{max-width:760px;margin:0 auto;padding-inline:var(--space-8)}
+
+/* ribbon */
+.ribbon{background:var(--burgundy);color:var(--inverse);text-align:center;
+  padding:.6rem var(--space-4);font-family:var(--font-display);font-size:var(--text-xs);
+  font-weight:600;letter-spacing:.19em;text-transform:uppercase}
+
+/* header */
+.hdr{position:sticky;top:0;z-index:50;background:color-mix(in oklab,var(--bg) 93%,transparent);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--divider)}
+.hdr-in{max-width:var(--wide);margin:0 auto;padding:var(--space-3) var(--space-8);
+  display:flex;align-items:center;justify-content:space-between;gap:var(--space-8)}
+.brand{display:flex;align-items:center;gap:var(--space-3)}
+.brand-txt{display:flex;flex-direction:column;line-height:1}
+.brand-script{font-family:var(--font-script);font-size:1.6rem;color:var(--burgundy);
+  line-height:.95;margin-bottom:.08em}
+.brand-name{font-family:var(--font-display);font-weight:700;font-size:1.04rem;
+  letter-spacing:.17em;text-transform:uppercase;color:var(--text)}
+.nav{display:flex;align-items:center;gap:var(--space-6)}
+.nav a{font-family:var(--font-display);font-size:var(--text-xs);font-weight:600;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--muted);padding-block:.4rem}
+.nav a:hover{color:var(--burgundy)}
+.nav a.on{color:var(--burgundy);border-bottom:1.5px solid var(--burgundy)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.6rem;
+  min-height:48px;padding:.85rem 1.9rem;font-family:var(--font-display);
+  font-size:var(--text-xs);font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  border-radius:var(--radius-full);transition:all 180ms var(--ease-out);cursor:pointer}
+.btn-fill{background:var(--burgundy);color:var(--inverse);border:1.5px solid var(--burgundy)}
+.btn-fill:hover{background:var(--burgundy-hover);border-color:var(--burgundy-hover);
+  color:var(--inverse);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.btn-line{background:transparent;color:var(--burgundy);border:1.5px solid var(--burgundy)}
+.btn-line:hover{background:var(--burgundy);color:var(--inverse);transform:translateY(-2px)}
+.btn-olive{background:var(--olive);color:var(--inverse);border:1.5px solid var(--olive)}
+.btn-olive:hover{background:var(--olive-hover);color:var(--inverse);transform:translateY(-2px)}
+
+/* section furniture */
+.sec{padding-block:var(--space-24)}
+.eyebrow{display:flex;align-items:center;justify-content:center;gap:var(--space-3);
+  font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+  letter-spacing:.26em;text-transform:uppercase;color:var(--burgundy);
+  margin-bottom:var(--space-5)}
+.eyebrow::before,.eyebrow::after{content:'';display:block;height:1px;width:42px;
+  background:var(--burgundy);opacity:.45}
+.eyebrow-l{justify-content:flex-start}
+.eyebrow-l::before{display:none}
+.sec-title{font-size:var(--text-xl);color:var(--text);margin-bottom:var(--space-4);
+  text-align:center}
+.sec-sub{font-size:var(--text-base);color:var(--muted);max-width:58ch;margin:0 auto;
+  text-align:center;line-height:1.75}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:var(--space-8);box-shadow:var(--shadow-sm);
+  transition:transform 180ms var(--ease-out),box-shadow 180ms var(--ease-out)}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.card h3{font-size:var(--text-lg);margin-bottom:var(--space-3)}
+.card p{font-size:var(--text-sm);color:var(--muted);line-height:1.72}
+.grid{display:grid;gap:var(--space-6)}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+
+/* numeral */
+.num{font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+  letter-spacing:.2em;color:var(--gold);margin-bottom:var(--space-3)}
+
+/* tag */
+.tag{display:inline-block;font-family:var(--font-display);font-size:.72rem;font-weight:600;
+  letter-spacing:.15em;text-transform:uppercase;padding:.3rem .9rem;
+  border-radius:var(--radius-full);background:var(--burgundy-tint);color:var(--burgundy)}
+.tag-olive{background:var(--olive-tint);color:var(--olive)}
+
+/* photo slot */
+.photo{position:relative;background:
+  linear-gradient(150deg,#F0E2C4 0%,#E8D6B2 48%,#DFC9A2 100%);
+  border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;
+  display:flex;align-items:center;justify-content:center}
+.photo::before{content:'';position:absolute;inset:10px;border:1px solid oklch(.45 .09 35/.16);
+  border-radius:calc(var(--radius-lg) - 5px);pointer-events:none}
+.photo-cap{position:absolute;bottom:14px;left:0;right:0;text-align:center;
+  font-family:var(--font-display);font-size:.68rem;font-weight:600;letter-spacing:.2em;
+  text-transform:uppercase;color:oklch(.42 .06 45/.62)}
+
+/* footer */
+.ftr{background:var(--burgundy-deep);color:#E8CFC2;padding-block:var(--space-16) var(--space-8)}
+.ftr h4{font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;color:#E9BFA8;margin-bottom:var(--space-4)}
+.ftr a{color:#E8CFC2}
+.ftr a:hover{color:#fff}
+.ftr p,.ftr li{font-size:var(--text-sm);line-height:1.8}
+.ftr-bot{border-top:1px solid oklch(1 0 0/.13);margin-top:var(--space-12);
+  padding-top:var(--space-6);display:flex;justify-content:space-between;gap:var(--space-6);
+  font-size:var(--text-xs);color:#C9A192}
+</style>
+</helmet>
+<div class="paper">
+<div class="ribbon">Brookings-Harbor Farmers Market &#183; Wednesdays &amp; Saturdays &#183; 9am &#8216;til sold out</div>
+<header class="hdr"><div class="hdr-in">
+<div class="brand"><svg width="58" height="58" viewBox="0 0 58 58" aria-hidden="true">
+<circle cx="29" cy="29" r="27.5" fill="#F5EDD8" stroke="#8E1B1B" stroke-width="2"/>
+<circle cx="29" cy="29" r="23.5" fill="none" stroke="#8E1B1B" stroke-width=".8" opacity=".55"/>
+<path d="M29 17c-4.6 2.6-7 6.4-7 11 0 4.2 3 7.6 7 10.6 4-3 7-6.4 7-10.6 0-4.6-2.4-8.4-7-11z" fill="none" stroke="#4E6023" stroke-width="1.3"/>
+<path d="M29 20.5v17" stroke="#4E6023" stroke-width="1" opacity=".75"/>
+<ellipse cx="24.2" cy="27.4" rx="2.1" ry="2.7" transform="rotate(-24 24.2 27.4)" fill="#4E6023" opacity=".9"/>
+<ellipse cx="33.8" cy="30.6" rx="2.1" ry="2.7" transform="rotate(-24 33.8 30.6)" fill="#4E6023" opacity=".9"/>
+</svg><span class="brand-txt"><span class="brand-script">Oh! You Fancy</span><span class="brand-name">Focaccia</span></span></div>
+<nav class="nav"><a href="#" class="">Home</a><a href="#" class="">About</a><a href="#" class="">Our Breads</a><a href="#" class="">Gallery</a><a href="#" class="on">Reviews</a><a href="#" class="">Contact</a></nav>
+</div></header><section style="background:var(--offset);border-bottom:1px solid var(--divider);
+  padding-block:var(--space-20);text-align:center;position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 80% at 50% 100%,
+    oklch(.42 .16 25/.10),transparent 70%);pointer-events:none"></div>
+  <div class="wrap-narrow" style="position:relative">
+    <p class="eyebrow">Kind Words</p>
+    <h1 style="font-size:var(--text-2xl);margin-bottom:var(--space-5)">What Our Customers Say</h1>
+    <p style="color:var(--muted);font-size:var(--text-lg);line-height:1.6">100% recommend across 9 reviews on Facebook.</p>
+    <div style="display:flex;justify-content:center;margin-top:var(--space-8)"><svg width="170" height="40" viewBox="0 0 150 40" aria-hidden="true">
+<g fill="none" stroke="#4E6023" stroke-width="1.4" stroke-linecap="round">
+<path d="M4 20C30 20 62 17 96 12"/>
+<path d="M28 20c-3-6-1-11 4-13 2 5 1 10-4 13z"/>
+<path d="M46 17c-4-5-3-10 2-13 2 5 2 10-2 13z"/>
+<path d="M66 15c-4-5-3-10 2-13 2 5 2 10-2 13z"/>
+<path d="M36 21c4-5 9-5 13-1-4 4-9 5-13 1z"/>
+<path d="M56 19c4-5 9-5 13-1-4 4-9 5-13 1z"/>
+</g>
+<g fill="#4E6023">
+<ellipse cx="86" cy="13" rx="4.6" ry="6" transform="rotate(28 86 13)"/>
+<ellipse cx="99" cy="10" rx="4.6" ry="6" transform="rotate(28 99 10)" opacity=".72"/>
+</g></svg></div>
+  </div>
+</section>
+<section class="sec" style="background:var(--bg)">
+  <div class="wrap">
+    <p class="eyebrow">From the Market</p>
+    <div style="height:var(--space-10)"></div>
+    <div class="grid g2" style="align-items:start">
+      <div class="card" style="padding:var(--space-10)">
+  <svg width="34" height="28" viewBox="0 0 46 38" aria-hidden="true" style="margin-bottom:var(--space-5)">
+    <path d="M18 38C8 38 2 31 2 21 2 10 9 2 20 0l2 6c-7 2-11 6-11 11 0 1 0 2 1 3 6-1 11 3 11 9 0 5-3 9-7 9zm24 0c-10 0-16-7-16-17C26 10 33 2 44 0l2 6c-7 2-11 6-11 11 0 1 0 2 1 3 6-1 11 3 11 9 0 5-3 9-7 9z" fill="#8E1B1B" opacity=".3"/></svg>
+  <p style="font-family:var(--font-display);font-size:1.45rem;
+    font-style:italic;line-height:1.55;color:var(--text);margin-bottom:var(--space-6)">I stopped at The Dawg House for a sandwich at the Farmer&#8217;s Market today. I received one of the most delicious Italian garden sandwiches I&#8217;ve ever had in my entire existence and it was because she made it with FRESH Focaccia bread from Oh You Fancy Focaccia! It&#8217;s fluffy, it&#8217;s fresh, it&#8217;s flavorful. Must try.</p>
+  <p style="font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--burgundy)">Jessica Dora</p>
+</div>
+      <div style="display:flex;flex-direction:column;gap:var(--space-6)">
+        <div class="card" style="padding:var(--space-10)">
+  <svg width="34" height="28" viewBox="0 0 46 38" aria-hidden="true" style="margin-bottom:var(--space-5)">
+    <path d="M18 38C8 38 2 31 2 21 2 10 9 2 20 0l2 6c-7 2-11 6-11 11 0 1 0 2 1 3 6-1 11 3 11 9 0 5-3 9-7 9zm24 0c-10 0-16-7-16-17C26 10 33 2 44 0l2 6c-7 2-11 6-11 11 0 1 0 2 1 3 6-1 11 3 11 9 0 5-3 9-7 9z" fill="#8E1B1B" opacity=".3"/></svg>
+  <p style="font-family:var(--font-display);font-size:1.2rem;
+    font-style:italic;line-height:1.55;color:var(--text);margin-bottom:var(--space-6)">Best Focaccia I&#8217;ve ever had. She definitely knows what she&#8217;s doing. Absolutely scrumptious.</p>
+  <p style="font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--burgundy)">TonyandTasha Holden</p>
+</div>
+        <div class="card" style="padding:var(--space-10)">
+  <svg width="34" height="28" viewBox="0 0 46 38" aria-hidden="true" style="margin-bottom:var(--space-5)">
+    <path d="M18 38C8 38 2 31 2 21 2 10 9 2 20 0l2 6c-7 2-11 6-11 11 0 1 0 2 1 3 6-1 11 3 11 9 0 5-3 9-7 9zm24 0c-10 0-16-7-16-17C26 10 33 2 44 0l2 6c-7 2-11 6-11 11 0 1 0 2 1 3 6-1 11 3 11 9 0 5-3 9-7 9z" fill="#8E1B1B" opacity=".3"/></svg>
+  <p style="font-family:var(--font-display);font-size:1.2rem;
+    font-style:italic;line-height:1.55;color:var(--text);margin-bottom:var(--space-6)">This bread is made with love, so delicious that it compliments every meal. Stop and taste her many yummy varieties.</p>
+  <p style="font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--burgundy)">Char Rigg</p>
+</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" style="background:var(--offset);border-block:1px solid var(--divider)">
+  <div class="wrap">
+    <p class="eyebrow">Word Around Town</p>
+    <h2 class="sec-title">Go see Amanda,<br>you will love it</h2>
+    <div style="display:flex;align-items:center;justify-content:center;gap:18px;margin-block:var(--space-10)">
+<span style="display:block;height:1px;width:110px;background:linear-gradient(90deg,transparent,#8E1B1B);opacity:.42"></span>
+<svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+<path d="M15 3l3.4 8.6L27 15l-8.6 3.4L15 27l-3.4-8.6L3 15l8.6-3.4z" fill="none" stroke="#8E1B1B" stroke-width="1.2"/>
+<circle cx="15" cy="15" r="2.6" fill="#C08A2E"/></svg>
+<span style="display:block;height:1px;width:110px;background:linear-gradient(270deg,transparent,#8E1B1B);opacity:.42"></span>
+</div>
+    <div class="grid g2">
+      <div class="card" style="padding:var(--space-10)">
+  <svg width="34" height="28" viewBox="0 0 46 38" aria-hidden="true" style="margin-bottom:var(--space-5)">
+    <path d="M18 38C8 38 2 31 2 21 2 10 9 2 20 0l2 6c-7 2-11 6-11 11 0 1 0 2 1 3 6-1 11 3 11 9 0 5-3 9-7 9zm24 0c-10 0-16-7-16-17C26 10 33 2 44 0l2 6c-7 2-11 6-11 11 0 1 0 2 1 3 6-1 11 3 11 9 0 5-3 9-7 9z" fill="#8E1B1B" opacity=".3"/></svg>
+  <p style="font-family:var(--font-display);font-size:1.2rem;
+    font-style:italic;line-height:1.55;color:var(--text);margin-bottom:var(--space-6)">Who has tried the Focaccia from the Brookings Farmers market?? They have sweet and savory flavors. The samples were amazing so I bought the &#8216;Oh you Fancy.&#8217; It was delicious the way it is but turning into a pizza was super fast and easy. Go see Amanda, you will love it.</p>
+  <p style="font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--burgundy)">A neighbour in Brookings</p>
+</div>
+      <div class="card" style="padding:var(--space-10)">
+  <svg width="34" height="28" viewBox="0 0 46 38" aria-hidden="true" style="margin-bottom:var(--space-5)">
+    <path d="M18 38C8 38 2 31 2 21 2 10 9 2 20 0l2 6c-7 2-11 6-11 11 0 1 0 2 1 3 6-1 11 3 11 9 0 5-3 9-7 9zm24 0c-10 0-16-7-16-17C26 10 33 2 44 0l2 6c-7 2-11 6-11 11 0 1 0 2 1 3 6-1 11 3 11 9 0 5-3 9-7 9z" fill="#8E1B1B" opacity=".3"/></svg>
+  <p style="font-family:var(--font-display);font-size:1.2rem;
+    font-style:italic;line-height:1.55;color:var(--text);margin-bottom:var(--space-6)">OMG! I tried some the other day and it is absolutely the best focaccia I&#8217;ve ever had in my life. My husband agreed.</p>
+  <p style="font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--burgundy)">A market regular</p>
+</div>
+      <div class="card" style="padding:var(--space-10)">
+  <svg width="34" height="28" viewBox="0 0 46 38" aria-hidden="true" style="margin-bottom:var(--space-5)">
+    <path d="M18 38C8 38 2 31 2 21 2 10 9 2 20 0l2 6c-7 2-11 6-11 11 0 1 0 2 1 3 6-1 11 3 11 9 0 5-3 9-7 9zm24 0c-10 0-16-7-16-17C26 10 33 2 44 0l2 6c-7 2-11 6-11 11 0 1 0 2 1 3 6-1 11 3 11 9 0 5-3 9-7 9z" fill="#8E1B1B" opacity=".3"/></svg>
+  <p style="font-family:var(--font-display);font-size:1.2rem;
+    font-style:italic;line-height:1.55;color:var(--text);margin-bottom:var(--space-6)">Super yummy food. Baked with love for sure. So many varieties. Get there early cause this girl sells out quick!</p>
+  <p style="font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--burgundy)">Linnea</p>
+</div>
+      <div class="card" style="padding:var(--space-10)">
+  <svg width="34" height="28" viewBox="0 0 46 38" aria-hidden="true" style="margin-bottom:var(--space-5)">
+    <path d="M18 38C8 38 2 31 2 21 2 10 9 2 20 0l2 6c-7 2-11 6-11 11 0 1 0 2 1 3 6-1 11 3 11 9 0 5-3 9-7 9zm24 0c-10 0-16-7-16-17C26 10 33 2 44 0l2 6c-7 2-11 6-11 11 0 1 0 2 1 3 6-1 11 3 11 9 0 5-3 9-7 9z" fill="#8E1B1B" opacity=".3"/></svg>
+  <p style="font-family:var(--font-display);font-size:1.2rem;
+    font-style:italic;line-height:1.55;color:var(--text);margin-bottom:var(--space-6)">It is the best. My family loved it. All three were gone in a day.</p>
+  <p style="font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--burgundy)">A Brookings customer</p>
+</div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--burgundy);color:var(--inverse);padding-block:var(--space-20);text-align:center">
+  <div class="wrap-narrow">
+    <h2 style="font-size:var(--text-xl);color:#FBEDE4;margin-bottom:var(--space-5)">Thank you</h2>
+    <p style="color:#E9BFA8;margin-bottom:var(--space-6)">We read every one of these, and they mean the world to us. Thank you to our customers, our friends, our family, and our Father in Heaven for supporting our small business.</p>
+    <p style="font-family:var(--font-script);font-size:2.2rem;color:#FBEDE4">Love always, Oh! You Fancy Focaccia</p>
+  </div>
+</section>
+<footer class="ftr"><div class="wrap">
+<div style="display:grid;grid-template-columns:1.7fr 1fr 1fr;gap:var(--space-12)">
+  <div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:var(--space-4)">
+      <svg width="46" height="46" viewBox="0 0 58 58" aria-hidden="true">
+      <circle cx="29" cy="29" r="27.5" fill="none" stroke="#E9BFA8" stroke-width="2"/>
+      <circle cx="29" cy="29" r="23.5" fill="none" stroke="#E9BFA8" stroke-width=".8" opacity=".5"/>
+      <path d="M29 17c-4.6 2.6-7 6.4-7 11 0 4.2 3 7.6 7 10.6 4-3 7-6.4 7-10.6 0-4.6-2.4-8.4-7-11z" fill="none" stroke="#E9BFA8" stroke-width="1.3"/>
+      <path d="M29 20.5v17" stroke="#E9BFA8" stroke-width="1" opacity=".7"/></svg>
+      <span style="display:flex;flex-direction:column;line-height:1">
+        <span style="font-family:var(--font-script);font-size:1.7rem;color:#E9BFA8">Oh! You Fancy</span>
+        <span style="font-family:var(--font-display);font-weight:700;font-size:1rem;letter-spacing:.18em;text-transform:uppercase;color:#E8CFC2">Focaccia</span>
+      </span>
+    </div>
+    <p style="max-width:44ch;color:#C9A192">Artisan focaccia baked by hand in Brookings, Oregon. Organic ingredients, a living sourdough starter, and small batches that sell out.</p>
+    <p style="margin-top:var(--space-5);font-family:var(--font-script);font-size:1.5rem;color:#E9BFA8">Pane &#183; Amore &#183; Sempre</p>
+  </div>
+  <div><h4>Explore</h4><ul style="display:flex;flex-direction:column;gap:.55rem">
+    <li><a href="#">About</a></li><li><a href="#">Our Breads</a></li>
+    <li><a href="#">Gallery</a></li><li><a href="#">Reviews</a></li><li><a href="#">Contact</a></li></ul></div>
+  <div><h4>Find Us</h4>
+    <p style="color:#C9A192">Brookings-Harbor Farmers Market<br>Wednesdays &amp; Saturdays<br>9am &#8216;til sold out</p>
+    <p style="margin-top:var(--space-4)"><a href="#">ohyoufancyfocaccia@gmail.com</a></p>
+    <p style="margin-top:var(--space-2)"><a href="#">Facebook</a></p></div>
+</div>
+<div class="ftr-bot"><p>&#169; 2026 Oh! You Fancy Focaccia &#183; Brookings, Oregon</p>
+<p>Baked with love. Thank you for shopping local.</p></div>
+</div></footer>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":1440,"height":2900}}'>
+class Component extends DCLogic {}
+</script>
+</body>
+</html>

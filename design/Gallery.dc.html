@@ -1,0 +1,391 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&amp;family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=Pinyon+Script&amp;display=swap">
+<style>
+:root{
+  --text-xs:0.8125rem; --text-sm:0.9375rem; --text-base:1.0625rem; --text-lg:1.375rem;
+  --text-xl:2rem; --text-2xl:3rem; --text-3xl:4.25rem; --text-hero:6rem;
+  --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-5:1.25rem;
+  --space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;--space-12:3rem;--space-16:4rem;
+  --space-20:5rem;--space-24:6rem;--space-32:8rem;
+  --bg:#F5EDD8; --surface:#FBF5E6; --surface-2:#FDFAF1;
+  --offset:#EFE4C8; --offset-2:#E7D8B6; --divider:#DCC9A0; --border:#CFBA8E;
+  --text:#3B1A14; --muted:#7A4A3A; --faint:#A88A72; --inverse:#FBF5E6;
+  --burgundy:#8E1B1B; --burgundy-hover:#731414; --burgundy-deep:#5C0F0F; --burgundy-tint:#F2DED6;
+  --olive:#4E6023; --olive-hover:#3D4B1B; --olive-tint:#E3E7CE;
+  --gold:#C08A2E; --terracotta:#B5643C;
+  --radius-sm:.375rem;--radius-md:.625rem;--radius-lg:1rem;--radius-xl:1.5rem;--radius-full:9999px;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --shadow-sm:0 1px 3px oklch(.2 .04 35/.08);
+  --shadow-md:0 4px 16px oklch(.2 .04 35/.10);
+  --shadow-lg:0 12px 40px oklch(.2 .04 35/.14);
+  --wide:1200px;--default:960px;--narrow:640px;
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'Lora',Georgia,serif;
+  --font-script:'Pinyon Script','Snell Roundhand',cursive;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);
+  font-size:var(--text-base);line-height:1.7;-webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility}
+h1,h2,h3,h4{font-family:var(--font-display);line-height:1.14;text-wrap:balance;font-weight:600}
+p{text-wrap:pretty}
+img,svg{display:block;max-width:100%}
+a{color:var(--burgundy);text-decoration:none}
+a:hover{color:var(--burgundy-hover)}
+ul{list-style:none}
+
+/* paper grain */
+.paper{position:relative}
+.paper::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(oklch(.45 .09 35/.055) .5px,transparent .5px);
+  background-size:3px 3px}
+
+.wrap{max-width:var(--wide);margin:0 auto;padding-inline:var(--space-8)}
+.wrap-narrow{max-width:760px;margin:0 auto;padding-inline:var(--space-8)}
+
+/* ribbon */
+.ribbon{background:var(--burgundy);color:var(--inverse);text-align:center;
+  padding:.6rem var(--space-4);font-family:var(--font-display);font-size:var(--text-xs);
+  font-weight:600;letter-spacing:.19em;text-transform:uppercase}
+
+/* header */
+.hdr{position:sticky;top:0;z-index:50;background:color-mix(in oklab,var(--bg) 93%,transparent);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--divider)}
+.hdr-in{max-width:var(--wide);margin:0 auto;padding:var(--space-3) var(--space-8);
+  display:flex;align-items:center;justify-content:space-between;gap:var(--space-8)}
+.brand{display:flex;align-items:center;gap:var(--space-3)}
+.brand-txt{display:flex;flex-direction:column;line-height:1}
+.brand-script{font-family:var(--font-script);font-size:1.6rem;color:var(--burgundy);
+  line-height:.95;margin-bottom:.08em}
+.brand-name{font-family:var(--font-display);font-weight:700;font-size:1.04rem;
+  letter-spacing:.17em;text-transform:uppercase;color:var(--text)}
+.nav{display:flex;align-items:center;gap:var(--space-6)}
+.nav a{font-family:var(--font-display);font-size:var(--text-xs);font-weight:600;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--muted);padding-block:.4rem}
+.nav a:hover{color:var(--burgundy)}
+.nav a.on{color:var(--burgundy);border-bottom:1.5px solid var(--burgundy)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.6rem;
+  min-height:48px;padding:.85rem 1.9rem;font-family:var(--font-display);
+  font-size:var(--text-xs);font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  border-radius:var(--radius-full);transition:all 180ms var(--ease-out);cursor:pointer}
+.btn-fill{background:var(--burgundy);color:var(--inverse);border:1.5px solid var(--burgundy)}
+.btn-fill:hover{background:var(--burgundy-hover);border-color:var(--burgundy-hover);
+  color:var(--inverse);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.btn-line{background:transparent;color:var(--burgundy);border:1.5px solid var(--burgundy)}
+.btn-line:hover{background:var(--burgundy);color:var(--inverse);transform:translateY(-2px)}
+.btn-olive{background:var(--olive);color:var(--inverse);border:1.5px solid var(--olive)}
+.btn-olive:hover{background:var(--olive-hover);color:var(--inverse);transform:translateY(-2px)}
+
+/* section furniture */
+.sec{padding-block:var(--space-24)}
+.eyebrow{display:flex;align-items:center;justify-content:center;gap:var(--space-3);
+  font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+  letter-spacing:.26em;text-transform:uppercase;color:var(--burgundy);
+  margin-bottom:var(--space-5)}
+.eyebrow::before,.eyebrow::after{content:'';display:block;height:1px;width:42px;
+  background:var(--burgundy);opacity:.45}
+.eyebrow-l{justify-content:flex-start}
+.eyebrow-l::before{display:none}
+.sec-title{font-size:var(--text-xl);color:var(--text);margin-bottom:var(--space-4);
+  text-align:center}
+.sec-sub{font-size:var(--text-base);color:var(--muted);max-width:58ch;margin:0 auto;
+  text-align:center;line-height:1.75}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:var(--space-8);box-shadow:var(--shadow-sm);
+  transition:transform 180ms var(--ease-out),box-shadow 180ms var(--ease-out)}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.card h3{font-size:var(--text-lg);margin-bottom:var(--space-3)}
+.card p{font-size:var(--text-sm);color:var(--muted);line-height:1.72}
+.grid{display:grid;gap:var(--space-6)}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+
+/* numeral */
+.num{font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+  letter-spacing:.2em;color:var(--gold);margin-bottom:var(--space-3)}
+
+/* tag */
+.tag{display:inline-block;font-family:var(--font-display);font-size:.72rem;font-weight:600;
+  letter-spacing:.15em;text-transform:uppercase;padding:.3rem .9rem;
+  border-radius:var(--radius-full);background:var(--burgundy-tint);color:var(--burgundy)}
+.tag-olive{background:var(--olive-tint);color:var(--olive)}
+
+/* photo slot */
+.photo{position:relative;background:
+  linear-gradient(150deg,#F0E2C4 0%,#E8D6B2 48%,#DFC9A2 100%);
+  border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;
+  display:flex;align-items:center;justify-content:center}
+.photo::before{content:'';position:absolute;inset:10px;border:1px solid oklch(.45 .09 35/.16);
+  border-radius:calc(var(--radius-lg) - 5px);pointer-events:none}
+.photo-cap{position:absolute;bottom:14px;left:0;right:0;text-align:center;
+  font-family:var(--font-display);font-size:.68rem;font-weight:600;letter-spacing:.2em;
+  text-transform:uppercase;color:oklch(.42 .06 45/.62)}
+
+/* footer */
+.ftr{background:var(--burgundy-deep);color:#E8CFC2;padding-block:var(--space-16) var(--space-8)}
+.ftr h4{font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;color:#E9BFA8;margin-bottom:var(--space-4)}
+.ftr a{color:#E8CFC2}
+.ftr a:hover{color:#fff}
+.ftr p,.ftr li{font-size:var(--text-sm);line-height:1.8}
+.ftr-bot{border-top:1px solid oklch(1 0 0/.13);margin-top:var(--space-12);
+  padding-top:var(--space-6);display:flex;justify-content:space-between;gap:var(--space-6);
+  font-size:var(--text-xs);color:#C9A192}
+</style>
+</helmet>
+<div class="paper">
+<div class="ribbon">Brookings-Harbor Farmers Market &#183; Wednesdays &amp; Saturdays &#183; 9am &#8216;til sold out</div>
+<header class="hdr"><div class="hdr-in">
+<div class="brand"><svg width="58" height="58" viewBox="0 0 58 58" aria-hidden="true">
+<circle cx="29" cy="29" r="27.5" fill="#F5EDD8" stroke="#8E1B1B" stroke-width="2"/>
+<circle cx="29" cy="29" r="23.5" fill="none" stroke="#8E1B1B" stroke-width=".8" opacity=".55"/>
+<path d="M29 17c-4.6 2.6-7 6.4-7 11 0 4.2 3 7.6 7 10.6 4-3 7-6.4 7-10.6 0-4.6-2.4-8.4-7-11z" fill="none" stroke="#4E6023" stroke-width="1.3"/>
+<path d="M29 20.5v17" stroke="#4E6023" stroke-width="1" opacity=".75"/>
+<ellipse cx="24.2" cy="27.4" rx="2.1" ry="2.7" transform="rotate(-24 24.2 27.4)" fill="#4E6023" opacity=".9"/>
+<ellipse cx="33.8" cy="30.6" rx="2.1" ry="2.7" transform="rotate(-24 33.8 30.6)" fill="#4E6023" opacity=".9"/>
+</svg><span class="brand-txt"><span class="brand-script">Oh! You Fancy</span><span class="brand-name">Focaccia</span></span></div>
+<nav class="nav"><a href="#" class="">Home</a><a href="#" class="">About</a><a href="#" class="">Our Breads</a><a href="#" class="on">Gallery</a><a href="#" class="">Reviews</a><a href="#" class="">Contact</a></nav>
+</div></header><section style="background:var(--offset);border-bottom:1px solid var(--divider);
+  padding-block:var(--space-20);text-align:center;position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 80% at 50% 100%,
+    oklch(.42 .16 25/.10),transparent 70%);pointer-events:none"></div>
+  <div class="wrap-narrow" style="position:relative">
+    <p class="eyebrow">The Gallery</p>
+    <h1 style="font-size:var(--text-2xl);margin-bottom:var(--space-5)">A Fancy Little Gallery</h1>
+    <p style="color:var(--muted);font-size:var(--text-lg);line-height:1.6">Fresh from the oven, and straight from the market table.</p>
+    <div style="display:flex;justify-content:center;margin-top:var(--space-8)"><svg width="170" height="40" viewBox="0 0 150 40" aria-hidden="true">
+<g fill="none" stroke="#4E6023" stroke-width="1.4" stroke-linecap="round">
+<path d="M4 20C30 20 62 17 96 12"/>
+<path d="M28 20c-3-6-1-11 4-13 2 5 1 10-4 13z"/>
+<path d="M46 17c-4-5-3-10 2-13 2 5 2 10-2 13z"/>
+<path d="M66 15c-4-5-3-10 2-13 2 5 2 10-2 13z"/>
+<path d="M36 21c4-5 9-5 13-1-4 4-9 5-13 1z"/>
+<path d="M56 19c4-5 9-5 13-1-4 4-9 5-13 1z"/>
+</g>
+<g fill="#4E6023">
+<ellipse cx="86" cy="13" rx="4.6" ry="6" transform="rotate(28 86 13)"/>
+<ellipse cx="99" cy="10" rx="4.6" ry="6" transform="rotate(28 99 10)" opacity=".72"/>
+</g></svg></div>
+  </div>
+</section>
+<section class="sec" style="background:var(--bg)">
+  <div class="wrap">
+    <div style="columns:3;column-gap:var(--space-6)">
+      <figure style="break-inside:avoid;margin-bottom:var(--space-6)">
+        <div class="photo" style="height:300px"><svg width="140" height="140" viewBox="0 0 190 190" aria-hidden="true" style="opacity:.5">
+<circle cx="95" cy="95" r="72" fill="none" stroke="#8B5A2B" stroke-width="2.2"/>
+<circle cx="95" cy="95" r="63" fill="none" stroke="#8B5A2B" stroke-width=".9" opacity=".6"/>
+<g fill="#8B5A2B" opacity=".55">
+<ellipse cx="76" cy="74" rx="5" ry="4"/><ellipse cx="104" cy="70" rx="4.4" ry="3.6"/>
+<ellipse cx="119" cy="92" rx="5" ry="4"/><ellipse cx="108" cy="116" rx="4.6" ry="3.7"/>
+<ellipse cx="80" cy="120" rx="5" ry="4"/><ellipse cx="66" cy="98" rx="4.4" ry="3.6"/>
+<ellipse cx="95" cy="95" rx="4.6" ry="3.8"/>
+</g>
+<g stroke="#4E6023" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".8">
+<path d="M58 58l16 15"/><path d="M60 64l5-6 6-1"/><path d="M68 70l5-6 6-1"/>
+<path d="M132 124l-16-15"/><path d="M130 118l-5 6-6 1"/><path d="M122 112l-5 6-6 1"/>
+</g></svg><span class="photo-cap">Photograph</span></div>
+        <figcaption style="padding-top:var(--space-3)">
+          <p style="font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+            letter-spacing:.16em;text-transform:uppercase;color:var(--text)">Sea Salt Roll</p>
+          <p style="font-size:var(--text-sm);color:var(--muted)">Olive-oil brushed, salt flaked, still warm.</p>
+        </figcaption></figure><figure style="break-inside:avoid;margin-bottom:var(--space-6)">
+        <div class="photo" style="height:380px"><svg width="140" height="140" viewBox="0 0 190 190" aria-hidden="true" style="opacity:.5">
+<circle cx="95" cy="95" r="72" fill="none" stroke="#8B5A2B" stroke-width="2.2"/>
+<circle cx="95" cy="95" r="63" fill="none" stroke="#8B5A2B" stroke-width=".9" opacity=".6"/>
+<g fill="#8B5A2B" opacity=".55">
+<ellipse cx="76" cy="74" rx="5" ry="4"/><ellipse cx="104" cy="70" rx="4.4" ry="3.6"/>
+<ellipse cx="119" cy="92" rx="5" ry="4"/><ellipse cx="108" cy="116" rx="4.6" ry="3.7"/>
+<ellipse cx="80" cy="120" rx="5" ry="4"/><ellipse cx="66" cy="98" rx="4.4" ry="3.6"/>
+<ellipse cx="95" cy="95" rx="4.6" ry="3.8"/>
+</g>
+<g stroke="#4E6023" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".8">
+<path d="M58 58l16 15"/><path d="M60 64l5-6 6-1"/><path d="M68 70l5-6 6-1"/>
+<path d="M132 124l-16-15"/><path d="M130 118l-5 6-6 1"/><path d="M122 112l-5 6-6 1"/>
+</g></svg><span class="photo-cap">Photograph</span></div>
+        <figcaption style="padding-top:var(--space-3)">
+          <p style="font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+            letter-spacing:.16em;text-transform:uppercase;color:var(--text)">Olive &amp; Sun-Dried Tomato Swirl</p>
+          <p style="font-size:var(--text-sm);color:var(--muted)">Spiralled, herbed, golden at the edges.</p>
+        </figcaption></figure><figure style="break-inside:avoid;margin-bottom:var(--space-6)">
+        <div class="photo" style="height:300px"><svg width="140" height="140" viewBox="0 0 190 190" aria-hidden="true" style="opacity:.5">
+<circle cx="95" cy="95" r="72" fill="none" stroke="#8B5A2B" stroke-width="2.2"/>
+<circle cx="95" cy="95" r="63" fill="none" stroke="#8B5A2B" stroke-width=".9" opacity=".6"/>
+<g fill="#8B5A2B" opacity=".55">
+<ellipse cx="76" cy="74" rx="5" ry="4"/><ellipse cx="104" cy="70" rx="4.4" ry="3.6"/>
+<ellipse cx="119" cy="92" rx="5" ry="4"/><ellipse cx="108" cy="116" rx="4.6" ry="3.7"/>
+<ellipse cx="80" cy="120" rx="5" ry="4"/><ellipse cx="66" cy="98" rx="4.4" ry="3.6"/>
+<ellipse cx="95" cy="95" rx="4.6" ry="3.8"/>
+</g>
+<g stroke="#4E6023" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".8">
+<path d="M58 58l16 15"/><path d="M60 64l5-6 6-1"/><path d="M68 70l5-6 6-1"/>
+<path d="M132 124l-16-15"/><path d="M130 118l-5 6-6 1"/><path d="M122 112l-5 6-6 1"/>
+</g></svg><span class="photo-cap">Photograph</span></div>
+        <figcaption style="padding-top:var(--space-3)">
+          <p style="font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+            letter-spacing:.16em;text-transform:uppercase;color:var(--text)">Cinnamon Swirl</p>
+          <p style="font-size:var(--text-sm);color:var(--muted)">A whole pan, pulled apart in ridges and glazed.</p>
+        </figcaption></figure><figure style="break-inside:avoid;margin-bottom:var(--space-6)">
+        <div class="photo" style="height:380px"><svg width="140" height="140" viewBox="0 0 190 190" aria-hidden="true" style="opacity:.5">
+<circle cx="95" cy="95" r="72" fill="none" stroke="#8B5A2B" stroke-width="2.2"/>
+<circle cx="95" cy="95" r="63" fill="none" stroke="#8B5A2B" stroke-width=".9" opacity=".6"/>
+<g fill="#8B5A2B" opacity=".55">
+<ellipse cx="76" cy="74" rx="5" ry="4"/><ellipse cx="104" cy="70" rx="4.4" ry="3.6"/>
+<ellipse cx="119" cy="92" rx="5" ry="4"/><ellipse cx="108" cy="116" rx="4.6" ry="3.7"/>
+<ellipse cx="80" cy="120" rx="5" ry="4"/><ellipse cx="66" cy="98" rx="4.4" ry="3.6"/>
+<ellipse cx="95" cy="95" rx="4.6" ry="3.8"/>
+</g>
+<g stroke="#4E6023" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".8">
+<path d="M58 58l16 15"/><path d="M60 64l5-6 6-1"/><path d="M68 70l5-6 6-1"/>
+<path d="M132 124l-16-15"/><path d="M130 118l-5 6-6 1"/><path d="M122 112l-5 6-6 1"/>
+</g></svg><span class="photo-cap">Photograph</span></div>
+        <figcaption style="padding-top:var(--space-3)">
+          <p style="font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+            letter-spacing:.16em;text-transform:uppercase;color:var(--text)">Jalape&#241;o &amp; Garlic Muffins</p>
+          <p style="font-size:var(--text-sm);color:var(--muted)">Hand-sized, crowned with toasted garlic.</p>
+        </figcaption></figure><figure style="break-inside:avoid;margin-bottom:var(--space-6)">
+        <div class="photo" style="height:300px"><svg width="140" height="140" viewBox="0 0 190 190" aria-hidden="true" style="opacity:.5">
+<circle cx="95" cy="95" r="72" fill="none" stroke="#8B5A2B" stroke-width="2.2"/>
+<circle cx="95" cy="95" r="63" fill="none" stroke="#8B5A2B" stroke-width=".9" opacity=".6"/>
+<g fill="#8B5A2B" opacity=".55">
+<ellipse cx="76" cy="74" rx="5" ry="4"/><ellipse cx="104" cy="70" rx="4.4" ry="3.6"/>
+<ellipse cx="119" cy="92" rx="5" ry="4"/><ellipse cx="108" cy="116" rx="4.6" ry="3.7"/>
+<ellipse cx="80" cy="120" rx="5" ry="4"/><ellipse cx="66" cy="98" rx="4.4" ry="3.6"/>
+<ellipse cx="95" cy="95" rx="4.6" ry="3.8"/>
+</g>
+<g stroke="#4E6023" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".8">
+<path d="M58 58l16 15"/><path d="M60 64l5-6 6-1"/><path d="M68 70l5-6 6-1"/>
+<path d="M132 124l-16-15"/><path d="M130 118l-5 6-6 1"/><path d="M122 112l-5 6-6 1"/>
+</g></svg><span class="photo-cap">Photograph</span></div>
+        <figcaption style="padding-top:var(--space-3)">
+          <p style="font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+            letter-spacing:.16em;text-transform:uppercase;color:var(--text)">Jalape&#241;o, Olive &amp; Red Onion Round</p>
+          <p style="font-size:var(--text-sm);color:var(--muted)">The one people recognise us by.</p>
+        </figcaption></figure><figure style="break-inside:avoid;margin-bottom:var(--space-6)">
+        <div class="photo" style="height:340px"><svg width="140" height="140" viewBox="0 0 190 190" aria-hidden="true" style="opacity:.5">
+<circle cx="95" cy="95" r="72" fill="none" stroke="#8B5A2B" stroke-width="2.2"/>
+<circle cx="95" cy="95" r="63" fill="none" stroke="#8B5A2B" stroke-width=".9" opacity=".6"/>
+<g fill="#8B5A2B" opacity=".55">
+<ellipse cx="76" cy="74" rx="5" ry="4"/><ellipse cx="104" cy="70" rx="4.4" ry="3.6"/>
+<ellipse cx="119" cy="92" rx="5" ry="4"/><ellipse cx="108" cy="116" rx="4.6" ry="3.7"/>
+<ellipse cx="80" cy="120" rx="5" ry="4"/><ellipse cx="66" cy="98" rx="4.4" ry="3.6"/>
+<ellipse cx="95" cy="95" rx="4.6" ry="3.8"/>
+</g>
+<g stroke="#4E6023" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".8">
+<path d="M58 58l16 15"/><path d="M60 64l5-6 6-1"/><path d="M68 70l5-6 6-1"/>
+<path d="M132 124l-16-15"/><path d="M130 118l-5 6-6 1"/><path d="M122 112l-5 6-6 1"/>
+</g></svg><span class="photo-cap">Photograph</span></div>
+        <figcaption style="padding-top:var(--space-3)">
+          <p style="font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+            letter-spacing:.16em;text-transform:uppercase;color:var(--text)">Honey Bites</p>
+          <p style="font-size:var(--text-sm);color:var(--muted)">Boxed and drizzled with Chetco Gold raw honey.</p>
+        </figcaption></figure><figure style="break-inside:avoid;margin-bottom:var(--space-6)">
+        <div class="photo" style="height:340px"><svg width="140" height="140" viewBox="0 0 190 190" aria-hidden="true" style="opacity:.5">
+<circle cx="95" cy="95" r="72" fill="none" stroke="#8B5A2B" stroke-width="2.2"/>
+<circle cx="95" cy="95" r="63" fill="none" stroke="#8B5A2B" stroke-width=".9" opacity=".6"/>
+<g fill="#8B5A2B" opacity=".55">
+<ellipse cx="76" cy="74" rx="5" ry="4"/><ellipse cx="104" cy="70" rx="4.4" ry="3.6"/>
+<ellipse cx="119" cy="92" rx="5" ry="4"/><ellipse cx="108" cy="116" rx="4.6" ry="3.7"/>
+<ellipse cx="80" cy="120" rx="5" ry="4"/><ellipse cx="66" cy="98" rx="4.4" ry="3.6"/>
+<ellipse cx="95" cy="95" rx="4.6" ry="3.8"/>
+</g>
+<g stroke="#4E6023" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".8">
+<path d="M58 58l16 15"/><path d="M60 64l5-6 6-1"/><path d="M68 70l5-6 6-1"/>
+<path d="M132 124l-16-15"/><path d="M130 118l-5 6-6 1"/><path d="M122 112l-5 6-6 1"/>
+</g></svg><span class="photo-cap">Photograph</span></div>
+        <figcaption style="padding-top:var(--space-3)">
+          <p style="font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+            letter-spacing:.16em;text-transform:uppercase;color:var(--text)">Heart Loaf</p>
+          <p style="font-size:var(--text-sm);color:var(--muted)">Little hand-shaped hearts. They go fast.</p>
+        </figcaption></figure><figure style="break-inside:avoid;margin-bottom:var(--space-6)">
+        <div class="photo" style="height:300px"><svg width="140" height="140" viewBox="0 0 190 190" aria-hidden="true" style="opacity:.5">
+<circle cx="95" cy="95" r="72" fill="none" stroke="#8B5A2B" stroke-width="2.2"/>
+<circle cx="95" cy="95" r="63" fill="none" stroke="#8B5A2B" stroke-width=".9" opacity=".6"/>
+<g fill="#8B5A2B" opacity=".55">
+<ellipse cx="76" cy="74" rx="5" ry="4"/><ellipse cx="104" cy="70" rx="4.4" ry="3.6"/>
+<ellipse cx="119" cy="92" rx="5" ry="4"/><ellipse cx="108" cy="116" rx="4.6" ry="3.7"/>
+<ellipse cx="80" cy="120" rx="5" ry="4"/><ellipse cx="66" cy="98" rx="4.4" ry="3.6"/>
+<ellipse cx="95" cy="95" rx="4.6" ry="3.8"/>
+</g>
+<g stroke="#4E6023" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".8">
+<path d="M58 58l16 15"/><path d="M60 64l5-6 6-1"/><path d="M68 70l5-6 6-1"/>
+<path d="M132 124l-16-15"/><path d="M130 118l-5 6-6 1"/><path d="M122 112l-5 6-6 1"/>
+</g></svg><span class="photo-cap">Photograph</span></div>
+        <figcaption style="padding-top:var(--space-3)">
+          <p style="font-family:var(--font-display);font-size:var(--text-xs);font-weight:700;
+            letter-spacing:.16em;text-transform:uppercase;color:var(--text)">At the Market</p>
+          <p style="font-size:var(--text-sm);color:var(--muted)">Crates out, gold bags filled, samples going round.</p>
+        </figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--offset);border-top:1px solid var(--divider);
+  padding-block:var(--space-20);text-align:center">
+  <div class="wrap-narrow">
+    <div style="display:flex;justify-content:center;margin-bottom:var(--space-6)"><svg width="170" height="40" viewBox="0 0 150 40" aria-hidden="true">
+<g fill="none" stroke="#4E6023" stroke-width="1.4" stroke-linecap="round">
+<path d="M4 20C30 20 62 17 96 12"/>
+<path d="M28 20c-3-6-1-11 4-13 2 5 1 10-4 13z"/>
+<path d="M46 17c-4-5-3-10 2-13 2 5 2 10-2 13z"/>
+<path d="M66 15c-4-5-3-10 2-13 2 5 2 10-2 13z"/>
+<path d="M36 21c4-5 9-5 13-1-4 4-9 5-13 1z"/>
+<path d="M56 19c4-5 9-5 13-1-4 4-9 5-13 1z"/>
+</g>
+<g fill="#4E6023">
+<ellipse cx="86" cy="13" rx="4.6" ry="6" transform="rotate(28 86 13)"/>
+<ellipse cx="99" cy="10" rx="4.6" ry="6" transform="rotate(28 99 10)" opacity=".72"/>
+</g></svg></div>
+    <h2 style="font-size:var(--text-xl);margin-bottom:var(--space-4)">See more on Facebook</h2>
+    <p style="color:var(--muted);margin-bottom:var(--space-8)">We post the fresh bakes as they come out of the oven.</p>
+    <a href="#" class="btn btn-fill">Oh! You Fancy Focaccia</a>
+  </div>
+</section>
+<footer class="ftr"><div class="wrap">
+<div style="display:grid;grid-template-columns:1.7fr 1fr 1fr;gap:var(--space-12)">
+  <div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:var(--space-4)">
+      <svg width="46" height="46" viewBox="0 0 58 58" aria-hidden="true">
+      <circle cx="29" cy="29" r="27.5" fill="none" stroke="#E9BFA8" stroke-width="2"/>
+      <circle cx="29" cy="29" r="23.5" fill="none" stroke="#E9BFA8" stroke-width=".8" opacity=".5"/>
+      <path d="M29 17c-4.6 2.6-7 6.4-7 11 0 4.2 3 7.6 7 10.6 4-3 7-6.4 7-10.6 0-4.6-2.4-8.4-7-11z" fill="none" stroke="#E9BFA8" stroke-width="1.3"/>
+      <path d="M29 20.5v17" stroke="#E9BFA8" stroke-width="1" opacity=".7"/></svg>
+      <span style="display:flex;flex-direction:column;line-height:1">
+        <span style="font-family:var(--font-script);font-size:1.7rem;color:#E9BFA8">Oh! You Fancy</span>
+        <span style="font-family:var(--font-display);font-weight:700;font-size:1rem;letter-spacing:.18em;text-transform:uppercase;color:#E8CFC2">Focaccia</span>
+      </span>
+    </div>
+    <p style="max-width:44ch;color:#C9A192">Artisan focaccia baked by hand in Brookings, Oregon. Organic ingredients, a living sourdough starter, and small batches that sell out.</p>
+    <p style="margin-top:var(--space-5);font-family:var(--font-script);font-size:1.5rem;color:#E9BFA8">Pane &#183; Amore &#183; Sempre</p>
+  </div>
+  <div><h4>Explore</h4><ul style="display:flex;flex-direction:column;gap:.55rem">
+    <li><a href="#">About</a></li><li><a href="#">Our Breads</a></li>
+    <li><a href="#">Gallery</a></li><li><a href="#">Reviews</a></li><li><a href="#">Contact</a></li></ul></div>
+  <div><h4>Find Us</h4>
+    <p style="color:#C9A192">Brookings-Harbor Farmers Market<br>Wednesdays &amp; Saturdays<br>9am &#8216;til sold out</p>
+    <p style="margin-top:var(--space-4)"><a href="#">ohyoufancyfocaccia@gmail.com</a></p>
+    <p style="margin-top:var(--space-2)"><a href="#">Facebook</a></p></div>
+</div>
+<div class="ftr-bot"><p>&#169; 2026 Oh! You Fancy Focaccia &#183; Brookings, Oregon</p>
+<p>Baked with love. Thank you for shopping local.</p></div>
+</div></footer>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":1440,"height":2900}}'>
+class Component extends DCLogic {}
+</script>
+</body>
+</html>
