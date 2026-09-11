@@ -154,7 +154,17 @@ ul{list-style:none}
 .roman{font-family:var(--serif);font-size:2.6rem;font-weight:400;color:var(--gold);
   line-height:1;margin-bottom:var(--s4);font-style:italic}
 
-/* photo slot */
+/* real photography, framed like a plate */
+.shot{position:relative;overflow:hidden;border:1px solid var(--rule);
+  background:var(--paper-3);margin:0}
+.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot::after{content:'';position:absolute;inset:8px;
+  border:1px solid oklch(1 0 0/.34);pointer-events:none}
+.shot-oval{border-radius:50%/50%;border:2px solid var(--burgundy);
+  box-shadow:var(--sh-lg)}
+.shot-oval::after{inset:9px;border:1px solid oklch(1 0 0/.42);border-radius:50%/50%}
+
+/* placeholder slot — only where no photograph exists yet */
 .slot{position:relative;background:linear-gradient(152deg,#EDE2C6,#E3D4B0 52%,#D8C69C);
   border:1px solid var(--rule);overflow:hidden;display:flex;
   align-items:center;justify-content:center}
@@ -263,6 +273,22 @@ CORNER = """<svg class="corner c-%s" width="96" height="96" viewBox="0 0 96 96" 
 <ellipse cx="58" cy="33" rx="3.6" ry="4.8" transform="rotate(30 58 33)" fill="#8FA05E"/>
 <circle cx="6" cy="6" r="2.6" fill="#D9A94E" opacity=".8"/></svg>"""
 
+def logo_badge(size=200, draw=True):
+    """The real label, with the gold ring stroking on around it."""
+    ring = f'''<svg width="{size}" height="{size}" viewBox="0 0 200 200" aria-hidden="true"
+  class="ring" style="position:absolute;inset:0">
+<circle cx="100" cy="100" r="96"{' class="draw" style="--len:604"' if draw else ''}
+  fill="none" stroke="#D9A94E" stroke-width="1.5" transform="rotate(-90 100 100)"
+  stroke-linecap="round"/>
+<circle cx="100" cy="100" r="91" fill="none" stroke="#D9A94E" stroke-width=".5" opacity=".4"/>
+</svg>'''
+    return f'''<div style="position:relative;width:{size}px;height:{size}px;margin:0 auto">
+  {ring}
+  <img src="logo.webp" alt="Oh! You Fancy Focaccia" class="mark"
+    style="position:absolute;inset:{int(size*0.075)}px;width:{int(size*0.85)}px;
+    height:{int(size*0.85)}px;border-radius:50%">
+</div>'''
+
 def ring_badge(size=132, draw=True):
     d = ' class="draw" style="--len:365"' if draw else ''
     d2 = ' class="draw" style="--len:150"' if draw else ''
@@ -285,7 +311,7 @@ LOADER = f"""
   {CORNER % 'tl'}{CORNER % 'tr'}{CORNER % 'bl'}{CORNER % 'br'}
   <div class="vig"></div>
   <div class="load-in">
-    {ring_badge(132)}
+    {logo_badge(214)}
     <div class="mark" style="margin-top:var(--s6)">
       <p style="font-family:var(--script);font-size:4.6rem;line-height:.78;color:#F2DFC0">Oh! You Fancy</p>
       <p style="font-family:var(--serif);font-size:2.2rem;font-weight:700;letter-spacing:.3em;
@@ -344,22 +370,29 @@ def masthead(active):
   backdrop-filter:blur(12px)">
   <div style="text-align:center">
     <div style="display:flex;align-items:center;justify-content:center;gap:var(--s6)">
-      {olive_rule(150)}
+      {olive_rule(120)}
+      <img src="logo.webp" alt="" style="width:62px;height:62px;border-radius:50%;flex-shrink:0">
       <a href="#" style="display:block">
         <p style="font-family:var(--script);font-size:2.9rem;line-height:.76;color:var(--burgundy)">Oh! You Fancy</p>
         <p style="font-family:var(--serif);font-size:1.18rem;font-weight:700;letter-spacing:.38em;
           text-transform:uppercase;color:var(--ink);margin-top:.32rem;padding-left:.38em">Focaccia</p>
       </a>
-      {olive_rule(150,True)}
+      {olive_rule(120,True)}
     </div>
     <nav style="display:flex;justify-content:center;gap:var(--s8);margin-top:var(--s6);
       border-top:1px solid var(--rule-soft);padding-block:var(--s4)">{links}</nav>
   </div>
 </header>"""
 
-def enamel(title, lines, small=None):
+def enamel(title, lines, small=None, bg=None):
+    layer = (f'<div style="position:absolute;inset:0;background-image:url(./{bg});'
+             f'background-size:cover;background-position:center;opacity:.24;'
+             f'filter:grayscale(.3) contrast(1.05)"></div>'
+             f'<div style="position:absolute;inset:0;background:'
+             f'linear-gradient(90deg,#8E1B1B 0%,oklch(.36 .13 25/.72) 50%,#8E1B1B 100%)"></div>') if bg else ''
     return f"""<section class="enamel">
-  <div class="narrow" style="position:relative">
+  {layer}
+  <div class="narrow" style="position:relative;z-index:2">
     <p class="caps" style="color:oklch(.82 .09 75/.72);margin-bottom:var(--s5)">{title}</p>
     <p style="font-family:var(--serif);font-size:3.1rem;font-weight:600;line-height:1.18;
       color:#F6E6C6">{lines}</p>
@@ -367,14 +400,22 @@ def enamel(title, lines, small=None):
   </div>
 </section>"""
 
+def shot(src, h, alt="", cls="", extra=""):
+    """A real photograph, framed like a plate."""
+    return (f'<figure class="shot {cls}" style="height:{h}px;{extra}">'
+            f'<img src="{src}" alt="{alt}"></figure>')
+
 def slot(h, cap):
+    """Placeholder — only where we genuinely have no photograph yet."""
     return f'<div class="slot" style="height:{h}px"><span class="slot-cap">{cap}</span></div>'
 
 FOOTER = f"""<footer style="background:var(--burgundy-ink);color:#D8BFA0;padding-block:var(--s20) var(--s8)">
 <div class="wrap">
   <div style="text-align:center;margin-bottom:var(--s16)">
     <div style="display:flex;justify-content:center;margin-bottom:var(--s5)">
-      {ring_badge(84, draw=False).replace('#D9A94E','#C9A46A').replace('#8FA05E','#93A06A')}
+      <img src="logo.webp" alt="Oh! You Fancy Focaccia"
+        style="width:104px;height:104px;border-radius:50%;
+        box-shadow:0 0 0 1px oklch(.82 .09 75/.35),0 0 0 7px oklch(.82 .09 75/.10)">
     </div>
     <p style="font-family:var(--script);font-size:2.9rem;line-height:.8;color:#EBD3AE">Oh! You Fancy</p>
     <p style="font-family:var(--serif);font-size:1.05rem;font-weight:700;letter-spacing:.36em;
@@ -447,11 +488,7 @@ HOME = masthead("Home") + f"""
       </div>
     </div>
     <div style="position:relative;display:flex;justify-content:center">
-      <div class="oval" style="width:430px;height:530px;overflow:hidden;background:
-        linear-gradient(152deg,#EDE2C6,#E3D4B0 52%,#D8C69C);display:flex;align-items:center;
-        justify-content:center;box-shadow:var(--sh-lg)">
-        <span class="slot-cap" style="bottom:44px">Hero photograph</span>
-      </div>
+      {shot("hero-garden.webp",530,"Focaccia painted in herbs and vegetables","shot-oval","width:430px")}
       <div style="position:absolute;bottom:-16px;left:50%;transform:translateX(-50%)">
         {olive_rule(190)}</div>
     </div>
@@ -459,7 +496,7 @@ HOME = masthead("Home") + f"""
 </section>
 
 {enamel("Il Mercato","Wednesdays &amp; Saturdays<br>9am &#8216;til sold out",
-  "Brookings-Harbor Farmers Market &#183; Port of Brookings Harbor")}
+  "Brookings-Harbor Farmers Market &#183; Port of Brookings Harbor", bg="wide-slab.webp")}
 
 <section class="sec" style="background:var(--paper-3)">
   <div class="wrap">
@@ -499,7 +536,8 @@ HOME = masthead("Home") + f"""
       <div style="margin-top:var(--s8)"><a href="#" class="btn btn-line">The Full Bill of Fare</a></div>
     </div>
     <div style="display:flex;flex-direction:column;gap:var(--s6)">
-      {slot(330,'Savory round')}{slot(260,'Sweet pan')}
+      {shot("savory-round.webp",330,"Jalapeno, olive and red onion focaccia")}
+      {shot("sweet-cinnamon.webp",300,"Cinnamon swirl focaccia with vanilla drizzle")}
     </div>
   </div>
 </section>
@@ -586,11 +624,10 @@ ABOUT = masthead("About") + head_band("La Nostra Storia","Welcome to Oh! You Fan
   "A small-batch bakery on the southern Oregon coast, run by Amanda &#8212; doing what she loves, where she loves to be.") + f"""
 <section class="sec" style="background:var(--paper)">
   <div class="wrap" style="display:grid;grid-template-columns:.9fr 1.1fr;gap:var(--s16);align-items:center">
-    <div style="display:flex;justify-content:center">
-      <div class="oval" style="width:400px;height:500px;background:
-        linear-gradient(152deg,#EDE2C6,#E3D4B0 52%,#D8C69C);display:flex;align-items:center;
-        justify-content:center;box-shadow:var(--sh-lg)">
-        <span class="slot-cap" style="bottom:44px">Amanda at the stall</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:var(--s4)">
+      {shot("art-garden.webp",500,"A flower garden painted across focaccia","shot-oval","width:400px")}
+      <p class="caps" style="font-size:.62rem;opacity:.5;text-align:center">
+        [PORTRAIT OF AMANDA &#8212; if she would like one here]</p>
     </div>
     <div>
       <p class="caps kicker kicker-l">From Our Kitchen</p>
@@ -635,7 +672,7 @@ def course(title, ital, rows, cap):
       <div style="width:64px;height:2px;background:var(--burgundy);margin-bottom:var(--s4)"></div>
       {''.join(rows)}
     </div>
-    {slot(360, cap)}
+    {shot(cap[0], 360, cap[1])}
   </div>
 </div>"""
 
@@ -648,21 +685,21 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
       fare("II","Jalape&#241;o, Olive &amp; Red Onion","Our signature round &#8212; fresh jalape&#241;o, mixed olives, red onion and herbs across a golden, dimpled crust."),
       fare("III","Roasted Garlic &amp; Sea Salt","Simple and perfect. Olive oil, roasted garlic and flaky salt on a pillowy sourdough crumb."),
       fare("IV","Cheesy Jalape&#241;o","Melted and bubbling, with jalape&#241;o baked right into the top."),
-    ],"Savory rounds")}
+    ],("savory-round.webp","Jalapeno, olive and red onion focaccia"))}
     {course("Sweet","I Dolci",[
       fare("V","Cinnamon Swirl with Vanilla Drizzle","A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze."),
       fare("VI","Honey Focaccia Bites","Pull-apart bites, boxed and drizzled with award-winning Chetco Gold raw honey from right here on the Chetco River."),
-    ],"Sweet pans")}
+    ],("sweet-cinnamon.webp","Cinnamon swirl focaccia with vanilla drizzle"))}
     {course("Muffins &amp; Rolls","I Piccoli",[
       fare("VII","Jalape&#241;o &amp; Roasted Garlic","Hand-sized, crisp-edged, crowned with jalape&#241;o and toasted garlic."),
       fare("VIII","Peppered Pickle","Made with Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles infused right into the dough. Organic ingredients only."),
       fare("IX","Sea Salt Rolls","Soft pull-apart rounds, olive-oil brushed and salt flaked."),
-    ],"Muffins")}
+    ],("muffins-jalapeno.webp","Jalapeno and roasted garlic focaccia muffins"))}
     {course("Focaccia Art","L&#8217;Arte",[
       fare("X","Heart Loaves","Little hand-shaped hearts. They go fast."),
       fare("XI","Flower Gardens","Hand-painted in vegetables and herbs &#8212; a whole garden across the top of the dough."),
       fare("XII","Seasonal &amp; Custom","Tell us the occasion. We have made a great many things that were never on a list."),
-    ],"Focaccia art")}
+    ],("heart-loaf.webp","A hand-shaped focaccia heart"))}
   </div>
 </section>
 
@@ -687,14 +724,23 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
 """ + FOOTER
 
 # ══ GALLERY ═══════════════════════════════════════════════════════════
-GAL = [("Sea Salt Roll","Olive-oil brushed, salt flaked, still warm.",320),
-("Olive &amp; Sun-Dried Tomato Swirl","Spiralled, herbed, golden at the edges.",400),
-("Cinnamon Swirl","A whole pan, pulled apart in ridges and glazed.",310),
-("Jalape&#241;o &amp; Garlic Muffins","Hand-sized, crowned with toasted garlic.",390),
-("Jalape&#241;o, Olive &amp; Red Onion","The round people recognise us by.",300),
-("Honey Bites","Boxed and drizzled with Chetco Gold raw honey.",350),
-("Heart Loaf","Little hand-shaped hearts. They go fast.",360),
-("At the Market","Crates out, gold bags filled, samples going round.",310)]
+GAL = [
+ ("swirl-jalapeno.webp","Jalape&#241;o Cheese Swirl","Spiralled, layered and blistered at the edge.",300),
+ ("heart-loaf.webp","Heart Loaf","Little hand-shaped hearts. They go fast.",300),
+ ("art-garden.webp","Flower Garden","Painted in herbs and vegetables, one stem at a time.",395),
+ ("sweet-cinnamon.webp","Cinnamon Swirl","A whole pan, pulled apart in ridges and glazed.",430),
+ ("savory-round.webp","Jalape&#241;o, Olive &amp; Red Onion","The round people recognise us by.",300),
+ ("honey-bites.webp","Honey Bites","Boxed, and drizzled with Chetco Gold raw honey.",360),
+ ("olive-slab.webp","Olive Slab","Green and kalamata, pressed into the dimples.",400),
+ ("muffins-jalapeno.webp","Jalape&#241;o &amp; Garlic Muffins","Hand-sized, crowned with toasted garlic.",300),
+ ("lemon-pepper.webp","Lemon Pepper &amp; Garlic","Cracked pepper, lemon zest, plenty of oil.",300),
+ ("rosemary-slab.webp","Rosemary &amp; Sea Salt","The plain one. Hardest to get right.",390),
+ ("cheesy-jalapeno.webp","Cheesy Jalape&#241;o","Melted, bubbling, baked right into the top.",280),
+ ("herb-rolls.webp","Herb Rolls","Sage, rosemary and garlic, pulled apart warm.",300),
+ ("olive-tomato.webp","Olive &amp; Sun-Dried Tomato","Crisp at the edge, soft through the middle.",300),
+ ("skillet.webp","Skillet Focaccia","Baked in cast iron, green with herbs.",240),
+ ("sea-salt-round.webp","Sea Salt Round","Olive-oil brushed, salt flaked, still warm.",300),
+ ("parm-muffins.webp","Garlic Parmesan Muffins","Crisp-edged and golden all over.",300)]
 
 GALLERY = masthead("Gallery") + head_band("La Galleria","Fresh From the Oven",
   "Straight from the tray, and straight from the market table.") + f"""
@@ -702,11 +748,11 @@ GALLERY = masthead("Gallery") + head_band("La Galleria","Fresh From the Oven",
   <div class="wrap">
     <div style="columns:3;column-gap:var(--s6)">
       {''.join(f'''<figure style="break-inside:avoid;margin-bottom:var(--s8)">
-        <div class="slot" style="height:{h}px"><span class="slot-cap">Photograph</span></div>
+        <div class="shot" style="height:{h}px"><img src="{f}" alt="{n}"></div>
         <figcaption style="padding-top:var(--s4);border-top:1px solid var(--rule-soft);margin-top:var(--s3)">
           <p class="caps" style="font-size:.68rem">{n}</p>
           <p style="font-size:var(--sm);opacity:.72;font-style:italic;margin-top:var(--s1)">{c}</p>
-        </figcaption></figure>''' for n,c,h in GAL)}
+        </figcaption></figure>''' for f,n,c,h in GAL)}
     </div>
   </div>
 </section>
@@ -810,7 +856,7 @@ CONTACT = masthead("Contact") + head_band("Scrivici","We&#8217;d Love to Hear Fr
         </div>
         <p style="opacity:.74;font-size:var(--sm);margin-top:var(--s6);font-style:italic">
           Port of Brookings Harbor. Come early and come hungry &#8212; there are always samples, and we do sell out.</p>
-        {slot(190,'Map &#183; Port of Brookings Harbor')}
+        {slot(180,'Map &#183; Port of Brookings Harbor')}
       </div>
     </div>
   </div>
@@ -841,7 +887,7 @@ LOADER_M = f"""
   <div class="frame" style="inset:18px"></div>
   <div class="vig"></div>
   <div class="load-in">
-    {ring_badge(96)}
+    {logo_badge(150)}
     <div class="mark" style="margin-top:var(--s5)">
       <p style="font-family:var(--script);font-size:3.1rem;line-height:.78;color:#F2DFC0">Oh! You Fancy</p>
       <p style="font-family:var(--serif);font-size:1.4rem;font-weight:700;letter-spacing:.3em;
@@ -887,9 +933,7 @@ MOBILE = f"""
     One bread,<br><span style="font-style:italic;font-weight:500">endlessly</span><br>argued over.</h1>
   <p style="text-align:center;opacity:.78;margin-bottom:var(--s6)">We make focaccia. Only focaccia &#8212; dimpled, blistered, organic, and shaped by hand.</p>
   <a href="#" class="btn btn-fill" style="width:100%">See the Bill of Fare</a>
-  <div class="oval" style="width:100%;height:340px;margin-top:var(--s8);background:
-    linear-gradient(152deg,#EDE2C6,#E3D4B0 52%,#D8C69C);display:flex;align-items:center;
-    justify-content:center"><span class="slot-cap" style="bottom:36px">Hero photograph</span></div>
+  {shot("hero-garden.webp",340,"Focaccia painted in herbs and vegetables","shot-oval","margin-top:var(--s8)")}
 </section>
 
 <section class="enamel" style="padding-block:var(--s10)">

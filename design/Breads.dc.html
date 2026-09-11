@@ -143,7 +143,17 @@ ul{list-style:none}
 .roman{font-family:var(--serif);font-size:2.6rem;font-weight:400;color:var(--gold);
   line-height:1;margin-bottom:var(--s4);font-style:italic}
 
-/* photo slot */
+/* real photography, framed like a plate */
+.shot{position:relative;overflow:hidden;border:1px solid var(--rule);
+  background:var(--paper-3);margin:0}
+.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot::after{content:'';position:absolute;inset:8px;
+  border:1px solid oklch(1 0 0/.34);pointer-events:none}
+.shot-oval{border-radius:50%/50%;border:2px solid var(--burgundy);
+  box-shadow:var(--sh-lg)}
+.shot-oval::after{inset:9px;border:1px solid oklch(1 0 0/.42);border-radius:50%/50%}
+
+/* placeholder slot — only where no photograph exists yet */
 .slot{position:relative;background:linear-gradient(152deg,#EDE2C6,#E3D4B0 52%,#D8C69C);
   border:1px solid var(--rule);overflow:hidden;display:flex;
   align-items:center;justify-content:center}
@@ -163,7 +173,7 @@ ul{list-style:none}
   backdrop-filter:blur(12px)">
   <div style="text-align:center">
     <div style="display:flex;align-items:center;justify-content:center;gap:var(--s6)">
-      <svg width="150" height="34" viewBox="0 0 190 34" aria-hidden="true">
+      <svg width="120" height="34" viewBox="0 0 190 34" aria-hidden="true">
 <g fill="none" stroke="#4E6023" stroke-width="1.2" stroke-linecap="round">
 <path d="M2 17C40 17 82 14 126 9"/>
 <path d="M36 17c-3-5-1-9 3-11 2 4 1 9-3 11z"/>
@@ -174,12 +184,13 @@ ul{list-style:none}
 <g fill="#4E6023">
 <ellipse cx="116" cy="10" rx="4" ry="5.2" transform="rotate(28 116 10)"/>
 <ellipse cx="130" cy="7" rx="4" ry="5.2" transform="rotate(28 130 7)" opacity=".68"/></g></svg>
+      <img src="logo.webp" alt="" style="width:62px;height:62px;border-radius:50%;flex-shrink:0">
       <a href="#" style="display:block">
         <p style="font-family:var(--script);font-size:2.9rem;line-height:.76;color:var(--burgundy)">Oh! You Fancy</p>
         <p style="font-family:var(--serif);font-size:1.18rem;font-weight:700;letter-spacing:.38em;
           text-transform:uppercase;color:var(--ink);margin-top:.32rem;padding-left:.38em">Focaccia</p>
       </a>
-      <svg width="150" height="34" viewBox="0 0 190 34" aria-hidden="true">
+      <svg width="120" height="34" viewBox="0 0 190 34" aria-hidden="true">
 <g transform="scale(-1,1) translate(-190,0)" fill="none" stroke="#4E6023" stroke-width="1.2" stroke-linecap="round">
 <path d="M2 17C40 17 82 14 126 9"/>
 <path d="M36 17c-3-5-1-9 3-11 2 4 1 9-3 11z"/>
@@ -229,7 +240,7 @@ ul{list-style:none}
       <p class="fare-t"><span>Roasted Garlic &amp; Sea Salt</span></p><p class="fare-d">Simple and perfect. Olive oil, roasted garlic and flaky salt on a pillowy sourdough crumb.</p></div></div><div class="fare"><span class="fare-n">IV</span><div class="fare-b">
       <p class="fare-t"><span>Cheesy Jalape&#241;o</span></p><p class="fare-d">Melted and bubbling, with jalape&#241;o baked right into the top.</p></div></div>
     </div>
-    <div class="slot" style="height:360px"><span class="slot-cap">Savory rounds</span></div>
+    <figure class="shot " style="height:360px;"><img src="savory-round.webp" alt="Jalapeno, olive and red onion focaccia"></figure>
   </div>
 </div>
     <div style="margin-bottom:var(--s20)">
@@ -242,7 +253,7 @@ ul{list-style:none}
       <p class="fare-t"><span>Cinnamon Swirl with Vanilla Drizzle</span></p><p class="fare-d">A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze.</p></div></div><div class="fare"><span class="fare-n">VI</span><div class="fare-b">
       <p class="fare-t"><span>Honey Focaccia Bites</span></p><p class="fare-d">Pull-apart bites, boxed and drizzled with award-winning Chetco Gold raw honey from right here on the Chetco River.</p></div></div>
     </div>
-    <div class="slot" style="height:360px"><span class="slot-cap">Sweet pans</span></div>
+    <figure class="shot " style="height:360px;"><img src="sweet-cinnamon.webp" alt="Cinnamon swirl focaccia with vanilla drizzle"></figure>
   </div>
 </div>
     <div style="margin-bottom:var(--s20)">
@@ -256,7 +267,7 @@ ul{list-style:none}
       <p class="fare-t"><span>Peppered Pickle</span></p><p class="fare-d">Made with Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles infused right into the dough. Organic ingredients only.</p></div></div><div class="fare"><span class="fare-n">IX</span><div class="fare-b">
       <p class="fare-t"><span>Sea Salt Rolls</span></p><p class="fare-d">Soft pull-apart rounds, olive-oil brushed and salt flaked.</p></div></div>
     </div>
-    <div class="slot" style="height:360px"><span class="slot-cap">Muffins</span></div>
+    <figure class="shot " style="height:360px;"><img src="muffins-jalapeno.webp" alt="Jalapeno and roasted garlic focaccia muffins"></figure>
   </div>
 </div>
     <div style="margin-bottom:var(--s20)">
@@ -270,7 +281,7 @@ ul{list-style:none}
       <p class="fare-t"><span>Flower Gardens</span></p><p class="fare-d">Hand-painted in vegetables and herbs &#8212; a whole garden across the top of the dough.</p></div></div><div class="fare"><span class="fare-n">XII</span><div class="fare-b">
       <p class="fare-t"><span>Seasonal &amp; Custom</span></p><p class="fare-d">Tell us the occasion. We have made a great many things that were never on a list.</p></div></div>
     </div>
-    <div class="slot" style="height:360px"><span class="slot-cap">Focaccia art</span></div>
+    <figure class="shot " style="height:360px;"><img src="heart-loaf.webp" alt="A hand-shaped focaccia heart"></figure>
   </div>
 </div>
   </div>
@@ -298,18 +309,9 @@ ul{list-style:none}
 <div class="wrap">
   <div style="text-align:center;margin-bottom:var(--s16)">
     <div style="display:flex;justify-content:center;margin-bottom:var(--s5)">
-      <svg class="ring" width="84" height="84" viewBox="0 0 140 140" aria-hidden="true"
-  style="margin:0 auto">
-<circle cx="70" cy="70" r="58" fill="none" stroke="#C9A46A" stroke-width="1.6"
-  transform="rotate(-90 70 70)" stroke-linecap="round"/>
-<circle cx="70" cy="70" r="50" fill="none" stroke="#C9A46A" stroke-width=".6" opacity=".45"/>
-<g class="mark">
-<path d="M70 45c-9 5.5-14 12.6-14 21.4 0 8.2 5.8 14.8 14 20.6 8.2-5.8 14-12.4 14-20.6C84 57.6 79 50.5 70 45z"
-  fill="none" stroke="#93A06A" stroke-width="1.5"/>
-<path d="M70 51v36" stroke="#93A06A" stroke-width="1.1" opacity=".7"/>
-<ellipse cx="60.5" cy="65" rx="4" ry="5.2" transform="rotate(-24 60.5 65)" fill="#93A06A"/>
-<ellipse cx="79.5" cy="71" rx="4" ry="5.2" transform="rotate(-24 79.5 71)" fill="#93A06A"/>
-</g></svg>
+      <img src="logo.webp" alt="Oh! You Fancy Focaccia"
+        style="width:104px;height:104px;border-radius:50%;
+        box-shadow:0 0 0 1px oklch(.82 .09 75/.35),0 0 0 7px oklch(.82 .09 75/.10)">
     </div>
     <p style="font-family:var(--script);font-size:2.9rem;line-height:.8;color:#EBD3AE">Oh! You Fancy</p>
     <p style="font-family:var(--serif);font-size:1.05rem;font-weight:700;letter-spacing:.36em;

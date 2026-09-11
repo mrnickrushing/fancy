@@ -143,7 +143,17 @@ ul{list-style:none}
 .roman{font-family:var(--serif);font-size:2.6rem;font-weight:400;color:var(--gold);
   line-height:1;margin-bottom:var(--s4);font-style:italic}
 
-/* photo slot */
+/* real photography, framed like a plate */
+.shot{position:relative;overflow:hidden;border:1px solid var(--rule);
+  background:var(--paper-3);margin:0}
+.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot::after{content:'';position:absolute;inset:8px;
+  border:1px solid oklch(1 0 0/.34);pointer-events:none}
+.shot-oval{border-radius:50%/50%;border:2px solid var(--burgundy);
+  box-shadow:var(--sh-lg)}
+.shot-oval::after{inset:9px;border:1px solid oklch(1 0 0/.42);border-radius:50%/50%}
+
+/* placeholder slot — only where no photograph exists yet */
 .slot{position:relative;background:linear-gradient(152deg,#EDE2C6,#E3D4B0 52%,#D8C69C);
   border:1px solid var(--rule);overflow:hidden;display:flex;
   align-items:center;justify-content:center}
@@ -264,18 +274,18 @@ ul{list-style:none}
 <circle cx="6" cy="6" r="2.6" fill="#D9A94E" opacity=".8"/></svg>
   <div class="vig"></div>
   <div class="load-in">
-    <svg class="ring" width="132" height="132" viewBox="0 0 140 140" aria-hidden="true"
-  style="margin:0 auto">
-<circle cx="70" cy="70" r="58" class="draw" style="--len:365" fill="none" stroke="#D9A94E" stroke-width="1.6"
-  transform="rotate(-90 70 70)" stroke-linecap="round"/>
-<circle cx="70" cy="70" r="50" fill="none" stroke="#D9A94E" stroke-width=".6" opacity=".45"/>
-<g class="mark">
-<path d="M70 45c-9 5.5-14 12.6-14 21.4 0 8.2 5.8 14.8 14 20.6 8.2-5.8 14-12.4 14-20.6C84 57.6 79 50.5 70 45z"
-  fill="none" stroke="#8FA05E" stroke-width="1.5"/>
-<path d="M70 51v36" stroke="#8FA05E" stroke-width="1.1" opacity=".7"/>
-<ellipse cx="60.5" cy="65" rx="4" ry="5.2" transform="rotate(-24 60.5 65)" fill="#8FA05E"/>
-<ellipse cx="79.5" cy="71" rx="4" ry="5.2" transform="rotate(-24 79.5 71)" fill="#8FA05E"/>
-</g></svg>
+    <div style="position:relative;width:214px;height:214px;margin:0 auto">
+  <svg width="214" height="214" viewBox="0 0 200 200" aria-hidden="true"
+  class="ring" style="position:absolute;inset:0">
+<circle cx="100" cy="100" r="96" class="draw" style="--len:604"
+  fill="none" stroke="#D9A94E" stroke-width="1.5" transform="rotate(-90 100 100)"
+  stroke-linecap="round"/>
+<circle cx="100" cy="100" r="91" fill="none" stroke="#D9A94E" stroke-width=".5" opacity=".4"/>
+</svg>
+  <img src="logo.webp" alt="Oh! You Fancy Focaccia" class="mark"
+    style="position:absolute;inset:16px;width:181px;
+    height:181px;border-radius:50%">
+</div>
     <div class="mark" style="margin-top:var(--s6)">
       <p style="font-family:var(--script);font-size:4.6rem;line-height:.78;color:#F2DFC0">Oh! You Fancy</p>
       <p style="font-family:var(--serif);font-size:2.2rem;font-weight:700;letter-spacing:.3em;
