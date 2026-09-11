@@ -26,6 +26,12 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const username = await authApi.restoreSession();
       set({ username, isAuthenticated: Boolean(username) });
+    } catch (err) {
+      // A keychain that cannot be read is not a crash — it only means
+      // signing in again. Without this the rejection goes unhandled and the
+      // phone lands on the login screen with no idea why.
+      console.warn('Could not restore the saved sign-in:', err);
+      set({ username: null, isAuthenticated: false });
     } finally {
       set({ isRestoring: false });
     }
