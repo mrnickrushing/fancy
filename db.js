@@ -69,9 +69,12 @@ async function initSchema() {
       paid_amount NUMERIC(10,2) NOT NULL DEFAULT 0,
       source TEXT NOT NULL DEFAULT 'website',
       respond_token TEXT NOT NULL,
+      idempotency_key TEXT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     );
   `);
+  await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS idempotency_key TEXT`);
+  await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS orders_idempotency_key_idx ON orders(idempotency_key) WHERE idempotency_key IS NOT NULL`);
   await pool.query(`
     CREATE TABLE IF NOT EXISTS order_items (
       id SERIAL PRIMARY KEY,
@@ -96,6 +99,27 @@ async function initSchema() {
     );
   `);
   await pool.query(`CREATE INDEX IF NOT EXISTS payments_order_id_idx ON payments(order_id);`);
+  // Transactional email is an outbox, not a best-effort side effect of the
+  // request. If Resend is unavailable after an order is saved, the message
+  // remains available for retry instead of disappearing.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS email_outbox (
+      id SERIAL PRIMARY KEY,
+      order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
+      kind TEXT NOT NULL,
+      recipient TEXT NOT NULL,
+      reply_to TEXT,
+      subject TEXT NOT NULL,
+      html TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      attempts INTEGER NOT NULL DEFAULT 0,
+      last_error TEXT,
+      next_attempt_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      sent_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS email_outbox_due_idx ON email_outbox(status, next_attempt_at);`);
   await pool.query(`
     CREATE TABLE IF NOT EXISTS blocks (
       id SERIAL PRIMARY KEY,
@@ -137,13 +161,16 @@ async function initSchema() {
 async function seedMenu() {
   const { rows } = await pool.query(`SELECT COUNT(*)::int AS n FROM menu_items`);
   if (rows[0].n > 0) return;
-  for (let i = 0; i < MENU_SEED.length; i++) {
-    const [course, name, description] = MENU_SEED[i];
-    await pool.query(
-      `INSERT INTO menu_items (course, name, description, sort_order) VALUES ($1,$2,$3,$4)`,
-      [course, name, description, i]
-    );
-  }
+  const values = [];
+  const rowsSql = MENU_SEED.map(([course, name, description], i) => {
+    values.push(course, name, description, i);
+    const offset = i * 4;
+    return `($${offset + 1},$${offset + 2},$${offset + 3},$${offset + 4})`;
+  });
+  await pool.query(
+    `INSERT INTO menu_items (course, name, description, sort_order) VALUES ${rowsSql.join(',')}`,
+    values
+  );
 }
 
 function toIsoDate(d) {
@@ -260,23 +287,33 @@ async function createOrder(order, items) {
     await client.query('BEGIN');
     const respondToken = crypto.randomBytes(20).toString('hex');
     const { rows } = await client.query(
-      `INSERT INTO orders (first_name, last_name, email, phone, fulfillment, needed_date, address, notes, source, respond_token)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id, respond_token`,
+      `INSERT INTO orders (first_name, last_name, email, phone, fulfillment, needed_date, address, notes, source, respond_token, idempotency_key)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id, respond_token`,
       [order.firstName, order.lastName, order.email || null, order.phone || null,
        order.fulfillment, order.neededDate, order.address || null, order.notes || null,
-       order.source || 'website', respondToken]
+       order.source || 'website', respondToken, order.idempotencyKey || null]
     );
     const saved = rows[0];
-    for (const it of items) {
+    if (items.length) {
+      const values = [];
+      const rowsSql = items.map((it, i) => {
+        values.push(saved.id, it.menuItemId ?? null, it.name, it.unitPrice ?? null, it.quantity);
+        const offset = i * 5;
+        return `($${offset + 1},$${offset + 2},$${offset + 3},$${offset + 4},$${offset + 5})`;
+      });
       await client.query(
-        `INSERT INTO order_items (order_id, menu_item_id, name, unit_price, quantity) VALUES ($1,$2,$3,$4,$5)`,
-        [saved.id, it.menuItemId ?? null, it.name, it.unitPrice ?? null, it.quantity]
+        `INSERT INTO order_items (order_id, menu_item_id, name, unit_price, quantity) VALUES ${rowsSql.join(',')}`,
+        values
       );
     }
     await client.query('COMMIT');
     return saved;
   } catch (err) {
     await client.query('ROLLBACK');
+    if (err.code === '23505' && order.idempotencyKey) {
+      const { rows } = await pool.query('SELECT id, respond_token FROM orders WHERE idempotency_key = $1', [order.idempotencyKey]);
+      if (rows[0]) return { ...rows[0], duplicate: true };
+    }
     throw err;
   } finally {
     client.release();
@@ -384,6 +421,79 @@ async function deletePayment(paymentId) {
   return recomputeOrderPayment(rows[0].order_id);
 }
 
+// ── email outbox ────────────────────────────────────────────────────────
+async function queueEmail({ orderId = null, kind, to, replyTo = null, subject, html }) {
+  const { rows } = await pool.query(
+    `INSERT INTO email_outbox (order_id, kind, recipient, reply_to, subject, html)
+     VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
+    [orderId, kind, to, replyTo, subject, html]
+  );
+  return rows[0];
+}
+
+// Claim rows inside a transaction so two app workers do not send the same
+// message. A failed worker can be retried after its short sending lease.
+async function claimDueEmails(limit = 10) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows } = await client.query(
+      `WITH picked AS (
+         SELECT id FROM email_outbox
+         WHERE status IN ('pending', 'failed')
+           AND next_attempt_at <= now()
+           AND attempts < 5
+         ORDER BY id
+         FOR UPDATE SKIP LOCKED
+         LIMIT $1
+       )
+       UPDATE email_outbox e
+       SET status = 'sending', attempts = e.attempts + 1
+       FROM picked
+       WHERE e.id = picked.id
+       RETURNING e.*`, [limit]
+    );
+    await client.query('COMMIT');
+    return rows;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+async function markEmailSent(id) {
+  await pool.query(
+    `UPDATE email_outbox SET status = 'sent', sent_at = now(), last_error = NULL WHERE id = $1`, [id]
+  );
+}
+
+async function markEmailFailed(id, error) {
+  await pool.query(
+    `UPDATE email_outbox
+     SET status = CASE WHEN attempts >= 5 THEN 'dead' ELSE 'failed' END,
+         last_error = $2,
+         next_attempt_at = now() + CASE WHEN attempts >= 5 THEN interval '1 day' ELSE interval '5 minutes' END
+     WHERE id = $1`, [id, String(error || 'Email delivery failed').slice(0, 500)]
+  );
+}
+
+async function emailOutboxSummary() {
+  const { rows } = await pool.query(
+    `SELECT status, COUNT(*)::int AS count FROM email_outbox GROUP BY status`
+  );
+  return Object.fromEntries(rows.map((r) => [r.status, r.count]));
+}
+
+async function retryFailedEmails() {
+  const { rowCount } = await pool.query(
+    `UPDATE email_outbox SET status = 'pending', attempts = 0, last_error = NULL, next_attempt_at = now()
+     WHERE status IN ('failed', 'dead')`
+  );
+  return rowCount;
+}
+
 async function setPaymentStatus(id, paymentStatus) {
   await pool.query(`UPDATE orders SET payment_status = $2 WHERE id = $1`, [id, paymentStatus]);
   return getOrder(id);
@@ -454,6 +564,7 @@ module.exports = {
   listBlocks, getBlockedRanges, isDateBlocked, createBlock, deleteBlock,
   createOrder, getOrder, listOrders, updateOrder, setOrderStatus, setOrderAmount, deleteOrder,
   addPayment, getPayment, deletePayment, setPaymentStatus, recomputeOrderPayment,
+  queueEmail, claimDueEmails, markEmailSent, markEmailFailed, emailOutboxSummary, retryFailedEmails,
   getCustomers, deleteCustomer,
   createReview, listApprovedReviews, listAllReviews, setReviewStatus, deleteReview,
   getAdminCredentials, setAdminCredentials,

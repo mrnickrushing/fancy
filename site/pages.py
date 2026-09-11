@@ -23,6 +23,7 @@ FORMS_CSS = """
 .field.is-error input,.field.is-error textarea,.field.is-error select{border-color:var(--burgundy)}
 .err{color:var(--burgundy);font-size:var(--sm);font-style:italic;display:none}
 .err.show{display:block}
+.hp{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s5)}
 .choice{display:grid;gap:var(--s3)}
 .choice label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s4);
@@ -189,7 +190,7 @@ ORDER = D.masthead("Order") + D.head_band("Ordina", "Place an Order",
         <div class="order-main">
           <section class="order-step">
             <div class="order-step-head"><span class="order-step-num">I</span><h2>Choose your bread</h2></div>
-            <p class="order-step-intro">Everything is baked to order in small batches. Where a price is not shown yet, we will quote it when we confirm.</p>
+            <p class="order-step-intro">Everything is baked to order in small batches. Where a price is not shown yet, this is a quote request; Amanda confirms availability, any delivery or shipping cost, and the final total before payment.</p>
             <div id="menu"><p class="empty">Loading the bill of fare&#8230;</p></div>
           </section>
 
@@ -199,9 +200,9 @@ ORDER = D.masthead("Order") + D.head_band("Ordina", "Place an Order",
           <label><input type="radio" name="fulfillment" value="pickup" checked>
             <span><b>Market pickup</b><small id="pickup-note">Brookings-Harbor Farmers Market, Wednesdays and Saturdays.</small></span></label>
           <label><input type="radio" name="fulfillment" value="delivery">
-            <span><b>Local delivery</b><small>Around Brookings and Harbor. We will confirm the details.</small></span></label>
+            <span><b>Local delivery</b><small>Around Brookings and Harbor. Any delivery fee and timing will be confirmed.</small></span></label>
           <label><input type="radio" name="fulfillment" value="shipping">
-            <span><b>Shipping</b><small>Tell us where it is going and we will let you know the cost.</small></span></label>
+            <span><b>Shipping</b><small>Tell us where it is going; destination, shipping cost, and timing will be confirmed.</small></span></label>
             </div>
             <div class="field">
               <span class="caps" id="date-label">Pickup day</span>
@@ -235,9 +236,10 @@ ORDER = D.masthead("Order") + D.head_band("Ordina", "Place an Order",
               <textarea id="notes" name="notes" rows="3" placeholder="An occasion, an allergy, a favourite&#8230;"></textarea></div>
             <div class="order-submit">
               <button type="submit" class="btn btn-fill" id="submit">Send the Order</button>
-              <p class="cal-note">Nothing is charged online. We confirm every order by email.</p>
+              <p class="cal-note">Nothing is charged online. We confirm availability, costs, and every order by email.</p>
             </div>
-            <div id="form-msg" class="msg"></div>
+            <p class="cal-note">We cannot promise an allergen-free kitchen; please tell us about allergies before we confirm.</p>
+            <div id="form-msg" class="msg" role="status" aria-live="polite"></div>
           </section>
         </div>
 
@@ -258,7 +260,7 @@ ORDER = D.masthead("Order") + D.head_band("Ordina", "Place an Order",
         <div style="display:flex;justify-content:center;margin-bottom:var(--s5)">{D.olive_rule(170)}</div>
         <p class="caps" style="color:var(--olive)">Grazie</p>
         <h2 style="font-size:var(--xxl);margin-block:var(--s3) var(--s5)" id="confirm-title">Your order is in</h2>
-        <p style="font-size:var(--lg);font-style:italic;opacity:.8" id="confirm-lead"></p>
+        <p style="font-size:var(--lg);font-style:italic;opacity:.8" id="confirm-lead" role="status" aria-live="polite"></p>
         <div id="confirm-lines" class="cart-lines" style="text-align:left;max-width:380px;margin:var(--s8) auto"></div>
         <p style="opacity:.74;font-size:var(--sm)" id="confirm-foot"></p>
         <div style="margin-top:var(--s8);display:flex;gap:var(--s4);justify-content:center;flex-wrap:wrap">
@@ -283,6 +285,21 @@ ORDER = D.masthead("Order") + D.head_band("Ordina", "Place an Order",
     </div>
   </div>
 </section>
+
+<section class="sec" style="background:var(--paper-3);border-block:1px solid var(--rule)">
+  <div class="narrow">
+    <p class="caps kicker">Prima di ordinare</p>
+    <h2 class="h-sec">A few useful things to know</h2>
+    {D.dimple_rule()}
+    <ul style="display:grid;gap:var(--s4);font-style:italic;opacity:.82">
+      <li>Orders are requests until Amanda confirms availability and the final total.</li>
+      <li>For changes or cancellations, email <a href="#">info@ohyoufancyfocaccia.com</a> as soon as possible.</li>
+      <li>Delivery and shipping availability, timing, and cost depend on the destination.</li>
+      <li>Please disclose allergies in the notes; we will tell you what we can safely accommodate.</li>
+      <li>Pickup is at the Brookings-Harbor Farmers Market on Wednesdays and Saturdays from 9am; exact arrangements are confirmed by email.</li>
+    </ul>
+  </div>
+</section>
 """ + D.FOOTER
 
 # ── admin sign-in ───────────────────────────────────────────────────────
@@ -297,7 +314,7 @@ ADMIN_LOGIN = D.masthead("Order") + f"""
         <div class="field"><label for="username">Username</label><input id="username" name="username" autocomplete="username" autofocus></div>
         <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password"></div>
         <button type="submit" class="btn btn-fill" style="width:100%" id="login-submit">Sign In</button>
-        <div id="login-msg" class="msg"></div>
+        <div id="login-msg" class="msg" role="status" aria-live="polite"></div>
       </form>
     </div>
   </div>
@@ -434,7 +451,8 @@ ADMIN = D.masthead("Order") + f"""
           <button type="submit" class="btn btn-fill btn-sm">Save</button>
           <div id="settings-msg" class="msg"></div>
         </form>
-        <p id="email-state" class="cal-note" style="margin-top:var(--s5)"></p>
+        <p id="email-state" class="cal-note" style="margin-top:var(--s5)" role="status" aria-live="polite"></p>
+        <button type="button" class="btn btn-line btn-sm" id="email-retry" hidden>Retry failed emails</button>
       </div>
       <div class="adm-section">
         <h2>Change Password</h2>
@@ -484,9 +502,47 @@ REVIEW_FORM = f"""
           <option value="3">&#9733;&#9733;&#9733;</option><option value="2">&#9733;&#9733;</option><option value="1">&#9733;</option></select></div>
         <div class="field"><label for="rv-text">A few words</label><textarea id="rv-text" rows="4"></textarea></div>
         <button type="submit" class="btn btn-fill" style="width:100%">Send</button>
-        <div id="review-msg" class="msg"></div>
+        <div id="rv-website-wrap" class="hp" aria-hidden="true"><label for="rv-website">Website</label><input id="rv-website" name="website" autocomplete="off" tabindex="-1"></div>
+        <div id="review-msg" class="msg" role="status" aria-live="polite"></div>
       </form>
     </div>
   </div>
 </section>
 """
+
+POLICIES = D.masthead("Policies") + D.head_band("Le Regole", "Before You Order",
+  "A clear note on requests, confirmations, allergens, and the information this website needs to serve you.") + f"""
+<section class="sec" style="background:var(--paper)">
+  <div class="narrow">
+    <div class="plate" style="padding:var(--s10);margin-bottom:var(--s8)">
+      <h2>Ordering and changes</h2>
+      <p>Submitting the order form sends a request. An order is not final until Amanda confirms availability, timing, delivery or shipping details, and the final total by email. There is no online payment or card collection on this website.</p>
+      <p>For a change or cancellation, email <a href="#">info@ohyoufancyfocaccia.com</a> as soon as possible. Delivery and shipping availability and costs depend on the destination.</p>
+    </div>
+    <div class="plate" style="padding:var(--s10);margin-bottom:var(--s8)">
+      <h2>Allergens and ingredients</h2>
+      <p>Please include allergies or dietary questions in your order notes before we confirm. This is a small bakery kitchen, and we cannot promise an allergen-free environment. Amanda will explain what can safely be accommodated.</p>
+    </div>
+    <div class="plate" style="padding:var(--s10);margin-bottom:var(--s8)">
+      <h2>Privacy</h2>
+      <p>We use the name, email, phone number, address, order details, and messages you provide to answer questions, prepare orders, and administer the bakery. We do not collect payment card details on this website. Orders and reviews are stored in the bakery's private order system so they can be fulfilled and managed.</p>
+      <p>To ask about information associated with your request, email <a href="#">info@ohyoufancyfocaccia.com</a>. Replace this plain-language notice with customer-approved legal text before launch if a formal privacy policy is required.</p>
+    </div>
+    <p class="cal-note">Last updated 09-11-2026. These notes describe the current site behavior; Amanda should confirm the final business policy before publishing.</p>
+  </div>
+</section>
+""" + D.FOOTER
+
+NOT_FOUND = D.masthead("Lost") + f"""
+<section class="sec" style="background:var(--paper);text-align:center">
+  <div class="narrow">
+    <p class="caps kicker">404</p>
+    <h1 class="h-sec">That page wandered off.</h1>
+    <p style="font-style:italic;opacity:.75;margin-bottom:var(--s8)">The bread is still here. Try the bill of fare or send us a note.</p>
+    <div style="display:flex;gap:var(--s4);justify-content:center;flex-wrap:wrap">
+      <a href="#" class="btn btn-fill">Back to the bakery</a>
+      <a href="#" class="btn btn-line">Place an order</a>
+    </div>
+  </div>
+</section>
+""" + D.FOOTER

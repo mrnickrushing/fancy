@@ -33,6 +33,10 @@ function weekday(min) {                       // a day that is not a market day
   while ([3, 6].includes(d.getUTCDay())) d.setUTCDate(d.getUTCDate() + 1);
   return d.toISOString().slice(0, 10);
 }
+function dateOffset(days) {
+  const d = new Date(); d.setUTCHours(12, 0, 0, 0); d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
 function cookieOf(res) {
   const c = (res.headers['set-cookie'] || []).find((x) => x.startsWith('oyff_admin='));
   return c ? c.split(';')[0] : null;
@@ -46,6 +50,19 @@ test('resolveBaseUrl prefers a real origin over loopback', () => {
   assert.equal(resolveBaseUrl({}, 4000), 'http://localhost:4000');
 });
 
+test('mail dates use the site-wide MM-DD-YYYY format', () => {
+  assert.equal(mail.formatDate('2027-02-03'), 'Wednesday, 02-03-2027');
+});
+
+test('email roles keep public correspondence separate from order notices', () => {
+  assert.equal(mail.INFO_EMAIL, 'info@ohyoufancyfocaccia.com');
+  assert.equal(mail.BAKERY_INBOX, mail.INFO_EMAIL);
+  assert.equal(mail.ORDERS_INBOX, 'orders@ohyoufancyfocaccia.com');
+  assert.match(mail.buildThankYou({ first_name: 'Jane', items: [], email: 'jane@example.com' }, {
+    payment_instructions: 'We will confirm your order.',
+  }).html, /info@ohyoufancyfocaccia\.com/);
+});
+
 test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
   await db.initSchema();
   let menu, admin;
@@ -53,7 +70,7 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
   t.beforeEach(async () => {
     // The menu is reseeded too, so a test that prices, renames or removes an
     // item cannot leak into the next one.
-    await db.pool.query('TRUNCATE payments, order_items, orders, blocks, reviews, settings, admin_credentials, menu_items RESTART IDENTITY CASCADE');
+    await db.pool.query('TRUNCATE email_outbox, payments, order_items, orders, blocks, reviews, settings, admin_credentials, menu_items RESTART IDENTITY CASCADE');
     await db.initSchema();
     menu = await db.listMenu();
     const login = await request(app).post('/admin/login').send({ username: 'test-admin', password: 'test-password' });
@@ -101,6 +118,11 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
       const res = await request(app).post('/api/order').send({ ...good(), fulfillment: 'delivery', address: '1 Main St', neededDate: weekday(0) });
       assert.equal(res.status, 400); assert.match(res.body.error, /days from today/);
     });
+    await t.test('never accepts a past date when the notice window is zero', async () => {
+      await db.setSettings({ min_notice_days: '0' });
+      const res = await request(app).post('/api/order').send({ ...good(), fulfillment: 'delivery', address: '1 Main St', neededDate: dateOffset(-1) });
+      assert.equal(res.status, 400); assert.match(res.body.error, /today onwards/);
+    });
     await t.test('refuses delivery without an address', async () => {
       const res = await request(app).post('/api/order').send({ ...good(), fulfillment: 'delivery', neededDate: weekday(5) });
       assert.equal(res.status, 400); assert.match(res.body.error, /address/i);
@@ -109,6 +131,11 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
       await db.updateMenuItem(menu[0].id, { available: false });
       const res = await request(app).post('/api/order').send(good());
       assert.equal(res.status, 400); assert.match(res.body.error, /not available/);
+    });
+    await t.test('refuses impossible calendar dates before they reach Postgres', async () => {
+      const res = await request(app).post('/api/order').send({ ...good(), fulfillment: 'delivery', address: '1 Main St', neededDate: '2027-02-31' });
+      assert.equal(res.status, 400);
+      assert.match(res.body.error, /choose a date/i);
     });
     await t.test('refuses a blocked day with 409', async () => {
       const day = marketDay(3);
@@ -131,9 +158,11 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
       assert.equal(order.items[0].name, menu[0].name);
       // one to the bakery with the respond link, one thank-you to the customer
       assert.equal(sent.length, 2);
-      const notice = sent.find((m) => m.to === mail.BAKERY_INBOX);
+      const notice = sent.find((m) => m.to === mail.ORDERS_INBOX);
+      assert.equal(notice.replyTo, mail.INFO_EMAIL);
       assert.match(notice.html, new RegExp(`https://base-url.test/respond/${order.id}\\?token=${order.respond_token}`));
       const thanks = sent.find((m) => m.to === 'jane@example.com');
+      assert.equal(thanks.replyTo, mail.INFO_EMAIL);
       assert.match(thanks.subject, /Thank you/);
       assert.doesNotMatch(thanks.html, /deposit/i, 'the thank-you asks for nothing');
     });
@@ -150,6 +179,17 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
       const order = await db.getOrder(ok.body.orderId);
       assert.equal(order.items.length, 1);
       assert.equal(order.items[0].quantity, 3);
+      const tooMany = await request(app).post('/api/order').send({ ...good(), items: [{ id: menu[0].id, quantity: 50 }, { id: menu[0].id, quantity: 1 }] });
+      assert.equal(tooMany.status, 400);
+    });
+    await t.test('retries with the same idempotency key return one order', async () => {
+      const key = 'audit-idempotency-key';
+      const first = await request(app).post('/api/order').set('Idempotency-Key', key).send(good());
+      const second = await request(app).post('/api/order').set('Idempotency-Key', key).send({ ...good(), notes: 'retried after a lost response' });
+      assert.equal(first.status, 201);
+      assert.equal(second.status, 201);
+      assert.equal(second.body.duplicate, true);
+      assert.equal(second.body.orderId, first.body.orderId);
     });
   });
 
@@ -333,6 +373,8 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     const pub = await request(app).get('/api/reviews');
     assert.equal(pub.body.reviews.length, 1);
     assert.equal(pub.body.reviews[0].name, 'Sam');
+    r = await request(app).post('/api/reviews').send({ name: 'Bot', rating: 5, review: 'Spam', website: 'https://example.com' });
+    assert.equal(r.status, 400);
 
     r = await A(request(app).put('/api/admin/settings')).send({ deposit_percent: 150 });
     assert.equal(r.status, 400);

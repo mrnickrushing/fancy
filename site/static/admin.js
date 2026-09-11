@@ -7,8 +7,17 @@
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function money(n) { return (Number(n) || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' }); }
-  function fmtDate(iso) { if (!iso) return '—'; return new Date(String(iso).slice(0, 10) + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }); }
-  function fmtWhen(iso) { if (!iso) return '—'; var d = new Date(iso); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    var d = new Date(String(iso).slice(0, 10) + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { weekday: 'short' }) + ' ' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') + '-' + d.getFullYear();
+  }
+  function fmtWhen(iso) {
+    if (!iso) return '—';
+    var d = new Date(iso);
+    return fmtDate(d.toISOString()) + ' ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
   function badge(s) { return '<span class="badge badge-' + esc(s) + '">' + esc(String(s).replace('_', ' ')) + '</span>'; }
   function say(id, text, ok) { var m = $(id); m.textContent = text; m.className = 'msg' + (text ? ' show ' + (ok ? 'ok' : 'error') : ''); }
   async function api(path, opts) {
@@ -275,7 +284,13 @@
     var data = await api('/api/admin/settings'), s = data.settings;
     $('set-notice').value = s.min_notice_days; $('set-deposit').value = s.deposit_percent;
     $('set-payment').value = s.payment_instructions; $('set-pickup').value = s.pickup_note;
-    $('email-state').textContent = data.emailConfigured ? 'Email is set up: confirmations and receipts will send.' : 'Email is not set up yet (no RESEND_API_KEY on the server), so nothing can be sent from here until it is. Orders still come in.';
+    var outbox = data.emailOutbox || {}, failed = (outbox.failed || 0) + (outbox.dead || 0), pending = (outbox.pending || 0) + (outbox.sending || 0);
+    $('email-retry').hidden = !failed;
+    $('email-state').textContent = !data.emailConfigured
+      ? 'Email is not set up yet (no RESEND_API_KEY on the server), so nothing can be sent from here until it is. Orders still come in.'
+      : failed ? failed + ' email' + (failed === 1 ? '' : 's') + ' need attention. You can retry them here.'
+      : pending ? pending + ' email' + (pending === 1 ? '' : 's') + ' queued for delivery.'
+      : 'Email is set up and the outbox is clear.';
   }
   $('settings-form').addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -283,6 +298,11 @@
       await api('/api/admin/settings', { method: 'PUT', body: JSON.stringify({ min_notice_days: Number($('set-notice').value), deposit_percent: Number($('set-deposit').value), payment_instructions: $('set-payment').value, pickup_note: $('set-pickup').value }) });
       say('settings-msg', 'Saved.', true);
     } catch (err) { say('settings-msg', err.message, false); }
+  });
+  $('email-retry').addEventListener('click', async function () {
+    try { $('email-retry').disabled = true; await api('/api/admin/email-outbox/retry', { method: 'POST' }); await loadSettings(); }
+    catch (err) { say('settings-msg', err.message, false); }
+    finally { $('email-retry').disabled = false; }
   });
   $('password-form').addEventListener('submit', async function (e) {
     e.preventDefault();

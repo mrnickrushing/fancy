@@ -24,7 +24,8 @@
 </head>
 <body>
 
-<div style="background:var(--burgundy-ink);color:var(--gold-pale);
+<a class="skip-link" href="#site-content">Skip to content</a>
+<div id="site-content"><div style="background:var(--burgundy-ink);color:var(--gold-pale);
   text-align:center;padding:.55rem" class="caps">
   Brookings-Harbor Farmers Market &#183; Wednesdays &amp; Saturdays &#183; 9am &#8216;til sold out</div>
 <header style="background:var(--paper);border-bottom:1px solid var(--rule);
@@ -62,7 +63,7 @@
 <ellipse cx="130" cy="7" rx="4" ry="5.2" transform="rotate(28 130 7)" opacity=".68"/></g></svg>
     </div>
     <nav class="nav-scroll" style="display:flex;justify-content:center;gap:var(--s8);margin-top:var(--s6);
-      border-top:1px solid var(--rule-soft);padding-block:var(--s4)"><a href="./" style="color:var(--ink);opacity:.72" class="caps">Home</a><a href="./about.html" style="color:var(--ink);opacity:.72" class="caps">About</a><a href="./breads.html" style="color:var(--ink);opacity:.72" class="caps">Our Breads</a><a href="./order.html" style="color:var(--burgundy);border-bottom:1px solid var(--burgundy)" class="caps">Order</a><a href="./gallery.html" style="color:var(--ink);opacity:.72" class="caps">Gallery</a><a href="./reviews.html" style="color:var(--ink);opacity:.72" class="caps">Reviews</a><a href="./contact.html" style="color:var(--ink);opacity:.72" class="caps">Contact</a></nav>
+      border-top:1px solid var(--rule-soft);padding-block:var(--s4)"><a href="./" style="color:var(--ink);opacity:.72" class="caps">Home</a><a href="./about.html" style="color:var(--ink);opacity:.72" class="caps">About</a><a href="./breads.html" style="color:var(--ink);opacity:.72" class="caps">Our Breads</a><a href="./order.html" style="color:var(--burgundy);border-bottom:1px solid var(--burgundy)" class="caps">Order</a><a href="./gallery.html" style="color:var(--ink);opacity:.72" class="caps">Gallery</a><a href="./reviews.html" style="color:var(--ink);opacity:.72" class="caps">Reviews</a><a href="./contact.html" style="color:var(--ink);opacity:.72" class="caps">Contact</a><a href="./policies.html" style="color:var(--ink);opacity:.72" class="caps">Policies</a></nav>
   </div>
 </header><section style="background:var(--paper-3);border-bottom:1px solid var(--rule);
   padding-block:var(--s20);text-align:center;position:relative;overflow:hidden">
@@ -92,7 +93,7 @@
         <div class="order-main">
           <section class="order-step">
             <div class="order-step-head"><span class="order-step-num">I</span><h2>Choose your bread</h2></div>
-            <p class="order-step-intro">Everything is baked to order in small batches. Where a price is not shown yet, we will quote it when we confirm.</p>
+            <p class="order-step-intro">Everything is baked to order in small batches. Where a price is not shown yet, this is a quote request; Amanda confirms availability, any delivery or shipping cost, and the final total before payment.</p>
             <div id="menu"><p class="empty">Loading the bill of fare&#8230;</p></div>
           </section>
 
@@ -102,9 +103,9 @@
           <label><input type="radio" name="fulfillment" value="pickup" checked>
             <span><b>Market pickup</b><small id="pickup-note">Brookings-Harbor Farmers Market, Wednesdays and Saturdays.</small></span></label>
           <label><input type="radio" name="fulfillment" value="delivery">
-            <span><b>Local delivery</b><small>Around Brookings and Harbor. We will confirm the details.</small></span></label>
+            <span><b>Local delivery</b><small>Around Brookings and Harbor. Any delivery fee and timing will be confirmed.</small></span></label>
           <label><input type="radio" name="fulfillment" value="shipping">
-            <span><b>Shipping</b><small>Tell us where it is going and we will let you know the cost.</small></span></label>
+            <span><b>Shipping</b><small>Tell us where it is going; destination, shipping cost, and timing will be confirmed.</small></span></label>
             </div>
             <div class="field">
               <span class="caps" id="date-label">Pickup day</span>
@@ -138,9 +139,10 @@
               <textarea id="notes" name="notes" rows="3" placeholder="An occasion, an allergy, a favourite&#8230;"></textarea></div>
             <div class="order-submit">
               <button type="submit" class="btn btn-fill" id="submit">Send the Order</button>
-              <p class="cal-note">Nothing is charged online. We confirm every order by email.</p>
+              <p class="cal-note">Nothing is charged online. We confirm availability, costs, and every order by email.</p>
             </div>
-            <div id="form-msg" class="msg"></div>
+            <p class="cal-note">We cannot promise an allergen-free kitchen; please tell us about allergies before we confirm.</p>
+            <div id="form-msg" class="msg" role="status" aria-live="polite"></div>
           </section>
         </div>
 
@@ -171,7 +173,7 @@
 <ellipse cx="130" cy="7" rx="4" ry="5.2" transform="rotate(28 130 7)" opacity=".68"/></g></svg></div>
         <p class="caps" style="color:var(--olive)">Grazie</p>
         <h2 style="font-size:var(--xxl);margin-block:var(--s3) var(--s5)" id="confirm-title">Your order is in</h2>
-        <p style="font-size:var(--lg);font-style:italic;opacity:.8" id="confirm-lead"></p>
+        <p style="font-size:var(--lg);font-style:italic;opacity:.8" id="confirm-lead" role="status" aria-live="polite"></p>
         <div id="confirm-lines" class="cart-lines" style="text-align:left;max-width:380px;margin:var(--s8) auto"></div>
         <p style="opacity:.74;font-size:var(--sm)" id="confirm-foot"></p>
         <div style="margin-top:var(--s8);display:flex;gap:var(--s4);justify-content:center;flex-wrap:wrap">
@@ -196,6 +198,21 @@
     </div>
   </div>
 </section>
+
+<section class="sec" style="background:var(--paper-3);border-block:1px solid var(--rule)">
+  <div class="narrow">
+    <p class="caps kicker">Prima di ordinare</p>
+    <h2 class="h-sec">A few useful things to know</h2>
+    <div class="dimples"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <ul style="display:grid;gap:var(--s4);font-style:italic;opacity:.82">
+      <li>Orders are requests until Amanda confirms availability and the final total.</li>
+      <li>For changes or cancellations, email <a href="mailto:info@ohyoufancyfocaccia.com">info@ohyoufancyfocaccia.com</a> as soon as possible.</li>
+      <li>Delivery and shipping availability, timing, and cost depend on the destination.</li>
+      <li>Please disclose allergies in the notes; we will tell you what we can safely accommodate.</li>
+      <li>Pickup is at the Brookings-Harbor Farmers Market on Wednesdays and Saturdays from 9am; exact arrangements are confirmed by email.</li>
+    </ul>
+  </div>
+</section>
 <footer style="background:var(--burgundy-ink);color:#D8BFA0;padding-block:var(--s20) var(--s8)">
 <div class="wrap">
   <div style="text-align:center;margin-bottom:var(--s16)">
@@ -214,10 +231,10 @@
       <p style="font-size:var(--sm);opacity:.82;max-width:36ch">Artisan focaccia and sourdough baked by hand in Brookings, Oregon. Organic ingredients, a living starter, and small batches that sell out.</p></div>
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">Explore</p>
       <ul style="display:flex;flex-direction:column;gap:.5rem;font-size:var(--sm)">
-      <li><a href="./about.html" style="color:#D8BFA0">About</a></li><li><a href="./breads.html" style="color:#D8BFA0">Our Breads</a></li><li><a href="./order.html" style="color:#D8BFA0">Order</a></li><li><a href="./gallery.html" style="color:#D8BFA0">Gallery</a></li><li><a href="./reviews.html" style="color:#D8BFA0">Reviews</a></li><li><a href="./contact.html" style="color:#D8BFA0">Contact</a></li></ul></div>
+      <li><a href="./about.html" style="color:#D8BFA0">About</a></li><li><a href="./breads.html" style="color:#D8BFA0">Our Breads</a></li><li><a href="./order.html" style="color:#D8BFA0">Order</a></li><li><a href="./gallery.html" style="color:#D8BFA0">Gallery</a></li><li><a href="./reviews.html" style="color:#D8BFA0">Reviews</a></li><li><a href="./contact.html" style="color:#D8BFA0">Contact</a></li><li><a href="./policies.html" style="color:#D8BFA0">Policies</a></li></ul></div>
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">Find Us</p>
       <p style="font-size:var(--sm);opacity:.82">Brookings-Harbor Farmers Market<br>Wednesdays &amp; Saturdays<br>9am &#8216;til sold out</p>
-      <p style="margin-top:var(--s4);font-size:var(--sm)"><a href="mailto:ohyoufancyfocaccia@gmail.com" style="color:#EBD3AE">ohyoufancyfocaccia@gmail.com</a></p>
+      <p style="margin-top:var(--s4);font-size:var(--sm)"><a href="mailto:info@ohyoufancyfocaccia.com" style="color:#EBD3AE">info@ohyoufancyfocaccia.com</a></p>
       <p style="margin-top:var(--s2);font-size:var(--sm)"><a href="https://www.facebook.com/profile.php?id=61584072034572" style="color:#EBD3AE" target="_blank" rel="noopener">Facebook</a></p></div>
   </div>
   <div style="border-top:1px solid oklch(1 0 0/.13);margin-top:var(--s12);padding-top:var(--s6);
@@ -225,7 +242,7 @@
     <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">&#169; 2026 Oh! You Fancy Focaccia</p>
     <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">Pane &#183; Amore &#183; Sempre</p>
   </div>
-</div></footer>
+</div></footer></div>
 <script src="./order.js" defer></script>
 </body>
 </html>

@@ -345,7 +345,7 @@ LOADER = f"""
 </div>
 """
 
-NAV = ["Home","About","Our Breads","Order","Gallery","Reviews","Contact"]
+NAV = ["Home","About","Our Breads","Order","Gallery","Reviews","Contact","Policies"]
 
 def olive_rule(w=190, flip=False):
     t = ' transform="scale(-1,1) translate(-190,0)"' if flip else ''
@@ -436,7 +436,7 @@ FOOTER = f"""<footer style="background:var(--burgundy-ink);color:#D8BFA0;padding
       {''.join(f'<li><a href="#" style="color:#D8BFA0">{n}</a></li>' for n in NAV[1:])}</ul></div>
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">Find Us</p>
       <p style="font-size:var(--sm);opacity:.82">Brookings-Harbor Farmers Market<br>Wednesdays &amp; Saturdays<br>9am &#8216;til sold out</p>
-      <p style="margin-top:var(--s4);font-size:var(--sm)"><a href="#" style="color:#EBD3AE">ohyoufancyfocaccia@gmail.com</a></p>
+      <p style="margin-top:var(--s4);font-size:var(--sm)"><a href="#" style="color:#EBD3AE">info@ohyoufancyfocaccia.com</a></p>
       <p style="margin-top:var(--s2);font-size:var(--sm)"><a href="#" style="color:#EBD3AE">Facebook</a></p></div>
   </div>
   <div style="border-top:1px solid oklch(1 0 0/.13);margin-top:var(--s12);padding-top:var(--s6);
@@ -599,7 +599,7 @@ HOME = masthead("Home") + f"""
     <h2 style="font-size:var(--xl);margin-bottom:var(--s4)">Come Wednesday. Come early.</h2>
     <p style="opacity:.76;margin-bottom:var(--s8);font-style:italic">
       We bake small and we sell out. Questions, delivery or shipping &#8212; just write.</p>
-    <a href="#" class="btn btn-fill">ohyoufancyfocaccia@gmail.com</a>
+    <a href="#" class="btn btn-fill">info@ohyoufancyfocaccia.com</a>
     <p style="margin-top:var(--s10);font-family:var(--script);font-size:2.6rem;color:var(--burgundy)">
       Love always, Oh! You Fancy Focaccia</p>
   </div>
@@ -661,7 +661,7 @@ ABOUT = masthead("About") + head_band("La Nostra Storia","Welcome to Oh! You Fan
   </div>
 </section>
 
-{enamel("Trovaci","Wednesdays &amp; Saturdays<br>9am &#8216;til sold out","ohyoufancyfocaccia@gmail.com")}
+{enamel("Trovaci","Wednesdays &amp; Saturdays<br>9am &#8216;til sold out","info@ohyoufancyfocaccia.com")}
 """ + FOOTER
 
 # ══ OUR BREADS ════════════════════════════════════════════════════════
@@ -849,10 +849,13 @@ REVIEWS = masthead("Reviews") + head_band("Parole Gentili","What Our Customers S
 
 # ══ CONTACT ═══════════════════════════════════════════════════════════
 FAQ = [("Do you have a storefront?","Not yet. You will find us at the Brookings-Harbor Farmers Market on Wednesdays and Saturdays, and we deliver and ship as well."),
-("Do you deliver?","Yes &#8212; around Brookings and Harbor. Write to us and we will sort out the details."),
-("Do you ship?","We do. Send us a note and let us know where you are."),
+("Where do I pick up?","Brookings-Harbor Farmers Market on Wednesdays and Saturdays from 9am. Amanda confirms the pickup details in the order email."),
+("Do you deliver or ship?","Choose delivery or shipping on the order form and include the destination. Amanda confirms availability, timing, and any cost before the order is final."),
 ("Are your ingredients organic?","We bake with organic ingredients, and we say so on every loaf we are proud of."),
 ("Can you make something custom?","Tell us the occasion. We have made hearts, flower gardens, and plenty of things that were never on a menu."),
+("How do I change or cancel?","Email info@ohyoufancyfocaccia.com as soon as possible; orders are not final until Amanda confirms them."),
+("What about allergies?","Tell us in the order notes. We cannot promise an allergen-free kitchen; Amanda will confirm what can be accommodated."),
+("How much does it cost?","Prices may vary by bake and some items are quoted; the final total is confirmed before payment."),
 ("What time should I come?","Early. We bake in small batches and we sell out most market days.")]
 
 def contact_row(icon, title, body, link=None):
@@ -875,7 +878,7 @@ CONTACT = masthead("Contact") + head_band("Scrivici","We&#8217;d Love to Hear Fr
     <div>
       <p class="caps kicker kicker-l">Get in Touch</p>
       <div style="margin-top:var(--s4)">
-        {contact_row(IC_MAIL,"Email","The fastest way to reach us. We answer every message.","ohyoufancyfocaccia@gmail.com")}
+        {contact_row(IC_MAIL,"Email","The fastest way to reach us. We answer every message.","info@ohyoufancyfocaccia.com")}
         {contact_row(IC_FB,"Facebook","That is where the fresh bakes get posted first.","Oh! You Fancy Focaccia")}
         {contact_row(IC_PIN,"Where We Are","Brookings, Oregon &#8212; on the southern Oregon coast, in Curry County.")}
       </div>

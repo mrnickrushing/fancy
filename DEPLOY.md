@@ -20,7 +20,8 @@ Merges to `main` deploy themselves.
 | `ADMIN_USERNAME`, `ADMIN_PASSWORD` | The first sign-in. Read only until the first successful sign-in stores a hash in the database; after that the password is changed from the admin's Settings tab and these are ignored |
 | `CANONICAL_HOST` | `ohyoufancyfocaccia.com` — turns on the `www` → apex redirect |
 | `BASE_URL` | Absolute origin for the "review & respond" link in the order email |
-| `BAKERY_INBOX` | Where new-order notices go |
+| `INFO_EMAIL` | Public contact address and reply-to for customer correspondence |
+| `ORDERS_INBOX` | Where new website-order notices go |
 | `EMAIL_FROM` | The sender. Must be on a domain verified in Resend |
 | `RESEND_API_KEY` | **Not set yet.** Without it, orders still save and the admin works, but nothing is emailed — the Settings tab says so |
 
@@ -50,7 +51,47 @@ Postgres comes up ready and an old one gains columns without any tooling. The
 menu is seeded from the bill of fare once, into an empty table; after that the
 admin owns it.
 
-There is no backup job yet. Railway's volume snapshots are the safety net.
+## Backup and restore
+
+The order book is the production data. Before a release that changes the schema,
+take a Railway Postgres snapshot and keep an off-platform dump as well. From a
+trusted shell with the production `DATABASE_URL` loaded (never commit it):
+
+```bash
+mkdir -p backups
+pg_dump --format=custom --no-owner --file="backups/fancy-$(date +%F).dump" "$DATABASE_URL"
+```
+
+Keep several dated dumps outside the repository and restrict their permissions.
+To restore, create a separate empty Postgres database first, verify the dump,
+then restore into that database with `pg_restore --clean --if-exists`; do not
+run a destructive restore against production until the dump and target have
+been independently checked.
+
+After a restore, run the smoke checks below, sign in to `/admin`, verify the
+menu and recent orders, and send a controlled test order before switching DNS
+or traffic back.
+
+## Release smoke checks
+
+After Railway reports a successful deploy, verify the actual service:
+
+```bash
+curl -fsS https://ohyoufancyfocaccia.com/healthz
+curl -fsS https://ohyoufancyfocaccia.com/robots.txt
+curl -fsS https://ohyoufancyfocaccia.com/sitemap.xml
+curl -sSI https://ohyoufancyfocaccia.com/order.html
+```
+
+In a browser, walk the order form at phone width and desktop width, submit one
+controlled request, confirm it appears in the admin order book, confirm the
+customer thank-you and order notice arrive, and verify a duplicate retry with
+the same `Idempotency-Key` does not create a second order. Delete or cancel the
+controlled order according to the confirmed business policy.
+
+Check `/admin` for the email outbox status after the test. Failed messages can
+be retried there once the Resend configuration or domain verification issue is
+fixed.
 
 ## Build
 

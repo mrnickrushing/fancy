@@ -19,7 +19,7 @@ sys.path.insert(0, DESIGN)
 import _build as D  # noqa: E402  (importing regenerates the .dc.html artboards; harmless)
 import pages as P   # noqa: E402  (the order page and the admin — served, never on the canvas)
 
-EMAIL = "ohyoufancyfocaccia@gmail.com"
+EMAIL = "info@ohyoufancyfocaccia.com"
 FB    = "https://www.facebook.com/profile.php?id=61584072034572"
 
 PAGES = [
@@ -38,7 +38,11 @@ PAGES = [
      "Questions, delivery, shipping, or something particular for an occasion."),
     ("order.html",   P.ORDER,   "Order — Oh! You Fancy Focaccia",
      "Order focaccia and sourdough for market pickup, local delivery or shipping. We confirm every order by email."),
+    ("policies.html", P.POLICIES, "Policies — Oh! You Fancy Focaccia",
+     "Ordering, allergen, privacy, and contact policies for Oh! You Fancy Focaccia."),
 ]
+
+UTILITY_PAGES = [("404.html", P.NOT_FOUND, "Page not found — Oh! You Fancy Focaccia")]
 
 # Served by the order book, never linked from the site and never indexed.
 ADMIN_PAGES = [
@@ -52,7 +56,8 @@ SCRIPTS = {"index.html": "splash.js", "order.html": "order.js", "reviews.html": 
            "admin.html": "admin.js", "admin-login.html": "admin-login.js"}
 
 NAV = {"Home": "./", "About": "./about.html", "Our Breads": "./breads.html", "Order": "./order.html",
-       "Gallery": "./gallery.html", "Reviews": "./reviews.html", "Contact": "./contact.html"}
+       "Gallery": "./gallery.html", "Reviews": "./reviews.html", "Contact": "./contact.html",
+       "Policies": "./policies.html"}
 
 # link text -> destination, for buttons and inline links the artboards left as "#"
 LINKS = {
@@ -93,12 +98,15 @@ def rewrite_links(html):
 # The artboards are fixed 1440 desktop compositions. These are the rules
 # that make the same markup survive a phone.
 RESPONSIVE = """
+html{overflow-x:clip}
 img{max-width:100%;height:auto}
 .wrap,.mid,.narrow{width:100%}
 
 /* masthead nav scrolls rather than wrapping into a mess */
 .nav-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .nav-scroll::-webkit-scrollbar{display:none}
+.skip-link{position:fixed;left:var(--s4);top:var(--s4);z-index:1000;transform:translateY(-180%);background:var(--burgundy);color:var(--paper);padding:.7rem 1rem;border-radius:var(--r-sm);font-family:var(--serif);font-weight:600}
+.skip-link:focus{transform:translateY(0)}
 
 @media (max-width:1100px){
   .spine{display:none}
@@ -361,7 +369,8 @@ DOC = """<!doctype html>
 </head>
 <body>
 {splash}
-{body}
+<a class="skip-link" href="#site-content">Skip to content</a>
+<div id="site-content">{body}</div>
 {script}
 </body>
 </html>
@@ -374,7 +383,7 @@ LD_JSON = """<script type="application/ld+json">
   "name": "Oh! You Fancy Focaccia",
   "url": "https://ohyoufancyfocaccia.com/",
   "description": "Small-batch organic focaccia and sourdough baked by hand in Brookings, Oregon.",
-  "email": "ohyoufancyfocaccia@gmail.com",
+  "email": "info@ohyoufancyfocaccia.com",
   "sameAs": ["https://www.facebook.com/profile.php?id=61584072034572"],
   "servesCuisine": "Italian",
   "address": {
@@ -410,7 +419,8 @@ def build():
         shutil.copy2(os.path.join(static, f), os.path.join(PUBLIC, f))
 
     base = "https://ohyoufancyfocaccia.com/"
-    for fname, body, title, desc in PAGES + [(f, b, t, "") for f, b, t in ADMIN_PAGES]:
+    all_pages = PAGES + [(f, b, t, "") for f, b, t in ADMIN_PAGES] + [(f, b, t, "") for f, b, t in UTILITY_PAGES]
+    for fname, body, title, desc in all_pages:
         if fname == "reviews.html":
             # the review form and the live reviews sit before the closing sign
             body = body.replace('<section class="enamel">', P.REVIEW_FORM + '<section class="enamel">', 1)
@@ -422,6 +432,7 @@ def build():
                             '<div class="brand-row" style="display:flex;align-items:center;justify-content:center;gap:var(--s6)">', 1)
         is_home = fname == "index.html"
         is_admin = fname.startswith("admin")
+        is_utility = fname in {f for f, *_ in UTILITY_PAGES}
         head_extra = ""
         if is_home:
             head_extra = '<link rel="preload" as="image" href="./img/splash-scene.webp" fetchpriority="high">\n'
@@ -429,6 +440,8 @@ def build():
             # /admin/login has a directory segment, so relative asset paths
             # would resolve under /admin/ and hit the auth guard
             head_extra = '<base href="/">\n<meta name="robots" content="noindex,nofollow">\n'
+        if is_utility:
+            head_extra += '<meta name="robots" content="noindex">\n'
         script = SCRIPTS.get(fname)
         page = DOC.format(
             title=title, desc=desc or title,
