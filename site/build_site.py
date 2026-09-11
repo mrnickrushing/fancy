@@ -17,6 +17,7 @@ PUBLIC = os.path.join(ROOT, "public")
 sys.path.insert(0, DESIGN)
 
 import _build as D  # noqa: E402  (importing regenerates the .dc.html artboards; harmless)
+import pages as P   # noqa: E402  (the order page and the admin — served, never on the canvas)
 
 EMAIL = "ohyoufancyfocaccia@gmail.com"
 FB    = "https://www.facebook.com/profile.php?id=61584072034572"
@@ -35,9 +36,22 @@ PAGES = [
      "100% recommend across 9 reviews. What our customers say."),
     ("contact.html", D.CONTACT, "Contact — Oh! You Fancy Focaccia",
      "Questions, delivery, shipping, or something particular for an occasion."),
+    ("order.html",   P.ORDER,   "Order — Oh! You Fancy Focaccia",
+     "Order focaccia and sourdough for market pickup, local delivery or shipping. We confirm every order by email."),
 ]
 
-NAV = {"Home": "./", "About": "./about.html", "Our Breads": "./breads.html",
+# Served by the order book, never linked from the site and never indexed.
+ADMIN_PAGES = [
+    ("admin.html",       P.ADMIN,       "The Order Book — Oh! You Fancy Focaccia"),
+    ("admin-login.html", P.ADMIN_LOGIN, "Sign In — Oh! You Fancy Focaccia"),
+]
+
+# Which script each page carries. Every script is its own file so the
+# server can keep a CSP without unsafe-inline.
+SCRIPTS = {"index.html": "splash.js", "order.html": "order.js", "reviews.html": "reviews.js",
+           "admin.html": "admin.js", "admin-login.html": "admin-login.js"}
+
+NAV = {"Home": "./", "About": "./about.html", "Our Breads": "./breads.html", "Order": "./order.html",
        "Gallery": "./gallery.html", "Reviews": "./reviews.html", "Contact": "./contact.html"}
 
 # link text -> destination, for buttons and inline links the artboards left as "#"
@@ -46,8 +60,12 @@ LINKS = {
     "The Full Bill of Fare": "./breads.html",
     "Find Us at the Market": "./contact.html",
     "Entra": "./",
+    "Order for Pickup": "./order.html",
+    "Place an Order": "./order.html",
+    "View the Order Page": "./order.html",
     EMAIL: f"mailto:{EMAIL}",
     "Oh! You Fancy Focaccia": FB,
+    "Facebook": FB,
     "Write to Us": f"mailto:{EMAIL}",
 }
 
@@ -151,8 +169,8 @@ SPLASH_CSS = """
      viewport as the column below it can spare */
   width:min(460px,40vh,80vw);height:min(460px,40vh,80vw)}
 .splash .wash{position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,oklch(.32 .13 28/.58) 0%,oklch(.25 .12 28/.74) 46%,
-    oklch(.15 .08 28/.92) 100%)}
+  background:linear-gradient(180deg,oklch(.40 .14 28/.50) 0%,oklch(.33 .13 28/.64) 46%,
+    oklch(.22 .10 28/.86) 100%)}
 .splash[hidden]{opacity:0;visibility:hidden;pointer-events:none;display:flex}
 /* a safety net for viewports too short for the column — never a visible bar */
 .splash{overflow-y:auto;scrollbar-width:none}
@@ -322,7 +340,7 @@ DOC = """<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{title}</title>
+{head_extra}<title>{title}</title>
 <meta name="description" content="{desc}">
 <meta name="theme-color" content="#8E1B1B">
 <link rel="canonical" href="{canon}">
@@ -339,7 +357,7 @@ DOC = """<!doctype html>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 {fonts}
 <link rel="stylesheet" href="./style.css">
-{preload}{ld}
+{ld}
 </head>
 <body>
 {splash}
@@ -383,13 +401,19 @@ def build():
         shutil.copy2(os.path.join(DESIGN, "img", f), os.path.join(PUBLIC, "img", f))
 
     with open(os.path.join(PUBLIC, "style.css"), "w", encoding="utf-8") as fh:
-        fh.write(D.TOKENS + RESPONSIVE + SPLASH_CSS)
+        fh.write(D.TOKENS + RESPONSIVE + SPLASH_CSS + P.FORMS_CSS)
     # kept out of the document so the server can run a CSP without unsafe-inline scripts
     with open(os.path.join(PUBLIC, "splash.js"), "w", encoding="utf-8") as fh:
         fh.write(SPLASH_JS.strip() + "\n")
+    static = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+    for f in sorted(os.listdir(static)):
+        shutil.copy2(os.path.join(static, f), os.path.join(PUBLIC, f))
 
     base = "https://ohyoufancyfocaccia.com/"
-    for fname, body, title, desc in PAGES:
+    for fname, body, title, desc in PAGES + [(f, b, t, "") for f, b, t in ADMIN_PAGES]:
+        if fname == "reviews.html":
+            # the review form and the live reviews sit before the closing sign
+            body = body.replace('<section class="enamel">', P.REVIEW_FORM + '<section class="enamel">', 1)
         html = rewrite_assets(rewrite_links(body))
         # the masthead nav needs to scroll on narrow screens
         html = html.replace('<nav style="display:flex;justify-content:center;gap:var(--s8);',
@@ -397,23 +421,31 @@ def build():
         html = html.replace('<div style="display:flex;align-items:center;justify-content:center;gap:var(--s6)">',
                             '<div class="brand-row" style="display:flex;align-items:center;justify-content:center;gap:var(--s6)">', 1)
         is_home = fname == "index.html"
+        is_admin = fname.startswith("admin")
+        head_extra = ""
+        if is_home:
+            head_extra = '<link rel="preload" as="image" href="./img/splash-scene.webp" fetchpriority="high">\n'
+        if is_admin:
+            # /admin/login has a directory segment, so relative asset paths
+            # would resolve under /admin/ and hit the auth guard
+            head_extra = '<base href="/">\n<meta name="robots" content="noindex,nofollow">\n'
+        script = SCRIPTS.get(fname)
         page = DOC.format(
-            title=title, desc=desc,
+            title=title, desc=desc or title,
             canon=base + ("" if is_home else fname),
             fonts=D.FONTS.replace("&amp;", "&"),
             ld=LD_JSON if is_home else "",
-            preload=('<link rel="preload" as="image" href="./img/splash-scene.webp" '
-                     'fetchpriority="high">\n') if is_home else "",
+            head_extra=head_extra,
             splash=SPLASH_HTML if is_home else "",
             body=html,
-            script='<script src="./splash.js" defer></script>' if is_home else "",
+            script=f'<script src="./{script}" defer></script>' if script else "",
         )
         with open(os.path.join(PUBLIC, fname), "w", encoding="utf-8") as fh:
             fh.write(page)
         print(f"  {fname:<14}{len(page)//1024}KB")
 
     with open(os.path.join(PUBLIC, "robots.txt"), "w") as fh:
-        fh.write(f"User-agent: *\nAllow: /\nSitemap: {base}sitemap.xml\n")
+        fh.write(f"User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nDisallow: /respond/\nSitemap: {base}sitemap.xml\n")
     urls = "".join(
         f"  <url><loc>{base}{'' if f=='index.html' else f}</loc></url>\n" for f, *_ in PAGES)
     with open(os.path.join(PUBLIC, "sitemap.xml"), "w") as fh:

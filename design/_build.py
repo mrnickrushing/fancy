@@ -208,8 +208,8 @@ LOADER_CSS = f"""
 /* the courtyard photograph sits under a burgundy wash: present, never competing */
 .scene{{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 45%}}
 .wash{{position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,oklch(.32 .13 28/.58) 0%,oklch(.25 .12 28/.74) 46%,
-    oklch(.15 .08 28/.92) 100%)}}
+  background:linear-gradient(180deg,oklch(.40 .14 28/.50) 0%,oklch(.33 .13 28/.64) 46%,
+    oklch(.22 .10 28/.86) 100%)}}
 .stage::after{{content:'';position:absolute;inset:0;pointer-events:none;opacity:.4;
   background-image:radial-gradient(oklch(.9 .08 75/.10) .6px,transparent .6px);
   background-size:4px 4px}}
@@ -345,7 +345,7 @@ LOADER = f"""
 </div>
 """
 
-NAV = ["Home","About","Our Breads","Gallery","Reviews","Contact"]
+NAV = ["Home","About","Our Breads","Order","Gallery","Reviews","Contact"]
 
 def olive_rule(w=190, flip=False):
     t = ' transform="scale(-1,1) translate(-190,0)"' if flip else ''
@@ -491,7 +491,7 @@ HOME = masthead("Home") + f"""
         on the southern Oregon coast.</p>
       <div style="display:flex;gap:var(--s4);flex-wrap:wrap">
         <a href="#" class="btn btn-fill">See the Bill of Fare</a>
-        <a href="#" class="btn btn-line">Find Us at the Market</a>
+        <a href="#" class="btn btn-line">Order for Pickup</a>
       </div>
     </div>
     <div style="position:relative;display:flex;justify-content:center">
@@ -633,8 +633,6 @@ ABOUT = masthead("About") + head_band("La Nostra Storia","Welcome to Oh! You Fan
   <div class="wrap" style="display:grid;grid-template-columns:.9fr 1.1fr;gap:var(--s16);align-items:center">
     <div style="display:flex;flex-direction:column;align-items:center;gap:var(--s4)">
       {shot("art-garden.webp",500,"A flower garden painted across focaccia","shot-oval","width:400px")}
-      <p class="caps" style="font-size:.62rem;opacity:.5;text-align:center">
-        [PORTRAIT OF AMANDA &#8212; if she would like one here]</p>
     </div>
     <div>
       <p class="caps kicker kicker-l">From Our Kitchen</p>
@@ -730,9 +728,10 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
       <div class="plate"><h3>As it comes</h3><p>Warm, torn by hand, with good olive oil. Honestly the best way.</p></div>
     </div>
     <div style="max-width:660px;margin:var(--s16) auto 0;padding:var(--s10);
-      background:var(--paper-2);border:1px dashed var(--rule);text-align:center">
-      <p class="caps" style="color:var(--burgundy);margin-bottom:var(--s3)">Prices</p>
-      <p style="opacity:.76;font-style:italic">[PRICES TO BE SUPPLIED] &#8212; ask at the market, or write for delivery and shipping.</p>
+      background:var(--paper-2);border:1px solid var(--rule);text-align:center">
+      <p class="caps" style="color:var(--burgundy);margin-bottom:var(--s3)">Ordina</p>
+      <p style="opacity:.76;font-style:italic;margin-bottom:var(--s6)">Order ahead for market pickup, local delivery or shipping. We confirm every order by email.</p>
+      <a href="#" class="btn btn-fill">Place an Order</a>
     </div>
   </div>
 </section>
@@ -879,11 +878,6 @@ CONTACT = masthead("Contact") + head_band("Scrivici","We&#8217;d Love to Hear Fr
         {contact_row(IC_MAIL,"Email","The fastest way to reach us. We answer every message.","ohyoufancyfocaccia@gmail.com")}
         {contact_row(IC_FB,"Facebook","That is where the fresh bakes get posted first.","Oh! You Fancy Focaccia")}
         {contact_row(IC_PIN,"Where We Are","Brookings, Oregon &#8212; on the southern Oregon coast, in Curry County.")}
-      </div>
-      <div style="margin-top:var(--s8);padding:var(--s6);background:var(--paper-2);
-        border:1px dashed var(--rule)">
-        <p class="caps" style="color:var(--burgundy);margin-bottom:var(--s2);font-size:.68rem">Telephone</p>
-        <p style="opacity:.74;font-size:var(--sm);font-style:italic">[PHONE NUMBER &#8212; if you want one public]</p>
       </div>
     </div>
 
