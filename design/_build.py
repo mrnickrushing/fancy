@@ -770,7 +770,7 @@ HOME = masthead("Home") + f"""
     <div>
       <p class="caps kicker kicker-l" style="color:var(--olive)">Artisan Breads</p>
       <h1 class="hero-h">
-        One starter,<br><span style="font-style:italic;font-weight:500">endlessly</span><br>argued over.</h1>
+        One starter.<br><span style="font-style:italic;font-weight:500">Endless flavor</span><br>possibilities.</h1>
       <p class="hero-lede">
         Focaccia and sourdough from one mother starter &#8212; savory and sweet,
         dimpled and blistered, and made by hand on the southern Oregon coast.</p>
@@ -793,7 +793,7 @@ HOME = masthead("Home") + f"""
   <div class="wrap">
     <p class="caps kicker">Il Processo</p>
     <h2 class="h-sec">Bend, snap, stretch, fold</h2>
-    <p class="lede">Four moves, in that order, every time. It is the whole method and it takes all day.</p>
+    <p class="lede">Four moves, in that order, every time. It is the whole method that consumes the dough days.</p>
     {dimple_rule()}
     <div class="grid g4">
       {''.join(f'''<div class="plate"><p class="roman">{r}</p><h3>{t}</h3><p>{d}</p></div>'''
@@ -1339,7 +1339,7 @@ MOBILE = f"""
 <section style="background:var(--paper);padding:var(--s12) var(--s5)">
   <p class="caps kicker" style="color:var(--olive);font-size:.66rem">Artisan Breads</p>
   <h1 style="font-size:2.6rem;line-height:1.04;text-align:center;margin-bottom:var(--s5)">
-    One starter,<br><span style="font-style:italic;font-weight:500">endlessly</span><br>argued over.</h1>
+    One starter.<br><span style="font-style:italic;font-weight:500">Endless flavor</span><br>possibilities.</h1>
   <p style="text-align:center;opacity:.78;margin-bottom:var(--s6)">Focaccia and sourdough from one mother starter &#8212; dimpled, blistered, organic, and made by hand.</p>
   <a href="#" class="btn btn-fill" style="width:100%">See the Bill of Fare</a>
   {shot("hero-garden.webp",340,"Focaccia painted in herbs and vegetables","shot-oval","margin-top:var(--s8)")}
