@@ -740,7 +740,8 @@ GAL = [
  ("olive-tomato.webp","Olive &amp; Sun-Dried Tomato","Crisp at the edge, soft through the middle.",300),
  ("skillet.webp","Skillet Focaccia","Baked in cast iron, green with herbs.",240),
  ("sea-salt-round.webp","Sea Salt Round","Olive-oil brushed, salt flaked, still warm.",300),
- ("parm-muffins.webp","Garlic Parmesan Muffins","Crisp-edged and golden all over.",300)]
+ ("parm-muffins.webp","Garlic Parmesan Muffins","Crisp-edged and golden all over.",300),
+ ("caramel-swirl.webp","Caramelised Swirl","Dark at the edges, glossy, unwinding in rings.",300)]
 
 GALLERY = masthead("Gallery") + head_band("La Galleria","Fresh From the Oven",
   "Straight from the tray, and straight from the market table.") + f"""

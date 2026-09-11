@@ -1,7 +1,8 @@
 # Photography
 
-All 30 images Amanda supplied are catalogued here. Nineteen are embedded in the
-canvas; the rest are held for when the real site gets built.
+All 30 images Amanda supplied are catalogued here. Twenty are embedded in the
+canvas; the rest are near-duplicates of what is already in, held for when the
+real site gets built.
 
 ## Preparing images for the canvas
 
@@ -13,7 +14,7 @@ WebP at a searched quality does the work. Heavily-textured crusts resist
 compression, so two images (`hero-garden`, `sweet-cinnamon`) bottomed out at
 minimum quality and had to be reduced in pixel dimensions instead.
 
-Current total: **1.25 MB across 19 files**, seeded page ~4.3 MB.
+Current total: **1.4 MB across 20 files**, seeded page ~4.4 MB.
 
 ## In use
 
@@ -28,7 +29,7 @@ Current total: **1.25 MB across 19 files**, seeded page ~4.3 MB.
 | `heart-loaf.webp` | Hand-shaped heart | Bill of Fare (Focaccia Art) |
 | `honey-bites.webp` | Honey bites boxed, with the Chetco Gold jar | Gallery |
 | `wide-slab.webp` | Wide olive & tomato slab | Behind the market sign band |
-| `swirl-jalapeno.webp` · `olive-slab.webp` · `lemon-pepper.webp` · `cheesy-jalapeno.webp` · `rosemary-slab.webp` · `herb-rolls.webp` · `olive-tomato.webp` · `skillet.webp` · `sea-salt-round.webp` · `parm-muffins.webp` | | Gallery |
+| `caramel-swirl.webp` · `swirl-jalapeno.webp` · `olive-slab.webp` · `lemon-pepper.webp` · `cheesy-jalapeno.webp` · `rosemary-slab.webp` · `herb-rolls.webp` · `olive-tomato.webp` · `skillet.webp` · `sea-salt-round.webp` · `parm-muffins.webp` | | Gallery |
 
 ## Held back
 

@@ -69,6 +69,7 @@ JOBS = [
     ("8f3eed65", "rosemary-slab", 520), ("b59dcf39", "herb-rolls", 560),
     ("3ff24cb1", "olive-tomato", 540), ("ca877ee9", "skillet", 560),
     ("d820daaa", "wide-slab", 900), ("093008b5", "parm-muffins", 560),
+    ("10815106", "caramel-swirl", 600),
 ]
 
 if __name__ == "__main__":
