@@ -1,0 +1,74 @@
+{
+  "$comment": "Structured facts scraped from the Oh! You Fancy Focaccia Facebook page on 2026-09-11. Fields marked null are unknown and must be supplied by the client. See facebook-research.md for sources and caveats.",
+  "name": "Oh! You Fancy Focaccia",
+  "facebookPageName": "Oh You Fancy Focaccia",
+  "owner": { "firstName": "Amanda", "fullName": null },
+  "category": "Chef / Bakery",
+  "tagline": "Oh! You Fancy Focaccia is located in Brookings, Oregon.",
+  "contact": {
+    "email": "ohyoufancyfocaccia@gmail.com",
+    "phone": null,
+    "website": null
+  },
+  "location": {
+    "note": "Not a storefront. This is the Port of Brookings Harbor / Brookings-Harbor Farmers Market site.",
+    "streetAddress": "15786 US-101 S",
+    "addressLocality": "Brookings",
+    "addressRegion": "OR",
+    "postalCode": "97415",
+    "addressCountry": "US"
+  },
+  "social": {
+    "facebook": "https://www.facebook.com/profile.php?id=61584072034572",
+    "facebookCanonical": "https://www.facebook.com/p/Oh-You-Fancy-Focaccia-61584072034572/",
+    "facebookPageId": "61584072034572",
+    "instagram": null,
+    "instagramKnownPost": "https://www.instagram.com/p/DQSQTkrkoG1/"
+  },
+  "socialProof": {
+    "asOf": "2026-09-11",
+    "facebookFollowers": 257,
+    "facebookFollowing": 179,
+    "recommendationRate": "100%",
+    "reviewCount": 9
+  },
+  "salesChannels": [
+    { "type": "farmers-market", "name": "Brookings-Harbor Farmers Market", "days": ["Wednesday", "Saturday"], "opens": "09:00", "closes": "sold out", "confirmed": false },
+    { "type": "shipping", "available": true, "details": null },
+    { "type": "delivery", "available": true, "area": null },
+    { "type": "wholesale", "available": true, "knownCustomer": "The Dawg House" }
+  ],
+  "products": [
+    "Savory focaccia",
+    "Sweet focaccia",
+    "Peppered pickle focaccia muffins (with Brookings Pickled Goodies LLC pickles)",
+    "Heart-shaped focaccia loaves",
+    "Decorative focaccia art loaves (floral)",
+    "Olive focaccia",
+    "Garlic focaccia",
+    "Jalapeno, olive and red onion focaccia",
+    "Cheesy jalapeno focaccia",
+    "Honey-drizzled focaccia bites (with Chetco Gold Raw Honey)"
+  ],
+  "attributes": ["organic ingredients", "sourdough starter", "small batch", "sells out daily", "free samples at market"],
+  "localPartners": [
+    { "name": "Brookings Pickled Goodies LLC", "relationship": "ingredient supplier - pickles" },
+    { "name": "Chetco Gold Raw Honey", "relationship": "paired product - raw honey", "email": "chetcogold@gmail.com", "note": "Chetco River, Brookings OR; award winning; 22oz jars" },
+    { "name": "The Dawg House", "contact": "Monica", "relationship": "wholesale customer - sandwiches on her focaccia" },
+    { "name": "Shalom Coffee Roasting", "relationship": "fellow vendor, same address", "phone": "(541) 661-4672", "website": "shalomcoffeeroasting.com" }
+  ],
+  "openQuestions": [
+    "phone number",
+    "which farmers market and confirmed days/hours (incl. winter schedule)",
+    "menu and prices",
+    "how customers order",
+    "shipping destinations, cost, lead time",
+    "delivery area",
+    "Instagram handle",
+    "business structure and Oregon food licensing",
+    "organic: certified vs made-with-organic-ingredients",
+    "allergen info",
+    "logo and preferred name spelling",
+    "owner full name and whether to feature her photo"
+  ]
+}
