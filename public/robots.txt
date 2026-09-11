@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ohyoufancyfocaccia.up.railway.app/sitemap.xml
