@@ -1,0 +1,111 @@
+{
+  "artboards": [
+    {
+      "file": "Loader.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "Loading screen",
+      "print": "fixed"
+    },
+    {
+      "file": "LoaderPhone.dc.html",
+      "x": 1560,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Loading - phone",
+      "print": "fixed"
+    },
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 1060,
+      "w": 1440,
+      "h": 5100,
+      "title": "Home",
+      "print": "flow"
+    },
+    {
+      "file": "Phone.dc.html",
+      "x": 1560,
+      "y": 1060,
+      "w": 390,
+      "h": 3550,
+      "title": "Home - phone",
+      "print": "flow"
+    },
+    {
+      "file": "About.dc.html",
+      "x": 0,
+      "y": 6320,
+      "w": 1440,
+      "h": 3900,
+      "title": "About",
+      "print": "flow"
+    },
+    {
+      "file": "Breads.dc.html",
+      "x": 1560,
+      "y": 6320,
+      "w": 1440,
+      "h": 4900,
+      "title": "Bill of Fare",
+      "print": "flow"
+    },
+    {
+      "file": "Gallery.dc.html",
+      "x": 0,
+      "y": 11380,
+      "w": 1440,
+      "h": 7600,
+      "title": "Gallery",
+      "print": "flow"
+    },
+    {
+      "file": "Reviews.dc.html",
+      "x": 1560,
+      "y": 11380,
+      "w": 1440,
+      "h": 3300,
+      "title": "Reviews",
+      "print": "flow"
+    },
+    {
+      "file": "Contact.dc.html",
+      "x": 0,
+      "y": 19200,
+      "w": 1440,
+      "h": 3700,
+      "title": "Contact",
+      "print": "flow"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "loader",
+      "x": -480,
+      "y": 0,
+      "w": 400,
+      "text": "LOADING SCREEN \u2014 animates live, on a 9s loop.\n\nThe ring strokes itself on like a stamp pressed into a label, then the five things focaccia is made of arrive in turn \u2014 Farina, Acqua, Olio d'Oliva, Sale, Tempo \u2014 while a dimple presses into the dough for each one. That row of dimples IS the progress bar.\n\nSugar Haus types a terminal; this proofs dough."
+    },
+    {
+      "id": "identity",
+      "x": -480,
+      "y": 330,
+      "w": 400,
+      "text": "OWN IDENTITY, not a Sugar Haus reskin.\n\nType: Bodoni Moda \u2014 the Italian didone \u2014 with EB Garamond and Italianno. Sugar Haus uses Playfair/Lora/Work Sans.\n\nAnatomy: centred label masthead, oval cartouches, an enamel market sign, a bill of fare with dotted leaders, vertical spine rails. Sugar Haus uses a left-logo navbar and centred card grids."
+    },
+    {
+      "id": "gaps",
+      "x": -480,
+      "y": 700,
+      "w": 400,
+      "text": "Palette is the logo's: burgundy #8E1B1B, olive #4E6023, gold #B8862F, paper #F4EFE2.\n\nEvery tan panel is a photo slot. Bracketed text marks the two facts we do not have \u2014 prices and a phone number. Nothing invented."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

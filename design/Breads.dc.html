@@ -1,0 +1,344 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&amp;family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=Italianno&amp;display=swap">
+<style>
+:root{
+  --xs:.78rem; --sm:.94rem; --base:1.08rem; --lg:1.35rem;
+  --xl:2.1rem; --xxl:3.2rem; --xxxl:4.6rem;
+  --s1:.25rem;--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.25rem;--s6:1.5rem;
+  --s8:2rem;--s10:2.5rem;--s12:3rem;--s16:4rem;--s20:5rem;--s24:6rem;--s32:8rem;
+
+  --burgundy:#8E1B1B; --burgundy-mid:#711616; --burgundy-deep:#4A0E0E;
+  --burgundy-ink:#2A0B0B;
+  --olive:#4E6023; --olive-deep:#33401A; --olive-pale:#E4E7D0;
+  --gold:#B8862F; --gold-pale:#EFE0BE;
+  --paper:#F4EFE2; --paper-2:#FBF8EF; --paper-3:#EAE1CB; --paper-4:#DED2B4;
+  --rule:#CBBB97; --rule-soft:#DED2B4;
+  --ink:#33190F; --ink-soft:#6E4432;
+  --crust:#C98A45;
+
+  --r-sm:2px; --r-md:3px; --r-lg:4px; --r-oval:50%;
+  --ease:cubic-bezier(.19,1,.22,1);
+  --sh-sm:0 1px 2px oklch(.25 .05 40/.10);
+  --sh-md:0 6px 22px oklch(.25 .05 40/.13);
+  --sh-lg:0 18px 52px oklch(.25 .05 40/.18);
+  --wide:1240px; --mid:900px; --narrow:680px;
+  --serif:'Bodoni Moda',Didot,'Bodoni MT',Georgia,serif;
+  --body:'EB Garamond',Garamond,Georgia,serif;
+  --script:'Italianno','Snell Roundhand',cursive;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);
+  font-size:var(--base);line-height:1.72;-webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;font-feature-settings:"liga","kern"}
+h1,h2,h3,h4{font-family:var(--serif);line-height:1.1;font-weight:600;text-wrap:balance}
+p{text-wrap:pretty}
+img,svg{display:block;max-width:100%}
+a{color:var(--burgundy);text-decoration:none}
+a:hover{color:var(--burgundy-deep)}
+ul{list-style:none}
+
+/* laid-paper grain, warmer and finer than a flat fill */
+.grain{position:relative}
+.grain::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.55;
+  background-image:radial-gradient(oklch(.42 .07 45/.05) .5px,transparent .5px),
+    repeating-linear-gradient(93deg,oklch(.42 .07 45/.022) 0 1px,transparent 1px 4px);
+  background-size:3px 3px,auto}
+
+.wrap{max-width:var(--wide);margin:0 auto;padding-inline:var(--s10)}
+.mid{max-width:var(--mid);margin:0 auto;padding-inline:var(--s10)}
+.narrow{max-width:var(--narrow);margin:0 auto;padding-inline:var(--s8)}
+
+/* ── small caps label, the house voice ── */
+.caps{font-family:var(--serif);font-size:var(--xs);font-weight:600;
+  letter-spacing:.34em;text-transform:uppercase}
+
+/* ── vertical spine rail (label-edge motif) ── */
+.spine{position:absolute;top:0;bottom:0;width:52px;display:flex;
+  align-items:center;justify-content:center}
+.spine span{writing-mode:vertical-rl;font-family:var(--serif);font-size:.68rem;
+  font-weight:600;letter-spacing:.44em;text-transform:uppercase;
+  color:var(--burgundy);opacity:.42}
+.spine-l{left:0}
+.spine-r{right:0;transform:rotate(180deg)}
+
+/* ── oval cartouche, echoing the logo's ring ── */
+.oval{border-radius:50%/50%;border:2px solid var(--burgundy);position:relative}
+.oval::before{content:'';position:absolute;inset:7px;border:1px solid var(--burgundy);
+  opacity:.45;border-radius:50%/50%;pointer-events:none}
+
+/* ── buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;
+  min-height:52px;padding:.9rem 2.3rem;font-family:var(--serif);font-size:var(--xs);
+  font-weight:600;letter-spacing:.28em;text-transform:uppercase;
+  border-radius:var(--r-sm);transition:all 280ms var(--ease);cursor:pointer}
+.btn-fill{background:var(--burgundy);color:var(--paper-2);border:1px solid var(--burgundy)}
+.btn-fill:hover{background:var(--burgundy-deep);border-color:var(--burgundy-deep);
+  color:var(--paper-2);letter-spacing:.32em}
+.btn-line{background:transparent;color:var(--burgundy);border:1px solid var(--burgundy)}
+.btn-line:hover{background:var(--burgundy);color:var(--paper-2);letter-spacing:.32em}
+.btn-pale{background:transparent;color:var(--gold-pale);border:1px solid oklch(.85 .07 80/.5)}
+.btn-pale:hover{background:var(--gold-pale);color:var(--burgundy-ink);letter-spacing:.32em}
+
+/* ── section furniture ── */
+.sec{padding-block:var(--s24);position:relative}
+.kicker{display:flex;align-items:center;gap:var(--s4);justify-content:center;
+  color:var(--burgundy);margin-bottom:var(--s5)}
+.kicker::before,.kicker::after{content:'';display:block;height:1px;width:54px;
+  background:currentColor;opacity:.4}
+.kicker-l{justify-content:flex-start}
+.kicker-l::before{display:none}
+.h-sec{font-size:var(--xl);text-align:center;margin-bottom:var(--s5)}
+.lede{font-size:var(--lg);color:var(--ink);opacity:.72;max-width:52ch;margin:0 auto;
+  text-align:center;line-height:1.62;font-style:italic}
+
+/* ── dimple rule: the focaccia motif as a divider ── */
+.dimples{display:flex;justify-content:center;align-items:center;gap:11px;
+  margin-block:var(--s10)}
+.dimples i{display:block;width:7px;height:7px;border-radius:50%;
+  background:var(--burgundy);opacity:.3}
+.dimples i:nth-child(4){width:11px;height:11px;opacity:.62;background:var(--gold)}
+
+/* ── bill of fare ── */
+.fare{display:flex;align-items:baseline;gap:var(--s4);padding-block:var(--s5);
+  border-bottom:1px solid var(--rule-soft)}
+.fare-n{font-family:var(--serif);font-size:var(--sm);color:var(--gold);
+  font-weight:600;width:34px;flex-shrink:0;letter-spacing:.1em}
+.fare-b{flex-grow:1}
+.fare-t{font-family:var(--serif);font-size:var(--lg);font-weight:600;
+  display:flex;align-items:baseline;gap:var(--s3)}
+.fare-t::after{content:'';flex-grow:1;border-bottom:1.5px dotted var(--rule);
+  transform:translateY(-4px)}
+.fare-d{font-size:var(--sm);opacity:.72;max-width:70ch;margin-top:var(--s2);
+  font-style:italic}
+
+/* ── enamel market sign ── */
+.enamel{background:var(--burgundy);color:var(--gold-pale);
+  border-block:6px double oklch(.85 .07 80/.42);padding-block:var(--s12);
+  text-align:center;position:relative;overflow:hidden}
+.enamel::before{content:'';position:absolute;inset:0;opacity:.09;
+  background-image:radial-gradient(#fff .7px,transparent .7px);background-size:5px 5px}
+
+/* ── plate: framed card with a hairline inset, not a rounded box ── */
+.plate{background:var(--paper-2);border:1px solid var(--rule);padding:var(--s8);
+  position:relative;transition:transform 320ms var(--ease),box-shadow 320ms var(--ease)}
+.plate::before{content:'';position:absolute;inset:6px;border:1px solid var(--rule);
+  opacity:.4;pointer-events:none}
+.plate:hover{transform:translateY(-5px);box-shadow:var(--sh-lg)}
+.plate h3{font-size:var(--lg);margin-bottom:var(--s3)}
+.plate p{font-size:var(--sm);opacity:.76;line-height:1.74}
+.grid{display:grid;gap:var(--s6)}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+
+/* roman numeral */
+.roman{font-family:var(--serif);font-size:2.6rem;font-weight:400;color:var(--gold);
+  line-height:1;margin-bottom:var(--s4);font-style:italic}
+
+/* real photography, framed like a plate */
+.shot{position:relative;overflow:hidden;border:1px solid var(--rule);
+  background:var(--paper-3);margin:0}
+.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot::after{content:'';position:absolute;inset:8px;
+  border:1px solid oklch(1 0 0/.34);pointer-events:none}
+.shot-oval{border-radius:50%/50%;border:2px solid var(--burgundy);
+  box-shadow:var(--sh-lg)}
+.shot-oval::after{inset:9px;border:1px solid oklch(1 0 0/.42);border-radius:50%/50%}
+
+/* placeholder slot — only where no photograph exists yet */
+.slot{position:relative;background:linear-gradient(152deg,#EDE2C6,#E3D4B0 52%,#D8C69C);
+  border:1px solid var(--rule);overflow:hidden;display:flex;
+  align-items:center;justify-content:center}
+.slot::before{content:'';position:absolute;inset:9px;border:1px solid oklch(.42 .07 45/.2);
+  pointer-events:none}
+.slot-cap{position:absolute;bottom:15px;left:0;right:0;text-align:center;
+  font-family:var(--serif);font-size:.64rem;font-weight:600;letter-spacing:.26em;
+  text-transform:uppercase;color:oklch(.40 .05 45/.6)}
+</style>
+</helmet>
+<div class="grain">
+<div style="background:var(--burgundy-ink);color:var(--gold-pale);
+  text-align:center;padding:.55rem" class="caps">
+  Brookings-Harbor Farmers Market &#183; Wednesdays &amp; Saturdays &#183; 9am &#8216;til sold out</div>
+<header style="background:var(--paper);border-bottom:1px solid var(--rule);
+  padding-block:var(--s8) 0;position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(12px)">
+  <div style="text-align:center">
+    <div style="display:flex;align-items:center;justify-content:center;gap:var(--s6)">
+      <svg width="120" height="34" viewBox="0 0 190 34" aria-hidden="true">
+<g fill="none" stroke="#4E6023" stroke-width="1.2" stroke-linecap="round">
+<path d="M2 17C40 17 82 14 126 9"/>
+<path d="M36 17c-3-5-1-9 3-11 2 4 1 9-3 11z"/>
+<path d="M56 15c-3-5-2-9 2-11 2 4 2 9-2 11z"/>
+<path d="M76 13c-3-5-2-9 2-11 2 4 2 9-2 11z"/>
+<path d="M46 18c3-4 8-4 11-1-3 4-8 5-11 1z"/>
+<path d="M66 16c3-4 8-4 11-1-3 4-8 5-11 1z"/></g>
+<g fill="#4E6023">
+<ellipse cx="116" cy="10" rx="4" ry="5.2" transform="rotate(28 116 10)"/>
+<ellipse cx="130" cy="7" rx="4" ry="5.2" transform="rotate(28 130 7)" opacity=".68"/></g></svg>
+      <img src="logo.webp" alt="" style="width:62px;height:62px;border-radius:50%;flex-shrink:0">
+      <a href="#" style="display:block">
+        <p style="font-family:var(--script);font-size:2.9rem;line-height:.76;color:var(--burgundy)">Oh! You Fancy</p>
+        <p style="font-family:var(--serif);font-size:1.18rem;font-weight:700;letter-spacing:.38em;
+          text-transform:uppercase;color:var(--ink);margin-top:.32rem;padding-left:.38em">Focaccia</p>
+      </a>
+      <svg width="120" height="34" viewBox="0 0 190 34" aria-hidden="true">
+<g transform="scale(-1,1) translate(-190,0)" fill="none" stroke="#4E6023" stroke-width="1.2" stroke-linecap="round">
+<path d="M2 17C40 17 82 14 126 9"/>
+<path d="M36 17c-3-5-1-9 3-11 2 4 1 9-3 11z"/>
+<path d="M56 15c-3-5-2-9 2-11 2 4 2 9-2 11z"/>
+<path d="M76 13c-3-5-2-9 2-11 2 4 2 9-2 11z"/>
+<path d="M46 18c3-4 8-4 11-1-3 4-8 5-11 1z"/>
+<path d="M66 16c3-4 8-4 11-1-3 4-8 5-11 1z"/></g>
+<g transform="scale(-1,1) translate(-190,0)" fill="#4E6023">
+<ellipse cx="116" cy="10" rx="4" ry="5.2" transform="rotate(28 116 10)"/>
+<ellipse cx="130" cy="7" rx="4" ry="5.2" transform="rotate(28 130 7)" opacity=".68"/></g></svg>
+    </div>
+    <nav style="display:flex;justify-content:center;gap:var(--s8);margin-top:var(--s6);
+      border-top:1px solid var(--rule-soft);padding-block:var(--s4)"><a href="#" style="color:var(--ink);opacity:.72" class="caps">Home</a><a href="#" style="color:var(--ink);opacity:.72" class="caps">About</a><a href="#" style="color:var(--burgundy);border-bottom:1px solid var(--burgundy)" class="caps">Our Breads</a><a href="#" style="color:var(--ink);opacity:.72" class="caps">Gallery</a><a href="#" style="color:var(--ink);opacity:.72" class="caps">Reviews</a><a href="#" style="color:var(--ink);opacity:.72" class="caps">Contact</a></nav>
+  </div>
+</header><section style="background:var(--paper-3);border-bottom:1px solid var(--rule);
+  padding-block:var(--s20);text-align:center;position:relative;overflow:hidden">
+  <div class="spine spine-l"><span>Oh! You Fancy Focaccia</span></div>
+  <div class="spine spine-r"><span>Brookings &#183; Oregon</span></div>
+  <div class="narrow" style="position:relative">
+    <p class="caps kicker">La Lista</p>
+    <h1 style="font-size:var(--xxl);margin-bottom:var(--s5)">The Bill of Fare</h1>
+    <p style="font-size:var(--lg);opacity:.76;font-style:italic;line-height:1.6">What comes out of the oven changes with the season, and with whatever our neighbours are growing.</p>
+    <div style="display:flex;justify-content:center;margin-top:var(--s8)"><svg width="190" height="34" viewBox="0 0 190 34" aria-hidden="true">
+<g fill="none" stroke="#4E6023" stroke-width="1.2" stroke-linecap="round">
+<path d="M2 17C40 17 82 14 126 9"/>
+<path d="M36 17c-3-5-1-9 3-11 2 4 1 9-3 11z"/>
+<path d="M56 15c-3-5-2-9 2-11 2 4 2 9-2 11z"/>
+<path d="M76 13c-3-5-2-9 2-11 2 4 2 9-2 11z"/>
+<path d="M46 18c3-4 8-4 11-1-3 4-8 5-11 1z"/>
+<path d="M66 16c3-4 8-4 11-1-3 4-8 5-11 1z"/></g>
+<g fill="#4E6023">
+<ellipse cx="116" cy="10" rx="4" ry="5.2" transform="rotate(28 116 10)"/>
+<ellipse cx="130" cy="7" rx="4" ry="5.2" transform="rotate(28 130 7)" opacity=".68"/></g></svg></div>
+  </div>
+</section>
+<section class="sec" style="background:var(--paper)">
+  <div class="wrap">
+    <div style="margin-bottom:var(--s20)">
+  <div style="display:grid;grid-template-columns:1fr 300px;gap:var(--s12);align-items:start">
+    <div>
+      <p class="caps" style="color:var(--olive);margin-bottom:var(--s2)">I Salati</p>
+      <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">Savory</h2>
+      <div style="width:64px;height:2px;background:var(--burgundy);margin-bottom:var(--s4)"></div>
+      <div class="fare"><span class="fare-n">I</span><div class="fare-b">
+      <p class="fare-t"><span>Olive &amp; Sun-Dried Tomato Swirl</span></p><p class="fare-d">A spiralled round layered with green and kalamata olives, sun-dried tomato, herbs and grated cheese. Crisp at the edges, soft through the middle.</p></div></div><div class="fare"><span class="fare-n">II</span><div class="fare-b">
+      <p class="fare-t"><span>Jalape&#241;o, Olive &amp; Red Onion</span></p><p class="fare-d">Our signature round &#8212; fresh jalape&#241;o, mixed olives, red onion and herbs across a golden, dimpled crust.</p></div></div><div class="fare"><span class="fare-n">III</span><div class="fare-b">
+      <p class="fare-t"><span>Roasted Garlic &amp; Sea Salt</span></p><p class="fare-d">Simple and perfect. Olive oil, roasted garlic and flaky salt on a pillowy sourdough crumb.</p></div></div><div class="fare"><span class="fare-n">IV</span><div class="fare-b">
+      <p class="fare-t"><span>Cheesy Jalape&#241;o</span></p><p class="fare-d">Melted and bubbling, with jalape&#241;o baked right into the top.</p></div></div>
+    </div>
+    <figure class="shot " style="height:360px;"><img src="savory-round.webp" alt="Jalapeno, olive and red onion focaccia"></figure>
+  </div>
+</div>
+    <div style="margin-bottom:var(--s20)">
+  <div style="display:grid;grid-template-columns:1fr 300px;gap:var(--s12);align-items:start">
+    <div>
+      <p class="caps" style="color:var(--olive);margin-bottom:var(--s2)">I Dolci</p>
+      <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">Sweet</h2>
+      <div style="width:64px;height:2px;background:var(--burgundy);margin-bottom:var(--s4)"></div>
+      <div class="fare"><span class="fare-n">V</span><div class="fare-b">
+      <p class="fare-t"><span>Cinnamon Swirl with Vanilla Drizzle</span></p><p class="fare-d">A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze.</p></div></div><div class="fare"><span class="fare-n">VI</span><div class="fare-b">
+      <p class="fare-t"><span>Honey Focaccia Bites</span></p><p class="fare-d">Pull-apart bites, boxed and drizzled with award-winning Chetco Gold raw honey from right here on the Chetco River.</p></div></div>
+    </div>
+    <figure class="shot " style="height:360px;"><img src="sweet-cinnamon.webp" alt="Cinnamon swirl focaccia with vanilla drizzle"></figure>
+  </div>
+</div>
+    <div style="margin-bottom:var(--s20)">
+  <div style="display:grid;grid-template-columns:1fr 300px;gap:var(--s12);align-items:start">
+    <div>
+      <p class="caps" style="color:var(--olive);margin-bottom:var(--s2)">I Piccoli</p>
+      <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">Muffins &amp; Rolls</h2>
+      <div style="width:64px;height:2px;background:var(--burgundy);margin-bottom:var(--s4)"></div>
+      <div class="fare"><span class="fare-n">VII</span><div class="fare-b">
+      <p class="fare-t"><span>Jalape&#241;o &amp; Roasted Garlic</span></p><p class="fare-d">Hand-sized, crisp-edged, crowned with jalape&#241;o and toasted garlic.</p></div></div><div class="fare"><span class="fare-n">VIII</span><div class="fare-b">
+      <p class="fare-t"><span>Peppered Pickle</span></p><p class="fare-d">Made with Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles infused right into the dough. Organic ingredients only.</p></div></div><div class="fare"><span class="fare-n">IX</span><div class="fare-b">
+      <p class="fare-t"><span>Sea Salt Rolls</span></p><p class="fare-d">Soft pull-apart rounds, olive-oil brushed and salt flaked.</p></div></div>
+    </div>
+    <figure class="shot " style="height:360px;"><img src="muffins-jalapeno.webp" alt="Jalapeno and roasted garlic focaccia muffins"></figure>
+  </div>
+</div>
+    <div style="margin-bottom:var(--s20)">
+  <div style="display:grid;grid-template-columns:1fr 300px;gap:var(--s12);align-items:start">
+    <div>
+      <p class="caps" style="color:var(--olive);margin-bottom:var(--s2)">L&#8217;Arte</p>
+      <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">Focaccia Art</h2>
+      <div style="width:64px;height:2px;background:var(--burgundy);margin-bottom:var(--s4)"></div>
+      <div class="fare"><span class="fare-n">X</span><div class="fare-b">
+      <p class="fare-t"><span>Heart Loaves</span></p><p class="fare-d">Little hand-shaped hearts. They go fast.</p></div></div><div class="fare"><span class="fare-n">XI</span><div class="fare-b">
+      <p class="fare-t"><span>Flower Gardens</span></p><p class="fare-d">Hand-painted in vegetables and herbs &#8212; a whole garden across the top of the dough.</p></div></div><div class="fare"><span class="fare-n">XII</span><div class="fare-b">
+      <p class="fare-t"><span>Seasonal &amp; Custom</span></p><p class="fare-d">Tell us the occasion. We have made a great many things that were never on a list.</p></div></div>
+    </div>
+    <figure class="shot " style="height:360px;"><img src="heart-loaf.webp" alt="A hand-shaped focaccia heart"></figure>
+  </div>
+</div>
+  </div>
+</section>
+
+<section class="sec" style="background:var(--paper-3);border-block:1px solid var(--rule)">
+  <div class="wrap">
+    <p class="caps kicker">Come Si Mangia</p>
+    <h2 class="h-sec">Our customers are more<br>inventive than we are</h2>
+    <div class="dimples"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="grid g4">
+      <div class="plate"><h3>As pizza</h3><p style="font-style:italic">&#8220;It was delicious the way it is, but turning it into a pizza was super fast and easy.&#8221;</p></div>
+      <div class="plate"><h3>As a sandwich</h3><p>Go see Monica at The Dawg House &#8212; she builds hers on our focaccia at the market.</p></div>
+      <div class="plate"><h3>As toast</h3><p>Avocado, feta and heirloom tomatoes on a thick slice. A customer sent us that one.</p></div>
+      <div class="plate"><h3>As it comes</h3><p>Warm, torn by hand, with good olive oil. Honestly the best way.</p></div>
+    </div>
+    <div style="max-width:660px;margin:var(--s16) auto 0;padding:var(--s10);
+      background:var(--paper-2);border:1px dashed var(--rule);text-align:center">
+      <p class="caps" style="color:var(--burgundy);margin-bottom:var(--s3)">Prices</p>
+      <p style="opacity:.76;font-style:italic">[PRICES TO BE SUPPLIED] &#8212; ask at the market, or write for delivery and shipping.</p>
+    </div>
+  </div>
+</section>
+<footer style="background:var(--burgundy-ink);color:#D8BFA0;padding-block:var(--s20) var(--s8)">
+<div class="wrap">
+  <div style="text-align:center;margin-bottom:var(--s16)">
+    <div style="display:flex;justify-content:center;margin-bottom:var(--s5)">
+      <img src="logo.webp" alt="Oh! You Fancy Focaccia"
+        style="width:104px;height:104px;border-radius:50%;
+        box-shadow:0 0 0 1px oklch(.82 .09 75/.35),0 0 0 7px oklch(.82 .09 75/.10)">
+    </div>
+    <p style="font-family:var(--script);font-size:2.9rem;line-height:.8;color:#EBD3AE">Oh! You Fancy</p>
+    <p style="font-family:var(--serif);font-size:1.05rem;font-weight:700;letter-spacing:.36em;
+      text-transform:uppercase;color:#D8BFA0;margin-top:.4rem;padding-left:.36em">Focaccia</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s12);
+    border-top:1px solid oklch(1 0 0/.13);padding-top:var(--s12)">
+    <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">The Bakery</p>
+      <p style="font-size:var(--sm);opacity:.82;max-width:36ch">Artisan focaccia baked by hand in Brookings, Oregon. Organic ingredients, a living sourdough starter, and small batches that sell out.</p></div>
+    <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">Explore</p>
+      <ul style="display:flex;flex-direction:column;gap:.5rem;font-size:var(--sm)">
+      <li><a href="#" style="color:#D8BFA0">About</a></li><li><a href="#" style="color:#D8BFA0">Our Breads</a></li><li><a href="#" style="color:#D8BFA0">Gallery</a></li><li><a href="#" style="color:#D8BFA0">Reviews</a></li><li><a href="#" style="color:#D8BFA0">Contact</a></li></ul></div>
+    <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">Find Us</p>
+      <p style="font-size:var(--sm);opacity:.82">Brookings-Harbor Farmers Market<br>Wednesdays &amp; Saturdays<br>9am &#8216;til sold out</p>
+      <p style="margin-top:var(--s4);font-size:var(--sm)"><a href="#" style="color:#EBD3AE">ohyoufancyfocaccia@gmail.com</a></p>
+      <p style="margin-top:var(--s2);font-size:var(--sm)"><a href="#" style="color:#EBD3AE">Facebook</a></p></div>
+  </div>
+  <div style="border-top:1px solid oklch(1 0 0/.13);margin-top:var(--s12);padding-top:var(--s6);
+    display:flex;justify-content:space-between;gap:var(--s6)">
+    <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">&#169; 2026 Oh! You Fancy Focaccia</p>
+    <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">Pane &#183; Amore &#183; Sempre</p>
+  </div>
+</div></footer>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":1440,"height":4900}}'>
+class Component extends DCLogic {}
+</script>
+</body>
+</html>
