@@ -763,7 +763,7 @@ class Component extends DCLogic {{}}
 # fare found none of them. Naming them means a rename either carries through
 # or fails the build here, which is what the lookup below is for.
 FEATURED = [
-    "Jalape\u00f1o, Olive & Red Onion",     # the round people know us by
+    "Jalape\u00f1o, Olive & Red Onion",     # the round she is known for
     "Olive & Sun-Dried Tomato",
     "The Brown Buttered Cinnamon Roll",  # photographed alongside
     "Peppered Pickle Focaccia Muffins",
