@@ -1024,7 +1024,7 @@ GAL_SECTIONS = [
    ("herb-rolls.webp","The Italiano Focaccia Muffins","The Italiano in muffin form &#8212; sage, oregano, thyme, basil and garlic.",300)]),
  ("I Dolci","Sweet", [
    ("sweet-cinnamon.webp","The Brown Buttered Cinnamon Roll","Flax seed oil butter. Coconut sugar.",420),
-   ("cinnamon-drizzle-2.webp","The Pow Cacao","A decadent chocolate focaccia dessert, sweetened with coconut sugar.",410),
+   ("cinnamon-drizzle-2.webp","The Pow Cacao","A decadent chocolate focaccia dessert, sweetened with coconut sugar so it doesn&#8217;t spike your blood sugar like regular refined sugar does.",410),
    ("cinnamon-dark.webp","The Apple Fritter","Apple fritter focaccia dessert.",400),
    ("hot-honey-bites.webp","The Hot Honey","Chili peppers, garlic and local honey from the happiest honey bees.",360)]),
  ("L&#8217;Arte","Focaccia Art", [
