@@ -53,3 +53,22 @@ Blocked on Amanda (full list in `facebook-research.md`):
 6. Delivery area
 7. Real product photography to replace Gamma's AI images
 8. Confirm the "organic" wording is legally accurate for her
+
+## Built site
+
+Gamma project: https://gamma.app/docs/6tbw727dyqwduw4
+
+| Page | Link |
+|---|---|
+| Home | https://gamma.app/docs/6tbw727dyqwduw4 |
+| About | https://gamma.app/docs/1ez900palxvrl93 |
+| Our Breads | https://gamma.app/docs/60ra33utj91nu0r |
+| Gallery | https://gamma.app/docs/nxbm8m84fpobfu9 |
+| Reviews | https://gamma.app/docs/zfuizz6aduazdw8 |
+| Contact | https://gamma.app/docs/w4bumgv83qtrvcp |
+
+Theme resolved to: cream parchment cards (`#F6EBD4`), dark brown type (`#403011`),
+olive green primary (`#626C3B`) on a goldenrod page ground (`#F1C064`), set in
+Brygada 1918 (serif). Close to the logo on parchment and olive; the logo's deep
+burgundy is not in the theme palette and would need setting by hand in the Gamma
+editor if it should carry through.
