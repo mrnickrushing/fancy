@@ -81,15 +81,25 @@
     var img = document.getElementById('lb-img');
     var name = document.getElementById('lb-name');
     var note = document.getElementById('lb-note');
+    var order = document.getElementById('lb-order');
     var at = 0;
 
     function show(i) {
       at = (i + opens.length) % opens.length;
       var b = opens[at];
+      var bake = b.getAttribute('data-name') || '';
       img.src = b.getAttribute('data-src');
-      img.alt = b.getAttribute('data-name') || '';
-      name.textContent = b.getAttribute('data-name') || '';
+      img.alt = bake;
+      name.textContent = bake;
       note.textContent = b.getAttribute('data-cap') || '';
+      // Carry the bake through to the order page. Most of what the gallery
+      // shows is a specialty that is not a standing menu row, so the order
+      // page decides what to do with the name rather than this one linking
+      // at an item id that may not exist.
+      if (order) {
+        order.href = './order.html?bake=' + encodeURIComponent(bake);
+        order.setAttribute('aria-label', 'Order ' + bake);
+      }
     }
 
     opens.forEach(function (b, i) {

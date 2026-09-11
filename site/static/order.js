@@ -260,6 +260,79 @@
     var m = minDate(); if (calMonth < new Date(m.getFullYear(), m.getMonth(), 1)) calMonth = new Date(m.getFullYear(), m.getMonth(), 1);
     renderCal();
   }
+  // ── arriving from the gallery ──
+  // The gallery shows thirty-one bakes; twelve are standing rows on the bill
+  // of fare. So a link cannot assume the photograph corresponds to an item
+  // id. Match on the name, and where there is no match carry the bake into
+  // the request box rather than dropping it on the floor.
+  function normName(s) { return String(s == null ? '' : s).toLowerCase().replace(/[^a-z0-9]/g, ''); }
+
+  function findBake(bake) {
+    var want = normName(bake);
+    if (!want) return null;
+    var exact = menu.items.filter(function (it) { return normName(it.name) === want; });
+    if (exact.length === 1) return exact[0];
+    // "Olive & Sun-Dried Tomato" in the gallery against "Olive & Sun-Dried
+    // Tomato Swirl" on the menu. Prefix only, long enough not to be an
+    // accident, and only when exactly one row is a candidate.
+    var loose = menu.items.filter(function (it) {
+      var n = normName(it.name);
+      return n.length > 8 && want.length > 8 && (n.indexOf(want) === 0 || want.indexOf(n) === 0);
+    });
+    return loose.length === 1 ? loose[0] : null;
+  }
+
+  // The note is moved next to whatever it is explaining, so it is not left
+  // stranded at the top of the page once we scroll somewhere else.
+  function say(msg, before) {
+    var f = $('order-flash'); if (!f) return;
+    f.textContent = msg;
+    f.hidden = false;
+    if (before && before.parentNode) before.parentNode.insertBefore(f, before);
+    return f;
+  }
+
+  function bring(el) {
+    if (!el) return;
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    try { el.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'center' }); }
+    catch (e) { el.scrollIntoView(); }
+    el.classList.add('is-target');
+    setTimeout(function () { el.classList.remove('is-target'); }, 4000);
+  }
+
+  function applyBake() {
+    var bake = null;
+    try { bake = new URLSearchParams(window.location.search).get('bake'); } catch (e) { return; }
+    if (!bake) return;
+    bake = bake.slice(0, 120);
+
+    var hit = findBake(bake);
+    if (hit) {
+      if (!cart[hit.id]) cart[hit.id] = 1;
+      renderMenu(); renderCart();
+      var row = $('menu').querySelector('.menu-item[data-id="' + hit.id + '"]');
+      if (row) {
+        var fold = row.closest('.course-fold');
+        if (fold) fold.open = true;
+        say('Added one ' + hit.name + ' from the gallery. Change the quantity below, or keep choosing.', row);
+        bring(row);
+      }
+    } else {
+      var notes = $('notes');
+      if (notes) {
+        var line = 'From the gallery: ' + bake;
+        if (notes.value.indexOf(line) === -1) {
+          notes.value = notes.value ? notes.value.replace(/\s+$/, '') + '\n' + line : line;
+        }
+        say('“' + bake + '” is one of Amanda\u2019s specialties rather than a standing row, so we have noted it in your special requests. Add anything else you would like below.', notes.closest('.field') || notes);
+        bring(notes);
+      }
+    }
+    // so a refresh does not add it a second time
+    try { window.history.replaceState(null, '', window.location.pathname); } catch (e) { /* ignore */ }
+  }
+
   async function loadMenu() {
     try {
       var r = await fetch('/api/menu');
@@ -270,6 +343,7 @@
       return;
     }
     renderMenu(); renderCart();
+    applyBake();
   }
   loadMenu(); loadAvailability();
   setInterval(loadAvailability, 60000);

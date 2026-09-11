@@ -102,7 +102,10 @@ FORMS_CSS = """
 .order-step::before{content:'';position:absolute;inset:7px;border:1px solid var(--rule);opacity:.35;pointer-events:none}
 .order-step>*{position:relative}
 .order-step-head{display:flex;align-items:baseline;gap:var(--s4);margin-bottom:var(--s6);padding-bottom:var(--s4);border-bottom:1px solid var(--rule-soft)}
-.order-step-num{font-family:var(--serif);font-size:var(--lg);font-weight:600;color:var(--gold);min-width:1.4em}
+/* --gold is an ornament colour (2.8:1 on paper); numerals are read, so they
+   take the readable gold instead */
+.order-step-num{font-family:var(--serif);font-size:var(--lg);font-weight:600;color:var(--gold-read);min-width:1.4em}
+.opt{opacity:.68;letter-spacing:.1em;font-weight:400}
 .order-step h2{font-size:var(--lg);text-align:left;margin:0}
 .order-step-intro{font-size:var(--sm);opacity:.8;margin:calc(var(--s3) * -1) 0 var(--s6);max-width:56ch}
 .order-summary{position:sticky;top:120px;background:var(--paper-2);border:1px solid var(--rule);padding:var(--s8);box-shadow:var(--sh-md)}
@@ -141,6 +144,11 @@ FORMS_CSS = """
 
 /* a row with something in the basket earns a visible mark */
 .menu-item.is-chosen{background:var(--olive-pale);box-shadow:inset 3px 0 0 var(--olive)}
+/* arriving from a gallery photograph: say what happened, and show where */
+.order-flash{font-size:var(--sm);color:var(--burgundy-deep);background:var(--gold-pale);
+  border-left:3px solid var(--gold-read);padding:var(--s3) var(--s4);
+  margin:var(--s4) 0 var(--s5);max-width:64ch;border-radius:0 var(--r-sm) var(--r-sm) 0}
+.menu-item.is-target,textarea.is-target{outline:2px solid var(--burgundy);outline-offset:2px}
 .course-fold-body>.menu-item:last-child{border-bottom:0}
 
 /* ── the sticky tally: on a phone the summary is far below the fold, so the
@@ -242,6 +250,7 @@ ORDER = D.masthead("Order") + D.head_band("Ordina", "Place an Order",
           <section class="order-step">
             <div class="order-step-head"><span class="order-step-num">I</span><h2>Choose your bread</h2></div>
             <p class="order-step-intro">Everything is baked to order in small batches. Where a price is not shown yet, this is a quote request; Amanda confirms availability, any delivery or shipping cost, and the final total before payment.</p>
+            <p class="order-flash" id="order-flash" role="status" hidden></p>
             <div id="menu"><p class="empty">Loading the bill of fare&#8230;</p></div>
           </section>
 
@@ -282,8 +291,8 @@ ORDER = D.masthead("Order") + D.head_band("Ordina", "Place an Order",
           <div class="field"><label for="last-name">Last name</label><input id="last-name" name="lastName" autocomplete="family-name"><p class="err" data-for="last-name"></p></div>
         </div>
             <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email"><p class="err" data-for="email"></p></div>
-            <div class="field"><label for="phone">Phone <span style="opacity:.5;letter-spacing:.1em">(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel"></div>
-            <div class="field"><label for="notes">Anything we should know? <span style="opacity:.5;letter-spacing:.1em">(optional)</span></label>
+            <div class="field"><label for="phone">Phone <span class="opt">(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel"></div>
+            <div class="field"><label for="notes">Anything we should know? <span class="opt">(optional)</span></label>
               <textarea id="notes" name="notes" rows="3" placeholder="An occasion, an allergy, a favourite&#8230;"></textarea></div>
             <div class="order-submit">
               <button type="submit" class="btn btn-fill" id="submit">Send the Order</button>

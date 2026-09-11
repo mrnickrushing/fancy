@@ -15,8 +15,14 @@ import os, json
 OUT = os.path.dirname(os.path.abspath(__file__))
 
 FONTS = ('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?'
-         'family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700'
-         '&amp;family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500'
+         # Nothing in the stylesheet asks for a weight above 700, and italic
+         # Bodoni is only ever set at 500, so the axes are cut to what is
+         # actually drawn instead of shipping the whole range.
+         'family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..500'
+         # Asking for named instances makes Google serve a whole separate
+         # font file per weight — five files, 223KB of latin. A variable
+         # range covering the same weights is two files, 90KB.
+         '&amp;family=EB+Garamond:ital,wght@0,400..600;1,400..500'
          '&amp;family=Italianno&amp;display=swap">')
 
 TOKENS = """
@@ -276,7 +282,7 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
   border-bottom:1px solid var(--rule);padding-bottom:var(--s4);flex-wrap:wrap}
 .gal-title{font-size:var(--lg);text-align:left}
 .gal-fill{flex-grow:1}
-.gal-count{opacity:.55;font-size:.66rem;color:var(--ink)}
+.gal-count{opacity:.72;font-size:.66rem;color:var(--ink)}
 .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
   gap:var(--s8) var(--s6)}
 .gal-item{display:flex;flex-direction:column;min-width:0}
@@ -345,8 +351,12 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
 .lb-fig{display:flex;flex-direction:column;min-height:0}
 .lb-fig img{display:block;width:100%;min-height:0;max-height:70vh;object-fit:contain;
   background:var(--burgundy-ink)}
-.lb-cap{padding:var(--s5) var(--s6);border-top:1px solid var(--rule);text-align:left}
-.lb-note{font-size:var(--sm);opacity:.82;margin-top:var(--s1)}
+.lb-cap{padding:var(--s5) var(--s6);border-top:1px solid var(--rule);text-align:left;
+  display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:var(--s8)}
+.lb-cap > .caps{grid-column:1;grid-row:1}
+.lb-note{font-size:var(--sm);opacity:.82;margin-top:var(--s1);grid-column:1;grid-row:2}
+/* the point of the gallery: you can order the thing you are looking at */
+.lb-order{grid-column:2;grid-row:1 / 3;white-space:nowrap;align-self:center}
 .lb-close,.lb-nav{position:absolute;z-index:2;display:flex;align-items:center;
   justify-content:center;width:44px;height:44px;background:var(--paper-2);
   border:1px solid var(--rule);border-radius:50%;font-family:var(--serif);
@@ -359,10 +369,12 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
 @media (max-width:720px){
   .lb-stage{padding:0}
   .lb-panel{width:100%;height:100%;justify-content:center}
-  .lb-fig img{max-height:62vh}
+  .lb-fig img{max-height:56vh}
   .lb-close{top:var(--s3);right:var(--s3)}
   .lb-prev{left:var(--s3)}
   .lb-next{right:var(--s3)}
+  .lb-cap{grid-template-columns:1fr;row-gap:var(--s4);padding:var(--s4) var(--s5)}
+  .lb-order{grid-column:1;grid-row:auto;width:100%;text-align:center}
 }
 """
 TOKENS = TOKENS.replace("#71 1616", "#711616").replace("--ink-soft:#6E4staging;", "--ink-soft:#6E4432;")
@@ -1083,6 +1095,7 @@ LIGHTBOX = """
         <figcaption class="lb-cap">
           <p class="caps" id="lb-name"></p>
           <p class="lb-note" id="lb-note"></p>
+          <a class="btn btn-line lb-order" id="lb-order" href="./order.html">Order this</a>
         </figcaption>
       </figure>
     </div>
