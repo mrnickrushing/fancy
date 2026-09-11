@@ -202,10 +202,16 @@ for i in range(5):
                f"box-shadow:inset 0 1px 2px oklch(0 0 0/.35)}}}}")
 KEYFRAMES = "\n".join(_kf)
 
+from _scene import scene_svg  # the hill country behind the loader
+
 LOADER_CSS = f"""
 .stage{{position:relative;min-height:900px;display:flex;align-items:center;
-  justify-content:center;overflow:hidden;
-  background:radial-gradient(ellipse 92% 80% at 50% 42%,#5C1414 0%,#3A0C0C 46%,#240808 100%)}}
+  justify-content:center;overflow:hidden;background:#240808}}
+/* the hill country sits under a burgundy wash: present, never competing */
+.scene{{position:absolute;inset:0;width:100%;height:100%}}
+.wash{{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,oklch(.32 .13 28/.58) 0%,oklch(.25 .12 28/.74) 46%,
+    oklch(.15 .08 28/.92) 100%)}}
 .stage::after{{content:'';position:absolute;inset:0;pointer-events:none;opacity:.4;
   background-image:radial-gradient(oklch(.9 .08 75/.10) .6px,transparent .6px);
   background-size:4px 4px}}
@@ -307,11 +313,13 @@ def ring_badge(size=132, draw=True):
 
 LOADER = f"""
 <div class="stage">
+  {scene_svg()}
+  <div class="wash"></div>
   <div class="frame"></div>
   {CORNER % 'tl'}{CORNER % 'tr'}{CORNER % 'bl'}{CORNER % 'br'}
   <div class="vig"></div>
   <div class="load-in">
-    {logo_badge(214)}
+    {logo_badge(300)}
     <div class="mark" style="margin-top:var(--s6)">
       <p style="font-family:var(--script);font-size:4.6rem;line-height:.78;color:#F2DFC0">Oh! You Fancy</p>
       <p style="font-family:var(--serif);font-size:2.2rem;font-weight:700;letter-spacing:.3em;
@@ -424,7 +432,7 @@ FOOTER = f"""<footer style="background:var(--burgundy-ink);color:#D8BFA0;padding
   <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s12);
     border-top:1px solid oklch(1 0 0/.13);padding-top:var(--s12)">
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">The Bakery</p>
-      <p style="font-size:var(--sm);opacity:.82;max-width:36ch">Artisan focaccia baked by hand in Brookings, Oregon. Organic ingredients, a living sourdough starter, and small batches that sell out.</p></div>
+      <p style="font-size:var(--sm);opacity:.82;max-width:36ch">Artisan focaccia and sourdough baked by hand in Brookings, Oregon. Organic ingredients, a living starter, and small batches that sell out.</p></div>
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">Explore</p>
       <ul style="display:flex;flex-direction:column;gap:.5rem;font-size:var(--sm)">
       {''.join(f'<li><a href="#" style="color:#D8BFA0">{n}</a></li>' for n in NAV[1:])}</ul></div>
@@ -478,10 +486,11 @@ HOME = masthead("Home") + f"""
     <div>
       <p class="caps kicker kicker-l" style="color:var(--olive)">Artisan Breads</p>
       <h1 style="font-size:var(--xxxl);font-weight:700;line-height:1.02;margin-bottom:var(--s6)">
-        One bread,<br><span style="font-style:italic;font-weight:500">endlessly</span><br>argued over.</h1>
-      <p style="font-size:var(--lg);opacity:.78;max-width:40ch;margin-bottom:var(--s8);line-height:1.62">
-        We make focaccia. Only focaccia &#8212; savory and sweet, dimpled and blistered,
-        organic through and through, and every loaf shaped by hand on the southern Oregon coast.</p>
+        One starter,<br><span style="font-style:italic;font-weight:500">endlessly</span><br>argued over.</h1>
+      <p style="font-size:var(--lg);opacity:.78;max-width:42ch;margin-bottom:var(--s8);line-height:1.62">
+        Focaccia and sourdough, lifted by the same mother starter &#8212; savory and sweet,
+        dimpled and blistered, organic through and through, and every loaf shaped by hand
+        on the southern Oregon coast.</p>
       <div style="display:flex;gap:var(--s4);flex-wrap:wrap">
         <a href="#" class="btn btn-fill">See the Bill of Fare</a>
         <a href="#" class="btn btn-line">Find Us at the Market</a>
@@ -635,6 +644,7 @@ ABOUT = masthead("About") + head_band("La Nostra Storia","Welcome to Oh! You Fan
       <p style="opacity:.8;margin-bottom:var(--s5)">Oh! You Fancy Focaccia is a family-run bakery in Brookings, Oregon, on the Curry County coast.</p>
       <p style="opacity:.8;margin-bottom:var(--s5)">What started as a love of bread became a booth at the Brookings-Harbor Farmers Market &#8212; and then loaves going out to neighbours, friends, and folks far enough away that we had to start shipping.</p>
       <p style="opacity:.8;margin-bottom:var(--s5)">We bake savory and sweet focaccia with organic ingredients: olives and garlic and jalape&#241;o, sun-dried tomato and herbs, cinnamon and honey. We infuse our neighbours&#8217; pickles and drizzle our neighbours&#8217; honey.</p>
+      <p style="opacity:.8;margin-bottom:var(--s5)">The same mother starter goes into our sourdough loaves &#8212; mixed the day before, left to rise slow, and baked dark alongside everything else.</p>
       <p style="opacity:.8;margin-bottom:var(--s8)">Every Wednesday and Saturday the crates come out, the gold paper bags get filled, and we hand out samples until the last loaf is gone.</p>
       <div style="border-left:2px solid var(--burgundy);padding-left:var(--s6)">
         <p style="font-style:italic">Thank you to our customers, our friends, our family, and our Father in Heaven for supporting our small business.</p>
@@ -663,16 +673,19 @@ def fare(n, title, desc):
     return f"""<div class="fare"><span class="fare-n">{n}</span><div class="fare-b">
       <p class="fare-t"><span>{title}</span></p><p class="fare-d">{desc}</p></div></div>"""
 
-def course(title, ital, rows, cap):
+def course(title, ital, rows, cap=None):
+    """A run of the bill of fare. Without a photograph it runs full width —
+    better an honest single column than a gap where a picture should be."""
+    cols = "1fr 300px" if cap else "1fr"
     return f"""<div style="margin-bottom:var(--s20)">
-  <div style="display:grid;grid-template-columns:1fr 300px;gap:var(--s12);align-items:start">
+  <div style="display:grid;grid-template-columns:{cols};gap:var(--s12);align-items:start">
     <div>
       <p class="caps" style="color:var(--olive);margin-bottom:var(--s2)">{ital}</p>
       <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">{title}</h2>
       <div style="width:64px;height:2px;background:var(--burgundy);margin-bottom:var(--s4)"></div>
       {''.join(rows)}
     </div>
-    {shot(cap[0], 360, cap[1])}
+    {shot(cap[0], 360, cap[1]) if cap else ""}
   </div>
 </div>"""
 
@@ -686,19 +699,23 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
       fare("III","Roasted Garlic &amp; Sea Salt","Simple and perfect. Olive oil, roasted garlic and flaky salt on a pillowy sourdough crumb."),
       fare("IV","Cheesy Jalape&#241;o","Melted and bubbling, with jalape&#241;o baked right into the top."),
     ],("savory-round.webp","Jalapeno, olive and red onion focaccia"))}
+    {course("Sourdough","Il Pane",[
+      fare("V","The Country Loaf","Naturally leavened with the same starter that lifts the focaccia &#8212; mixed the day before, left to rise slow, and baked dark."),
+      fare("VI","Sourdough Through the Week","What goes into the oven changes with the week. Ask at the market table, or write ahead and we will set one by for you."),
+    ])}
     {course("Sweet","I Dolci",[
-      fare("V","Cinnamon Swirl with Vanilla Drizzle","A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze."),
-      fare("VI","Honey Focaccia Bites","Pull-apart bites, boxed and drizzled with award-winning Chetco Gold raw honey from right here on the Chetco River."),
+      fare("VII","Cinnamon Swirl with Vanilla Drizzle","A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze."),
+      fare("VIII","Honey Focaccia Bites","Pull-apart bites, boxed and drizzled with award-winning Chetco Gold raw honey from right here on the Chetco River."),
     ],("sweet-cinnamon.webp","Cinnamon swirl focaccia with vanilla drizzle"))}
     {course("Muffins &amp; Rolls","I Piccoli",[
-      fare("VII","Jalape&#241;o &amp; Roasted Garlic","Hand-sized, crisp-edged, crowned with jalape&#241;o and toasted garlic."),
-      fare("VIII","Peppered Pickle","Made with Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles infused right into the dough. Organic ingredients only."),
-      fare("IX","Sea Salt Rolls","Soft pull-apart rounds, olive-oil brushed and salt flaked."),
+      fare("IX","Jalape&#241;o &amp; Roasted Garlic","Hand-sized, crisp-edged, crowned with jalape&#241;o and toasted garlic."),
+      fare("X","Peppered Pickle","Made with Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles infused right into the dough. Organic ingredients only."),
+      fare("XI","Sea Salt Rolls","Soft pull-apart rounds, olive-oil brushed and salt flaked."),
     ],("muffins-jalapeno.webp","Jalapeno and roasted garlic focaccia muffins"))}
     {course("Focaccia Art","L&#8217;Arte",[
-      fare("X","Heart Loaves","Little hand-shaped hearts. They go fast."),
-      fare("XI","Flower Gardens","Hand-painted in vegetables and herbs &#8212; a whole garden across the top of the dough."),
-      fare("XII","Seasonal &amp; Custom","Tell us the occasion. We have made a great many things that were never on a list."),
+      fare("XII","Heart Loaves","Little hand-shaped hearts. They go fast."),
+      fare("XIII","Flower Gardens","Hand-painted in vegetables and herbs &#8212; a whole garden across the top of the dough."),
+      fare("XIV","Seasonal &amp; Custom","Tell us the occasion. We have made a great many things that were never on a list."),
     ],("heart-loaf.webp","A hand-shaped focaccia heart"))}
   </div>
 </section>
@@ -915,10 +932,12 @@ CONTACT = masthead("Contact") + head_band("Scrivici","We&#8217;d Love to Hear Fr
 # ══ MOBILE ════════════════════════════════════════════════════════════
 LOADER_M = f"""
 <div class="stage" style="min-height:844px">
+  {scene_svg()}
+  <div class="wash"></div>
   <div class="frame" style="inset:18px"></div>
   <div class="vig"></div>
   <div class="load-in">
-    {logo_badge(150)}
+    {logo_badge(196)}
     <div class="mark" style="margin-top:var(--s5)">
       <p style="font-family:var(--script);font-size:3.1rem;line-height:.78;color:#F2DFC0">Oh! You Fancy</p>
       <p style="font-family:var(--serif);font-size:1.4rem;font-weight:700;letter-spacing:.3em;
@@ -961,8 +980,8 @@ MOBILE = f"""
 <section style="background:var(--paper);padding:var(--s12) var(--s5)">
   <p class="caps kicker" style="color:var(--olive);font-size:.66rem">Artisan Breads</p>
   <h1 style="font-size:2.6rem;line-height:1.04;text-align:center;margin-bottom:var(--s5)">
-    One bread,<br><span style="font-style:italic;font-weight:500">endlessly</span><br>argued over.</h1>
-  <p style="text-align:center;opacity:.78;margin-bottom:var(--s6)">We make focaccia. Only focaccia &#8212; dimpled, blistered, organic, and shaped by hand.</p>
+    One starter,<br><span style="font-style:italic;font-weight:500">endlessly</span><br>argued over.</h1>
+  <p style="text-align:center;opacity:.78;margin-bottom:var(--s6)">Focaccia and sourdough from one mother starter &#8212; dimpled, blistered, organic, and shaped by hand.</p>
   <a href="#" class="btn btn-fill" style="width:100%">See the Bill of Fare</a>
   {shot("hero-garden.webp",340,"Focaccia painted in herbs and vegetables","shot-oval","margin-top:var(--s8)")}
 </section>
@@ -1037,7 +1056,7 @@ canvas = {"artboards":[
   {"file":"Reviews.dc.html","x":1560,"y":11380,"w":1440,"h":3300,"title":"Reviews","print":"flow"},
   {"file":"Contact.dc.html","x":0,"y":19200,"w":1440,"h":3700,"title":"Contact","print":"flow"}],
  "annotations":[
-  {"id":"loader","x":-480,"y":0,"w":400,"text":"LOADING SCREEN — animates live, on a 9s loop.\n\nThe ring strokes itself on like a stamp pressed into a label, then the five things focaccia is made of arrive in turn — Farina, Acqua, Olio d'Oliva, Sale, Tempo — while a dimple presses into the dough for each one. That row of dimples IS the progress bar.\n\nSugar Haus types a terminal; this proofs dough."},
+  {"id":"loader","x":-480,"y":0,"w":400,"text":"LOADING SCREEN — animates live, on a 9s loop.\n\nThe ring strokes itself on like a stamp pressed into a label, then the five things focaccia is made of arrive in turn — Farina, Acqua, Olio d'Oliva, Sale, Tempo — while a dimple presses into the dough for each one. That row of dimples IS the progress bar.\n\nBehind it, the hill country from the label, drawn as vector and sunk under a burgundy wash. Sugar Haus types a terminal; this proofs dough."},
   {"id":"identity","x":-480,"y":330,"w":400,"text":"OWN IDENTITY, not a Sugar Haus reskin.\n\nType: Bodoni Moda — the Italian didone — with EB Garamond and Italianno. Sugar Haus uses Playfair/Lora/Work Sans.\n\nAnatomy: centred label masthead, oval cartouches, an enamel market sign, a bill of fare with dotted leaders, vertical spine rails. Sugar Haus uses a left-logo navbar and centred card grids."},
   {"id":"gaps","x":-480,"y":700,"w":400,"text":"Palette is the logo's: burgundy #8E1B1B, olive #4E6023, gold #B8862F, paper #F4EFE2.\n\nEvery tan panel is a photo slot. Bracketed text marks the two facts we do not have — prices and a phone number. Nothing invented."}],
  "launch":{"view":"canvas"}}

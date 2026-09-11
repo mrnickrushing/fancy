@@ -212,8 +212,15 @@ img{max-width:100%;height:auto}
 @media print{.splash{display:none!important}}
 
 .splash{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;
-  overflow:hidden;background:radial-gradient(ellipse 92% 80% at 50% 42%,#5C1414,#3A0C0C 46%,#240808);
+  overflow:hidden;background:#240808;
   transition:opacity .85s var(--ease),visibility .85s var(--ease)}
+/* the hill country drifts in and settles, the way a curtain lifts on it */
+.splash .scene{position:absolute;inset:0;width:100%;height:100%;opacity:0;transform:scale(1.07);
+  transition:opacity 1.8s var(--ease),transform 12s linear}
+.splash .scene.on{opacity:1;transform:scale(1)}
+.splash .wash{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,oklch(.32 .13 28/.58) 0%,oklch(.25 .12 28/.74) 46%,
+    oklch(.15 .08 28/.92) 100%)}
 .splash[hidden]{opacity:0;visibility:hidden;pointer-events:none;display:flex}
 .splash::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.4;
   background-image:radial-gradient(oklch(.9 .08 75/.10) .6px,transparent .6px);background-size:4px 4px}
@@ -249,8 +256,22 @@ img{max-width:100%;height:auto}
 .splash-skip.on{opacity:1}
 body.splashing{overflow:hidden}
 @media (max-width:640px){
-  .ing-w{font-size:1.8rem}.ing-rail{height:76px}
+  .ing-w{font-size:1.8rem}.ing-rail{height:76px;margin-top:var(--s6)}
   .splash .frame{inset:16px}
+  .splash-badge{width:172px;height:172px}
+  .splash-in p[style*="var(--script)"]{font-size:3.1rem!important}
+  .splash-in p[style*="uppercase"][style*="2.2rem"]{font-size:1.3rem!important}
+  .splash-tag{margin-top:var(--s6)!important}
+  .splash-enter{margin-top:var(--s6)!important}
+  /* a phone has no keyboard to press, and the line only crowds the button */
+  .splash-skip{display:none}
+}
+/* a laptop lid is often shorter than the column is tall — give it back.
+   Phones are handled above; this is only for short, wide screens. */
+@media (min-width:641px) and (max-height:860px){
+  .splash-badge{width:224px;height:224px}
+  .ing-rail{height:80px;margin-top:var(--s6)}
+  .splash-tag{margin-top:var(--s6)!important}
 }
 @media (prefers-reduced-motion:reduce){
   .splash-ring circle.draw{stroke-dashoffset:0}
