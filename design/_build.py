@@ -996,13 +996,13 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
 GAL_SECTIONS = [
  ("I Salati","Savory", [
    ("savory-round.webp","Jalape&#241;o, Olive &amp; Red Onion","Specialty made to order.",300),
-   ("jalapeno-garlic-round.webp","Jalape&#241;o &amp; Roasted Garlic","Toasted garlic right across the top.",300),
+   ("jalapeno-garlic-round.webp","The Jalape&#241;o, Garlic and Onion Focaccia","Jalape&#241;o, garlic and onion.",300),
    ("jalapeno-dimpled.webp","The Jalape&#241;o n Chedda n Garlic","Jalape&#241;o, cheddar and garlic, baked into a golden dimpled round.",300),
    ("scallion-chili.webp","The Asian Crisp","Crunchy garlics and onions, chili peppers, sesame seeds, mushroom powder, scallions and an agave drizzle.",280),
    ("tomato-olive-round.webp","Tomato, Olive &amp; Onion","Specialty made to order.",300),
    ("olive-tomato.webp","Olive &amp; Sun-Dried Tomato","Specialty made to order.",300),
    ("garlic-herb-round.webp","The Italiano","The true Italian focaccia. Focaccia originated in Rome, Italy, and you can taste it in this loaf. Sage, oregano, thyme, basil and garlic.",280),
-   ("lemon-pepper.webp","Lemon Pepper &amp; Garlic","Cracked pepper, lemon zest, plenty of oil.",300),
+   ("lemon-pepper.webp","The Lemon Pepper","Black pepper with lemon extract from Meyer lemons, garlic and onion.",300),
    ("square-focaccia.webp","The Roasted Garlic Boss","True garlic lovers want this one. Roasted garlic, garlic oil and minced garlic.",300)]),
  ("Le Teglie","Slabs &amp; Pans", [
    ("olive-slab.webp","The Mediterranean Olive","Olive variety and sun dried tomatoes.",400),
@@ -1013,10 +1013,12 @@ GAL_SECTIONS = [
  ("Le Spirali","Swirls", [
    ("jalapeno-swirl-xl.webp","Jalape&#241;o, Garlic and Chedda Sourdough","Jalape&#241;o, garlic and cheddar wound through a sourdough spiral.",300),
    ("swirl-jalapeno.webp","Jalape&#241;o Swirl","Layer on layer, blistered at the edge.",300),
+   ("classic-sourdough.webp","The Classic Sourdough","The loaf everything else is built on.",300),
+   ("garlic-rosemary-sourdough.webp","The Roasted Garlic and Rosemary Sourdough","Roasted garlic and rosemary, wound through the spiral.",300),
    ("plain-swirl.webp","Classic Artisan Celtic Salted Sourdough","Nothing on it but Celtic salt.",300),
    ("caramel-swirl.webp","The Mediterranean Sourdough","Sun dried tomato and olive variety.",300)]),
  ("I Piccoli","Muffins &amp; Rolls", [
-   ("muffins-jalapeno.webp","Jalape&#241;o &amp; Garlic Muffins","Hand-sized, crowned with toasted garlic.",300),
+   ("muffins-jalapeno.webp","The Jalape&#241;o, Garlic and Onion Focaccia Muffins","Jalape&#241;o, garlic and onion, hand-sized.",300),
    ("parm-muffins.webp","The Roasted Garlic Focaccia Muffins","Roasted garlic, hand-sized.",300),
    ("sea-salt-round.webp","The Plain Jane Celtic Salted Focaccia Muffin","Celtic salt, and nothing else.",300),
    ("herb-rolls.webp","The Italiano Focaccia Muffins","The Italiano in muffin form &#8212; sage, oregano, thyme, basil and garlic.",300)]),
@@ -1084,7 +1086,7 @@ LIGHTBOX = """
 </dialog>"""
 
 GALLERY = masthead("Gallery") + head_band("La Galleria","Fresh From the Oven",
-  "Twenty-nine bakes, straight from the tray and straight from the market table.") + f"""
+  "Thirty-one bakes, straight from the tray and straight from the market table.") + f"""
 <section class="sec" style="background:var(--paper)">
   <div class="wrap">
     {"".join(gal_block(k,t,items) for k,t,items in GAL_SECTIONS)}

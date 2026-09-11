@@ -11,6 +11,7 @@ import os, io, sys
 
 SRC = "/root/.claude/uploads/01dc96a3-a6dd-5803-8a08-d1aa320808c5"
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "img")
+ROOT_SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "src")
 TARGET = 68 * 1024
 
 def fit(im, path, lo=38, hi=90, target=TARGET):
@@ -106,6 +107,13 @@ JOBS = [
     ("ee579750", "cinnamon-drizzle-2", 520),
 ]
 
+# Bakes whose only copy came through a screenshot, cropped into design/src
+# rather than sitting in the upload set. Same budget, same encoder.
+SRC_JOBS = [
+    ("classic-sourdough", 560),
+    ("garlic-rosemary-sourdough", 560),
+]
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     if sys.argv[1:] == ["splash"]:          # the photo alone; the bakes need the upload set
@@ -118,6 +126,9 @@ if __name__ == "__main__":
         if not os.path.exists(src):
             src = f"{SRC}/{stem}-image.jpg"
         size, q, n = fit_dim(src, name, w)
+        print(f"{name+'.webp':<24}{size[0]}x{size[1]:<5} q{q}  {n//1024}KB")
+    for name, w in SRC_JOBS:
+        size, q, n = fit_dim(f"{ROOT_SRC}/{name}.png", name, w)
         print(f"{name+'.webp':<24}{size[0]}x{size[1]:<5} q{q}  {n//1024}KB")
     tot = sum(os.path.getsize(f"{OUT}/{f}") for f in os.listdir(OUT))
     print(f"\nTOTAL {tot//1024}KB / {len(os.listdir(OUT))} files")
