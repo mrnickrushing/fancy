@@ -40,6 +40,10 @@ def _smooth(pts, base_close=True):
 
 
 def _ridge(pts, fill, op=1.0):
+    """One filled range of hills, drawn through `pts` and closed to the bottom.
+
+    Each ridge is opaque below its own skyline, so they are painted back to
+    front and the nearer one simply covers what is behind it."""
     o = "" if op == 1 else f' opacity="{op}"'
     return f'<path d="{_smooth(pts)}" fill="{fill}"{o}/>'
 

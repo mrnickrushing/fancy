@@ -14,6 +14,12 @@ OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "img")
 TARGET = 68 * 1024
 
 def fit(im, path, lo=38, hi=90, target=TARGET):
+    """Write `im` as WebP at the highest quality that stays inside `target`.
+
+    Binary search rather than a fixed quality: a flat-lit round and a
+    heavily-blistered crust land decades apart on the quality scale for the
+    same file size. Returns (quality, bytes), or None if even `lo` overshoots
+    — which is the caller's signal to reduce the dimensions instead."""
     best = None
     while lo <= hi:
         q = (lo + hi) // 2
