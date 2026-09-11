@@ -166,9 +166,9 @@ img{max-width:100%;height:auto}
 @media (max-width:640px){
   .ribbon-full{display:none}
   .ribbon-short{display:inline}
-  .brand-script{font-size:2.1rem}
-  .brand-caps{font-size:.84rem;letter-spacing:.26em}
-  .brand-mark{width:48px;height:48px}
+  .brand-script{font-size:2.9rem}
+  .brand-caps{font-size:1.02rem;letter-spacing:.28em}
+  .brand-mark{width:54px;height:54px}
   .brand-row{gap:var(--s4);padding-inline:var(--s4)}
 }
 @media print{.splash{display:none!important}}
