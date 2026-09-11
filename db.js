@@ -145,6 +145,15 @@ async function initSchema() {
       CONSTRAINT admin_credentials_single_row CHECK (id = 1)
     );
   `);
+  // Amanda's phone, so a new order can reach her away from the laptop. The
+  // app re-registers on every launch, which is what last_seen_at records.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS push_tokens (
+      token TEXT PRIMARY KEY,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+  `);
   await seedMenu();
   await ensureCatalogItems();
   await backfillMenuPrices();
@@ -681,6 +690,24 @@ async function setAdminCredentials(username, passwordHash) {
     [username, passwordHash]);
 }
 
+// ── push tokens ─────────────────────────────────────────────────────────
+// Registering an already-known token is a heartbeat, not an error, so the
+// insert upserts rather than conflicting.
+async function savePushToken(token) {
+  await pool.query(
+    `INSERT INTO push_tokens (token) VALUES ($1)
+     ON CONFLICT (token) DO UPDATE SET last_seen_at = now()`, [token]);
+}
+// Ordered, because the send maps Expo's ticket array back onto this list by
+// index to find out which device a failure belongs to.
+async function listPushTokens() {
+  const { rows } = await pool.query(`SELECT token FROM push_tokens ORDER BY created_at`);
+  return rows.map((r) => r.token);
+}
+async function deletePushToken(token) {
+  await pool.query(`DELETE FROM push_tokens WHERE token = $1`, [token]);
+}
+
 module.exports = {
   pool, initSchema, toIsoDate, COURSES, SETTINGS_DEFAULTS, MENU_SEED,
   getSettings, setSettings,
@@ -692,4 +719,5 @@ module.exports = {
   getCustomers, deleteCustomer,
   createReview, listApprovedReviews, listAllReviews, setReviewStatus, deleteReview,
   getAdminCredentials, setAdminCredentials,
+  savePushToken, listPushTokens, deletePushToken,
 };

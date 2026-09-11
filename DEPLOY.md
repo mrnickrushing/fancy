@@ -24,6 +24,28 @@ Merges to `main` deploy themselves.
 | `ORDERS_INBOX` | Where new website-order notices go |
 | `EMAIL_FROM` | The sender. Must be on a domain verified in Resend |
 | `RESEND_API_KEY` | Resend API key for transactional email. Without it, orders still save and the admin works, but nothing is emailed — the Settings tab says so |
+| `ADMIN_RATE_LIMIT` | Rejected admin credentials per 15 minutes, default 20. Only a 401 spends the budget, so the phone app — which sends its password on every request — is not locked out by ordinary validation errors |
+
+## The phone app
+
+`app/` is Amanda's admin as an Expo app. It is served by nothing here: Railway
+runs only `npm start`, and `express.static` serves `public/`, so the app
+directory is not web-reachable. It talks to this server over the public API.
+
+Two things on the server exist for it:
+
+- **HTTP Basic on `/api/admin`.** The browser admin presents a session cookie;
+  the app holds no cookie and presents Basic on every request. Both are
+  accepted, and both run through the same `checkLogin`, so a password changed
+  from the Settings tab moves the app over at the same moment.
+- **`push_tokens`, and `POST`/`DELETE /api/admin/push-token`.** A website order
+  pushes to every registered device through Expo. The push is deliberately not
+  awaited: it can never delay or fail the order the customer is waiting on, and
+  a token Expo reports as `DeviceNotRegistered` is dropped.
+
+The app ships through EAS as `@rushingtechnologies/ohyoufancyfocaccia-admin`,
+and reaches the App Store as **Bread Lady** (Apple ID `6811223231`). Its own
+build, submit and over-the-air update commands are in `app/README.md`.
 
 The `Postgres` service carries `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` and
 `PGDATA=/var/lib/postgresql/data/pgdata` (the official image needs the data
