@@ -724,37 +724,67 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
 """ + FOOTER
 
 # ══ GALLERY ═══════════════════════════════════════════════════════════
-GAL = [
- ("swirl-jalapeno.webp","Jalape&#241;o Cheese Swirl","Spiralled, layered and blistered at the edge.",300),
- ("heart-loaf.webp","Heart Loaf","Little hand-shaped hearts. They go fast.",300),
- ("art-garden.webp","Flower Garden","Painted in herbs and vegetables, one stem at a time.",395),
- ("sweet-cinnamon.webp","Cinnamon Swirl","A whole pan, pulled apart in ridges and glazed.",430),
- ("savory-round.webp","Jalape&#241;o, Olive &amp; Red Onion","The round people recognise us by.",300),
- ("honey-bites.webp","Honey Bites","Boxed, and drizzled with Chetco Gold raw honey.",360),
- ("olive-slab.webp","Olive Slab","Green and kalamata, pressed into the dimples.",400),
- ("muffins-jalapeno.webp","Jalape&#241;o &amp; Garlic Muffins","Hand-sized, crowned with toasted garlic.",300),
- ("lemon-pepper.webp","Lemon Pepper &amp; Garlic","Cracked pepper, lemon zest, plenty of oil.",300),
- ("rosemary-slab.webp","Rosemary &amp; Sea Salt","The plain one. Hardest to get right.",390),
- ("cheesy-jalapeno.webp","Cheesy Jalape&#241;o","Melted, bubbling, baked right into the top.",280),
- ("herb-rolls.webp","Herb Rolls","Sage, rosemary and garlic, pulled apart warm.",300),
- ("olive-tomato.webp","Olive &amp; Sun-Dried Tomato","Crisp at the edge, soft through the middle.",300),
- ("skillet.webp","Skillet Focaccia","Baked in cast iron, green with herbs.",240),
- ("sea-salt-round.webp","Sea Salt Round","Olive-oil brushed, salt flaked, still warm.",300),
- ("parm-muffins.webp","Garlic Parmesan Muffins","Crisp-edged and golden all over.",300),
- ("caramel-swirl.webp","Caramelised Swirl","Dark at the edges, glossy, unwinding in rings.",300)]
+GAL_SECTIONS = [
+ ("I Salati","Savory", [
+   ("savory-round.webp","Jalape&#241;o, Olive &amp; Red Onion","The round people recognise us by.",300),
+   ("jalapeno-garlic-round.webp","Jalape&#241;o &amp; Roasted Garlic","Toasted garlic right across the top.",300),
+   ("jalapeno-dimpled.webp","Jalape&#241;o, Dimpled","Deep wells, with the oil pooling in them.",300),
+   ("cheesy-jalapeno.webp","Cheesy Jalape&#241;o","Melted and bubbling, baked into the crust.",280),
+   ("tomato-olive-round.webp","Tomato, Olive &amp; Onion","Cherry tomatoes burst against the dough.",300),
+   ("olive-tomato.webp","Olive &amp; Sun-Dried Tomato","Crisp at the edge, soft through the middle.",300),
+   ("garlic-herb-round.webp","Garlic &amp; Herb","Green with herbs, gold underneath.",280),
+   ("lemon-pepper.webp","Lemon Pepper &amp; Garlic","Cracked pepper, lemon zest, plenty of oil.",300),
+   ("sea-salt-round.webp","Sea Salt Round","Olive-oil brushed, salt flaked, still warm.",300),
+   ("square-focaccia.webp","Square Cut","Baked in the pan, corners and all.",300)]),
+ ("Le Teglie","Slabs &amp; Pans", [
+   ("olive-slab.webp","Olive Slab","Green and kalamata, pressed into the dimples.",400),
+   ("rosemary-slab.webp","Rosemary &amp; Sea Salt","The plain one. Hardest to get right.",390),
+   ("rosemary-oval.webp","Rosemary Oval","Hand-stretched long rather than round.",380),
+   ("skillet.webp","Skillet Focaccia","Baked in cast iron, green with herbs.",240),
+   ("wide-slab.webp","The Long Tray","What a market morning looks like.",250)]),
+ ("Le Spirali","Swirls", [
+   ("jalapeno-swirl-xl.webp","Jalape&#241;o Cheese Swirl","Cheese caught and caramelised in the coils.",300),
+   ("swirl-jalapeno.webp","Jalape&#241;o Swirl","Layer on layer, blistered at the edge.",300),
+   ("plain-swirl.webp","The Plain Swirl","No toppings to hide behind.",300),
+   ("caramel-swirl.webp","Caramelised Swirl","Dark at the edges, glossy, unwinding in rings.",300)]),
+ ("I Piccoli","Muffins &amp; Rolls", [
+   ("muffins-jalapeno.webp","Jalape&#241;o &amp; Garlic Muffins","Hand-sized, crowned with toasted garlic.",300),
+   ("parm-muffins.webp","Garlic Parmesan Muffins","Crisp-edged and golden all over.",300),
+   ("herb-rolls.webp","Herb Rolls","Sage, rosemary and garlic, pulled apart warm.",300)]),
+ ("I Dolci","Sweet", [
+   ("sweet-cinnamon.webp","Cinnamon Swirl","A whole pan, pulled apart in ridges and glazed.",420),
+   ("cinnamon-drizzle-2.webp","Cinnamon, Drizzled","Vanilla glaze laid across the top in ribbons.",410),
+   ("cinnamon-dark.webp","Deep Cinnamon","Taken further in the oven, glossy and dark.",400),
+   ("honey-bites.webp","Honey Bites","Boxed, and drizzled with Chetco Gold raw honey.",360)]),
+ ("L&#8217;Arte","Focaccia Art", [
+   ("heart-loaf.webp","Heart Loaf","Little hand-shaped hearts. They go fast.",300),
+   ("art-garden.webp","Flower Garden","Painted in herbs and vegetables, one stem at a time.",395),
+   ("hero-garden.webp","Flower Garden, Again","No two are ever laid out the same way.",390)]),
+]
+
+def gal_block(kicker, title, items):
+    figs = "".join(
+      f'<figure style="break-inside:avoid;margin-bottom:var(--s8)">'
+      f'<div class="shot" style="height:{h}px"><img src="{f}" alt="{n}"></div>'
+      f'<figcaption style="padding-top:var(--s4);border-top:1px solid var(--rule-soft);'
+      f'margin-top:var(--s3)">'
+      f'<p class="caps" style="font-size:.66rem">{n}</p>'
+      f'<p style="font-size:var(--sm);opacity:.72;font-style:italic;margin-top:var(--s1)">{c}</p>'
+      f'</figcaption></figure>' for f,n,c,h in items)
+    return (f'<div style="margin-bottom:var(--s16)">'
+      f'<div style="display:flex;align-items:baseline;gap:var(--s5);margin-bottom:var(--s8);'
+      f'border-bottom:1px solid var(--rule);padding-bottom:var(--s4)">'
+      f'<p class="caps" style="color:var(--olive)">{kicker}</p>'
+      f'<h2 style="font-size:var(--lg);text-align:left">{title}</h2>'
+      f'<span style="flex-grow:1"></span>'
+      f'<p class="caps" style="opacity:.42;font-size:.64rem">{len(items)} bakes</p></div>'
+      f'<div style="columns:4;column-gap:var(--s6)">{figs}</div></div>')
 
 GALLERY = masthead("Gallery") + head_band("La Galleria","Fresh From the Oven",
-  "Straight from the tray, and straight from the market table.") + f"""
+  "Twenty-nine bakes, straight from the tray and straight from the market table.") + f"""
 <section class="sec" style="background:var(--paper)">
   <div class="wrap">
-    <div style="columns:3;column-gap:var(--s6)">
-      {''.join(f'''<figure style="break-inside:avoid;margin-bottom:var(--s8)">
-        <div class="shot" style="height:{h}px"><img src="{f}" alt="{n}"></div>
-        <figcaption style="padding-top:var(--s4);border-top:1px solid var(--rule-soft);margin-top:var(--s3)">
-          <p class="caps" style="font-size:.68rem">{n}</p>
-          <p style="font-size:var(--sm);opacity:.72;font-style:italic;margin-top:var(--s1)">{c}</p>
-        </figcaption></figure>''' for f,n,c,h in GAL)}
-    </div>
+    {"".join(gal_block(k,t,items) for k,t,items in GAL_SECTIONS)}
   </div>
 </section>
 
@@ -987,7 +1017,7 @@ PAGES = [
   ("Phone",       MOBILE,    390, 3550, ""),
   ("About",       ABOUT,    1440, 3900, ""),
   ("Breads",      BREADS,   1440, 4900, ""),
-  ("Gallery",     GALLERY,  1440, 3400, ""),
+  ("Gallery",     GALLERY,  1440, 7600, ""),
   ("Reviews",     REVIEWS,  1440, 3300, ""),
   ("Contact",     CONTACT,  1440, 3700, ""),
 ]
@@ -1003,9 +1033,9 @@ canvas = {"artboards":[
   {"file":"Phone.dc.html","x":1560,"y":1060,"w":390,"h":3550,"title":"Home - phone","print":"flow"},
   {"file":"About.dc.html","x":0,"y":6320,"w":1440,"h":3900,"title":"About","print":"flow"},
   {"file":"Breads.dc.html","x":1560,"y":6320,"w":1440,"h":4900,"title":"Bill of Fare","print":"flow"},
-  {"file":"Gallery.dc.html","x":0,"y":11380,"w":1440,"h":3400,"title":"Gallery","print":"flow"},
+  {"file":"Gallery.dc.html","x":0,"y":11380,"w":1440,"h":7600,"title":"Gallery","print":"flow"},
   {"file":"Reviews.dc.html","x":1560,"y":11380,"w":1440,"h":3300,"title":"Reviews","print":"flow"},
-  {"file":"Contact.dc.html","x":0,"y":14940,"w":1440,"h":3700,"title":"Contact","print":"flow"}],
+  {"file":"Contact.dc.html","x":0,"y":19200,"w":1440,"h":3700,"title":"Contact","print":"flow"}],
  "annotations":[
   {"id":"loader","x":-480,"y":0,"w":400,"text":"LOADING SCREEN — animates live, on a 9s loop.\n\nThe ring strokes itself on like a stamp pressed into a label, then the five things focaccia is made of arrive in turn — Farina, Acqua, Olio d'Oliva, Sale, Tempo — while a dimple presses into the dough for each one. That row of dimples IS the progress bar.\n\nSugar Haus types a terminal; this proofs dough."},
   {"id":"identity","x":-480,"y":330,"w":400,"text":"OWN IDENTITY, not a Sugar Haus reskin.\n\nType: Bodoni Moda — the Italian didone — with EB Garamond and Italianno. Sugar Haus uses Playfair/Lora/Work Sans.\n\nAnatomy: centred label masthead, oval cartouches, an enamel market sign, a bill of fare with dotted leaders, vertical spine rails. Sugar Haus uses a left-logo navbar and centred card grids."},

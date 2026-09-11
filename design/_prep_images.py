@@ -70,6 +70,16 @@ JOBS = [
     ("3ff24cb1", "olive-tomato", 540), ("ca877ee9", "skillet", 560),
     ("d820daaa", "wide-slab", 900), ("093008b5", "parm-muffins", 560),
     ("10815106", "caramel-swirl", 600),
+    ("02d0f819", "jalapeno-swirl-xl", 600),
+    ("791fd729", "jalapeno-garlic-round", 560),
+    ("33e81866", "jalapeno-dimpled", 560),
+    ("7453f7b8", "tomato-olive-round", 560),
+    ("596ef3d4", "garlic-herb-round", 560),
+    ("474db0bc", "rosemary-oval", 520),
+    ("9dbee8ae", "plain-swirl", 560),
+    ("a64338e8", "square-focaccia", 560),
+    ("b031a6e9", "cinnamon-dark", 520),
+    ("ee579750", "cinnamon-drizzle-2", 520),
 ]
 
 if __name__ == "__main__":

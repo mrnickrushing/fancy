@@ -1,8 +1,6 @@
 # Photography
 
-All 30 images Amanda supplied are catalogued here. Twenty are embedded in the
-canvas; the rest are near-duplicates of what is already in, held for when the
-real site gets built.
+All 30 images Amanda supplied are catalogued here. **All 29 product shots are embedded**, plus the logo. Nothing is held back.
 
 ## Preparing images for the canvas
 
@@ -14,28 +12,40 @@ WebP at a searched quality does the work. Heavily-textured crusts resist
 compression, so two images (`hero-garden`, `sweet-cinnamon`) bottomed out at
 minimum quality and had to be reduced in pixel dimensions instead.
 
-Current total: **1.4 MB across 20 files**, seeded page ~4.4 MB.
+Current total: **2.0 MB across 30 files**, seeded page ~5.1 MB (cap is 16 MB).
 
-## In use
+## The gallery
 
-| File | Shows | Where |
-|---|---|---|
-| `logo.webp` | The label, cropped to its circle with the white ground masked out | Loading screen, masthead, footer |
-| `hero-garden.webp` | Flower-garden focaccia | Home hero oval, phone hero |
-| `art-garden.webp` | Flower-garden focaccia, second cut | About oval, gallery |
-| `savory-round.webp` | Jalapeño, olive, red onion | Home, Bill of Fare (Savory) |
-| `sweet-cinnamon.webp` | Cinnamon swirl with vanilla drizzle | Home, Bill of Fare (Sweet) |
-| `muffins-jalapeno.webp` | Jalapeño & garlic muffins | Bill of Fare (Muffins) |
-| `heart-loaf.webp` | Hand-shaped heart | Bill of Fare (Focaccia Art) |
-| `honey-bites.webp` | Honey bites boxed, with the Chetco Gold jar | Gallery |
-| `wide-slab.webp` | Wide olive & tomato slab | Behind the market sign band |
-| `caramel-swirl.webp` · `swirl-jalapeno.webp` · `olive-slab.webp` · `lemon-pepper.webp` · `cheesy-jalapeno.webp` · `rosemary-slab.webp` · `herb-rolls.webp` · `olive-tomato.webp` · `skillet.webp` · `sea-salt-round.webp` · `parm-muffins.webp` | | Gallery |
+Twenty-nine bakes, grouped into six courses rather than one flat wall:
 
-## Held back
+| Course | Count |
+|---|---|
+| I Salati — Savory | 10 |
+| Le Teglie — Slabs & Pans | 5 |
+| Le Spirali — Swirls | 4 |
+| I Piccoli — Muffins & Rolls | 3 |
+| I Dolci — Sweet | 4 |
+| L'Arte — Focaccia Art | 3 |
 
-Duplicates and near-variants not yet placed — plain swirls, a second cinnamon
-slab, additional rounds and slabs. They are all in the session upload folder and
-can be added if the gallery wants more.
+## Carrying the brand
+
+| File | Where |
+|---|---|
+| `logo.webp` | Loading screen, masthead, footer — cropped to its circle, white ground masked to alpha |
+| `hero-garden.webp` | Home hero oval, phone hero |
+| `art-garden.webp` | About oval |
+| `savory-round.webp` | Home board, Bill of Fare (Savory) |
+| `sweet-cinnamon.webp` | Home board, Bill of Fare (Sweet) |
+| `muffins-jalapeno.webp` | Bill of Fare (Muffins) |
+| `heart-loaf.webp` | Bill of Fare (Focaccia Art) |
+| `wide-slab.webp` | Darkened behind the market sign band |
+
+## Captions
+
+Written from what is visible in each photograph. Where a flavour is not stated
+anywhere in the source material it is described by appearance instead — the dark
+swirl is "caramelised," not "cinnamon," because nothing confirms which it is.
+Correct any that are wrong.
 
 ## Still missing
 
