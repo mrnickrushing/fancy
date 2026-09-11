@@ -25,14 +25,12 @@
 <body>
 
 <a class="skip-link" href="#site-content">Skip to content</a>
-<div id="site-content"><div style="background:var(--burgundy-ink);color:var(--gold-pale);
-  text-align:center;padding:.55rem" class="caps">
-  Brookings-Harbor Farmers Market &#183; Wednesdays &amp; Saturdays &#183; 9am &#8216;til sold out</div>
-<header style="background:var(--paper);border-bottom:1px solid var(--rule);
-  padding-block:var(--s8) 0;position:sticky;top:0;z-index:50;
-  backdrop-filter:blur(12px)">
-  <div style="text-align:center">
-    <div class="brand-row" style="display:flex;align-items:center;justify-content:center;gap:var(--s6)">
+<div id="site-content"><div class="ribbon caps">
+  <span class="ribbon-full">Brookings-Harbor Farmers Market &#183; Wednesdays &amp; Saturdays &#183; 9am &#8216;til sold out</span>
+  <span class="ribbon-short">Wed &amp; Sat &#183; from 9am</span></div>
+<header class="mast">
+  <div class="mast-in">
+    <div class="brand-row">
       <svg width="120" height="34" viewBox="0 0 190 34" aria-hidden="true">
 <g fill="none" stroke="#4E6023" stroke-width="1.2" stroke-linecap="round">
 <path d="M2 17C40 17 82 14 126 9"/>
@@ -44,11 +42,10 @@
 <g fill="#4E6023">
 <ellipse cx="116" cy="10" rx="4" ry="5.2" transform="rotate(28 116 10)"/>
 <ellipse cx="130" cy="7" rx="4" ry="5.2" transform="rotate(28 130 7)" opacity=".68"/></g></svg>
-      <img src="./img/logo.webp" alt="" style="width:62px;height:62px;border-radius:50%;flex-shrink:0">
-      <a href="./" style="display:block">
-        <p style="font-family:var(--script);font-size:2.9rem;line-height:.76;color:var(--burgundy)">Oh! You Fancy</p>
-        <p style="font-family:var(--serif);font-size:1.18rem;font-weight:700;letter-spacing:.38em;
-          text-transform:uppercase;color:var(--ink);margin-top:.32rem;padding-left:.38em">Focaccia</p>
+      <img src="./img/logo.webp" alt="" class="brand-mark" width="56" height="56">
+      <a href="./" class="brand-word">
+        <p class="brand-script">Oh! You Fancy</p>
+        <p class="brand-caps">Focaccia</p>
       </a>
       <svg width="120" height="34" viewBox="0 0 190 34" aria-hidden="true">
 <g transform="scale(-1,1) translate(-190,0)" fill="none" stroke="#4E6023" stroke-width="1.2" stroke-linecap="round">
@@ -61,9 +58,13 @@
 <g transform="scale(-1,1) translate(-190,0)" fill="#4E6023">
 <ellipse cx="116" cy="10" rx="4" ry="5.2" transform="rotate(28 116 10)"/>
 <ellipse cx="130" cy="7" rx="4" ry="5.2" transform="rotate(28 130 7)" opacity=".68"/></g></svg>
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false"
+        aria-controls="nav-drawer"><span class="nav-bars" aria-hidden="true"><i></i><i></i><i></i></span><span class="vh">Menu</span></button>
     </div>
-    <nav class="nav-scroll" style="display:flex;justify-content:center;gap:var(--s8);margin-top:var(--s6);
-      border-top:1px solid var(--rule-soft);padding-block:var(--s4)"><a href="./" style="color:var(--ink);opacity:.72" class="caps">Home</a><a href="./about.html" style="color:var(--ink);opacity:.72" class="caps">About</a><a href="./breads.html" style="color:var(--ink);opacity:.72" class="caps">Our Breads</a><a href="./order.html" style="color:var(--burgundy);border-bottom:1px solid var(--burgundy)" class="caps">Order</a><a href="./gallery.html" style="color:var(--ink);opacity:.72" class="caps">Gallery</a><a href="./reviews.html" style="color:var(--ink);opacity:.72" class="caps">Reviews</a><a href="./contact.html" style="color:var(--ink);opacity:.72" class="caps">Contact</a><a href="./policies.html" style="color:var(--ink);opacity:.72" class="caps">Policies</a></nav>
+    <nav class="nav-rail" aria-label="Main"><a href="./" class="nav-link caps">Home</a><a href="./about.html" class="nav-link caps">About</a><a href="./breads.html" class="nav-link caps">Our Breads</a><a href="./order.html" class="nav-link is-current caps" aria-current="page">Order</a><a href="./gallery.html" class="nav-link caps">Gallery</a><a href="./reviews.html" class="nav-link caps">Reviews</a><a href="./contact.html" class="nav-link caps">Contact</a><a href="./policies.html" class="nav-link caps">Policies</a></nav>
+  </div>
+  <div class="nav-drawer" id="nav-drawer" hidden>
+    <nav class="drawer-nav" aria-label="Main menu"><a href="./" class="drawer-link caps">Home</a><a href="./about.html" class="drawer-link caps">About</a><a href="./breads.html" class="drawer-link caps">Our Breads</a><a href="./order.html" class="drawer-link is-current is-order caps" aria-current="page">Order</a><a href="./gallery.html" class="drawer-link caps">Gallery</a><a href="./reviews.html" class="drawer-link caps">Reviews</a><a href="./contact.html" class="drawer-link caps">Contact</a><a href="./policies.html" class="drawer-link caps">Policies</a></nav>
   </div>
 </header><section style="background:var(--paper-3);border-bottom:1px solid var(--rule);
   padding-block:var(--s20);text-align:center;position:relative;overflow:hidden">
@@ -156,6 +157,16 @@
           <div class="order-reassurance"><strong>Made for your table</strong>Every order is baked in small batches and confirmed by Amanda before anything is final.</div>
         </aside>
       </form>
+
+      <div class="order-bar" id="order-bar" hidden>
+        <div class="order-bar-in">
+          <div class="order-bar-tally">
+            <span class="order-bar-count" id="bar-count">Nothing chosen</span>
+            <span class="order-bar-total" id="bar-total">&#8212;</span>
+          </div>
+          <button type="button" class="btn btn-fill" id="bar-review">Review order</button>
+        </div>
+      </div>
     </div>
 
     <div id="confirmation" hidden>
@@ -204,7 +215,7 @@
     <p class="caps kicker">Prima di ordinare</p>
     <h2 class="h-sec">A few useful things to know</h2>
     <div class="dimples"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-    <ul style="display:grid;gap:var(--s4);font-style:italic;opacity:.82">
+    <ul style="display:grid;gap:var(--s4);opacity:.86">
       <li>Orders are requests until Amanda confirms availability and the final total.</li>
       <li>For changes or cancellations, email <a href="mailto:info@ohyoufancyfocaccia.com">info@ohyoufancyfocaccia.com</a> as soon as possible.</li>
       <li>Delivery and shipping availability, timing, and cost depend on the destination.</li>
@@ -221,12 +232,10 @@
         style="width:104px;height:104px;border-radius:50%;
         box-shadow:0 0 0 1px oklch(.82 .09 75/.35),0 0 0 7px oklch(.82 .09 75/.10)">
     </div>
-    <p style="font-family:var(--script);font-size:2.9rem;line-height:.8;color:#EBD3AE">Oh! You Fancy</p>
-    <p style="font-family:var(--serif);font-size:1.05rem;font-weight:700;letter-spacing:.36em;
-      text-transform:uppercase;color:#D8BFA0;margin-top:.4rem;padding-left:.36em">Focaccia</p>
+    <p class="ftr-script">Oh! You Fancy</p>
+    <p class="ftr-caps">Focaccia</p>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s12);
-    border-top:1px solid oklch(1 0 0/.13);padding-top:var(--s12)">
+  <div class="ftr-cols">
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">The Bakery</p>
       <p style="font-size:var(--sm);opacity:.82;max-width:36ch">Artisan focaccia and sourdough baked by hand in Brookings, Oregon. Organic ingredients, a living starter, and small batches that sell out.</p></div>
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">Explore</p>
@@ -237,12 +246,12 @@
       <p style="margin-top:var(--s4);font-size:var(--sm)"><a href="mailto:info@ohyoufancyfocaccia.com" style="color:#EBD3AE">info@ohyoufancyfocaccia.com</a></p>
       <p style="margin-top:var(--s2);font-size:var(--sm)"><a href="https://www.facebook.com/profile.php?id=61584072034572" style="color:#EBD3AE" target="_blank" rel="noopener">Facebook</a></p></div>
   </div>
-  <div style="border-top:1px solid oklch(1 0 0/.13);margin-top:var(--s12);padding-top:var(--s6);
-    display:flex;justify-content:space-between;gap:var(--s6)">
+  <div class="ftr-bot">
     <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">&#169; 2026 Oh! You Fancy Focaccia</p>
     <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">Pane &#183; Amore &#183; Sempre</p>
   </div>
 </div></footer></div>
+<script src="./nav.js" defer></script>
 <script src="./order.js" defer></script>
 </body>
 </html>
