@@ -54,7 +54,47 @@ Blocked on Amanda (full list in `facebook-research.md`):
 7. Real product photography to replace Gamma's AI images
 8. Confirm the "organic" wording is legally accurate for her
 
-## Built site
+## Built sites
+
+Two versions exist. The burgundy one is current.
+
+### v2 — Wine (current)
+
+Gamma project: https://gamma.app/docs/ylw3afpzf13ni90
+
+| Page | Link |
+|---|---|
+| Home | https://gamma.app/docs/ylw3afpzf13ni90 |
+| About | https://gamma.app/docs/ekcmflpp20yzluh |
+| Our Breads | https://gamma.app/docs/82z69wo0icx0u7i |
+| Gallery | https://gamma.app/docs/mye6ijqfba91y3w |
+| Reviews | https://gamma.app/docs/9hdghh7ewkzfkiu |
+| Contact | https://gamma.app/docs/xxundg2qfpaj20j |
+
+Theme `wine` resolved to: burgundy page ground (`#421424`), burgundy cards
+(`#5C2438`), **peach/salmon headings (`#FFB393`)** and pale peach body text
+(`#F4CAB8`), Brygada 1918 headings over **Montserrat** body.
+
+Art direction was reversed for the dark ground — chiaroscuro Italian still life on
+aged walnut and terracotta with cream linen and olive branches, rather than v1's
+bright white marble, which would have clashed.
+
+**Known gap against the logo.** The burgundy ground is right, but the theme's peach
+type is not the logo's cream, the Montserrat body font fights the vintage-label
+feel, and there is no olive green anywhere. Theme colors and fonts are not settable
+through the Gamma API — only the theme choice is — so these four edits have to be
+made by hand in the Gamma editor (free):
+
+1. Heading color `#FFB393` → cream `#F6EBD4`
+2. Body color `#F4CAB8` → same cream
+3. Body font Montserrat → Brygada 1918 (matches the headings)
+4. Accent → olive green `#626C3B`
+
+Gamma credits: v1 cost 147, v2 cost 135. **48 remaining** — not enough for another
+full six-page rebuild (~135), so further changes are editor-side until credits are
+topped up.
+
+### v1 — Cornfield
 
 Gamma project: https://gamma.app/docs/6tbw727dyqwduw4
 
