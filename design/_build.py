@@ -941,7 +941,7 @@ def course(title, ital, rows, cap=None):
 </div>"""
 
 BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
-  "What comes out of the oven changes with the season, and with whatever our neighbours are growing.") + f"""
+  "What comes out of the oven changes with the season, and with whatever our neighbours are growing. Every bread is $15, focaccia or sourdough alike; muffin-sized focaccia are $2.") + f"""
 <section class="sec" style="background:var(--paper)">
   <div class="wrap">
     {course("Savory","I Salati",[
@@ -1007,7 +1007,7 @@ GAL_SECTIONS = [
  ("Le Teglie","Slabs &amp; Pans", [
    ("olive-slab.webp","The Mediterranean Olive","Olive variety and sun dried tomatoes.",400),
    ("rosemary-slab.webp","The Rosemary and Black Pepper","Rosemary and cracked black pepper, right across the tray.",390),
-   ("potato-onion.webp","The Fall Favorite","Roasted potatoes, rosemary, garlic, caramelized onions and Fontana cheese.",380),
+   ("potato-onion.webp","The Fall Favorite","Roasted potatoes, rosemary, garlic, caramelized onions and Fontina cheese.",380),
    ("pesto-skillet.webp","The Pesto and Cashew Cheese","Basil pesto and cashew cheese, baked in the pan it is served from.",250),
    ("wide-slab.webp","The Focaccia Queen","Tomatoes, cheese, onions, garlic and an olive variety &#8212; Kalamata, pimento and black olives &#8212; with cold pressed olive oil.",250)]),
  ("Le Spirali","Swirls", [
@@ -1147,7 +1147,7 @@ FAQ = [("Do you have a storefront?","Not yet. You will find us at the Brookings-
 ("Can you make something custom?","Tell us the occasion. We have made hearts, flower gardens, and plenty of things that were never on a menu."),
 ("How do I change or cancel?","Email info@ohyoufancyfocaccia.com as soon as possible; orders are not final until Amanda confirms them."),
 ("What about allergies?","Tell us in the order notes. We cannot promise an allergen-free kitchen; Amanda will confirm what can be accommodated."),
-("How much does it cost?","Prices may vary by bake and some items are quoted; the final total is confirmed before payment."),
+("How much does it cost?","$15 for any bread, focaccia or sourdough, and $2 for a muffin-sized focaccia. Delivery and shipping are quoted separately, and the final total is confirmed before payment."),
 ("What time should I come?","Early. We bake in small batches and we sell out most market days.")]
 
 def contact_row(icon, title, body, link=None):

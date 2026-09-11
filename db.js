@@ -13,18 +13,18 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 // until Amanda enters them — an order for an unpriced item is a request she
 // quotes, exactly as every order was before the site could take them.
 const MENU_SEED = [
-  ['savory',    'Olive & Sun-Dried Tomato Swirl', 'A spiralled round layered with green and kalamata olives, sun-dried tomato, herbs and grated cheese.'],
-  ['savory',    'Jalapeño, Olive & Red Onion',    'Our signature round — fresh jalapeño, mixed olives, red onion and herbs across a golden, dimpled crust.'],
-  ['savory',    'Roasted Garlic & Sea Salt',      'Olive oil, roasted garlic and flaky salt on a pillowy sourdough crumb.'],
-  ['savory',    'Cheesy Jalapeño',                'Melted and bubbling, with jalapeño baked right into the top.'],
-  ['sourdough', 'The Country Loaf',               'Naturally leavened with the same starter that lifts the focaccia — mixed the day before, left to rise slow, and baked dark.'],
-  ['sweet',     'Cinnamon Swirl with Vanilla Drizzle', 'A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze.'],
-  ['sweet',     'Honey Focaccia Bites',           'Pull-apart bites, boxed and drizzled with Chetco Gold raw honey.'],
-  ['small',     'Jalapeño & Roasted Garlic Muffins', 'Hand-sized, crisp-edged, crowned with jalapeño and toasted garlic.'],
-  ['small',     'Peppered Pickle Muffins',        'Brookings Pickled Goodies’ spicy bread-and-butter pickles, infused right into the dough.'],
-  ['small',     'Sea Salt Rolls',                 'Soft pull-apart rounds, olive-oil brushed and salt flaked.'],
-  ['art',       'Heart Loaf',                     'A little hand-shaped heart. They go fast.'],
-  ['art',       'Flower Garden',                  'Hand-painted in vegetables and herbs — a whole garden across the top of the dough.'],
+  ['savory',    'Olive & Sun-Dried Tomato Swirl', 'A spiralled round layered with green and kalamata olives, sun-dried tomato, herbs and grated cheese.', 15],
+  ['savory',    'Jalapeño, Olive & Red Onion',    'Our signature round — fresh jalapeño, mixed olives, red onion and herbs across a golden, dimpled crust.', 15],
+  ['savory',    'Roasted Garlic & Sea Salt',      'Olive oil, roasted garlic and flaky salt on a pillowy sourdough crumb.', 15],
+  ['savory',    'Cheesy Jalapeño',                'Melted and bubbling, with jalapeño baked right into the top.', 15],
+  ['sourdough', 'The Country Loaf',               'Naturally leavened with the same starter that lifts the focaccia — mixed the day before, left to rise slow, and baked dark.', 15],
+  ['sweet',     'Cinnamon Swirl with Vanilla Drizzle', 'A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze.', 15],
+  ['sweet',     'Honey Focaccia Bites',           'Pull-apart bites, boxed and drizzled with Chetco Gold raw honey.', 15],
+  ['small',     'Jalapeño & Roasted Garlic Muffins', 'Hand-sized, crisp-edged, crowned with jalapeño and toasted garlic.', 2],
+  ['small',     'Peppered Pickle Muffins',        'Brookings Pickled Goodies’ spicy bread-and-butter pickles, infused right into the dough.', 2],
+  ['small',     'Sea Salt Rolls',                 'Soft pull-apart rounds, olive-oil brushed and salt flaked.', 2],
+  ['art',       'Heart Loaf',                     'A little hand-shaped heart. They go fast.', 15],
+  ['art',       'Flower Garden',                  'Hand-painted in vegetables and herbs — a whole garden across the top of the dough.', 15],
 ];
 
 const COURSES = { savory: 'Savory', sourdough: 'Sourdough', sweet: 'Sweet', small: 'Muffins & Rolls', art: 'Focaccia Art' };
@@ -156,21 +156,47 @@ async function initSchema() {
     );
   `);
   await seedMenu();
+  await backfillMenuPrices();
 }
 
 async function seedMenu() {
   const { rows } = await pool.query(`SELECT COUNT(*)::int AS n FROM menu_items`);
   if (rows[0].n > 0) return;
   const values = [];
-  const rowsSql = MENU_SEED.map(([course, name, description], i) => {
-    values.push(course, name, description, i);
-    const offset = i * 4;
-    return `($${offset + 1},$${offset + 2},$${offset + 3},$${offset + 4})`;
+  const rowsSql = MENU_SEED.map(([course, name, description, price], i) => {
+    values.push(course, name, description, price, i);
+    const offset = i * 5;
+    return `($${offset + 1},$${offset + 2},$${offset + 3},$${offset + 4},$${offset + 5})`;
   });
   await pool.query(
-    `INSERT INTO menu_items (course, name, description, sort_order) VALUES ${rowsSql.join(',')}`,
+    `INSERT INTO menu_items (course, name, description, price, sort_order) VALUES ${rowsSql.join(',')}`,
     values
   );
+}
+
+// The live menu was seeded before Amanda gave us prices, so those rows carry
+// NULL and the order page quotes them instead. Fill the blanks by course —
+// fifteen dollars a bread, two for a muffin-sized one.
+//
+// Once only, and never on top of a price that is already set. Clearing a
+// price in the admin is how Amanda marks something quote-on-request, so a
+// backfill that ran on every boot would undo that choice the next time the
+// service restarted. The marker lives outside SETTINGS_DEFAULTS because it
+// is bookkeeping, not a setting anyone should see in the Settings tab.
+async function backfillMenuPrices() {
+  const done = await pool.query(
+    `SELECT 1 FROM settings WHERE key = 'menu_prices_backfilled'`
+  );
+  if (done.rowCount) return;
+  const { rowCount } = await pool.query(
+    `UPDATE menu_items SET price = CASE WHEN course = 'small' THEN 2 ELSE 15 END
+      WHERE price IS NULL`
+  );
+  await pool.query(
+    `INSERT INTO settings (key, value, updated_at) VALUES ('menu_prices_backfilled', '1', now())
+     ON CONFLICT (key) DO NOTHING`
+  );
+  if (rowCount) console.log(`menu: priced ${rowCount} item(s) that had none`);
 }
 
 function toIsoDate(d) {
