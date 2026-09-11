@@ -202,13 +202,11 @@ for i in range(5):
                f"box-shadow:inset 0 1px 2px oklch(0 0 0/.35)}}}}")
 KEYFRAMES = "\n".join(_kf)
 
-from _scene import scene_svg  # the hill country behind the loader
-
 LOADER_CSS = f"""
 .stage{{position:relative;min-height:900px;display:flex;align-items:center;
   justify-content:center;overflow:hidden;background:#240808}}
-/* the hill country sits under a burgundy wash: present, never competing */
-.scene{{position:absolute;inset:0;width:100%;height:100%}}
+/* the courtyard photograph sits under a burgundy wash: present, never competing */
+.scene{{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 45%}}
 .wash{{position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(180deg,oklch(.32 .13 28/.58) 0%,oklch(.25 .12 28/.74) 46%,
     oklch(.15 .08 28/.92) 100%)}}
@@ -313,7 +311,7 @@ def ring_badge(size=132, draw=True):
 
 LOADER = f"""
 <div class="stage">
-  {scene_svg()}
+  <img class="scene" src="splash-scene.webp" alt="">
   <div class="wash"></div>
   <div class="frame"></div>
   {CORNER % 'tl'}{CORNER % 'tr'}{CORNER % 'bl'}{CORNER % 'br'}
@@ -932,7 +930,7 @@ CONTACT = masthead("Contact") + head_band("Scrivici","We&#8217;d Love to Hear Fr
 # ══ MOBILE ════════════════════════════════════════════════════════════
 LOADER_M = f"""
 <div class="stage" style="min-height:844px">
-  {scene_svg()}
+  <img class="scene" src="splash-scene.webp" alt="">
   <div class="wash"></div>
   <div class="frame" style="inset:18px"></div>
   <div class="vig"></div>
@@ -1056,7 +1054,7 @@ canvas = {"artboards":[
   {"file":"Reviews.dc.html","x":1560,"y":11380,"w":1440,"h":3300,"title":"Reviews","print":"flow"},
   {"file":"Contact.dc.html","x":0,"y":19200,"w":1440,"h":3700,"title":"Contact","print":"flow"}],
  "annotations":[
-  {"id":"loader","x":-480,"y":0,"w":400,"text":"LOADING SCREEN — animates live, on a 9s loop.\n\nThe ring strokes itself on like a stamp pressed into a label, then the five things focaccia is made of arrive in turn — Farina, Acqua, Olio d'Oliva, Sale, Tempo — while a dimple presses into the dough for each one. That row of dimples IS the progress bar.\n\nBehind it, the hill country from the label, drawn as vector and sunk under a burgundy wash. Sugar Haus types a terminal; this proofs dough."},
+  {"id":"loader","x":-480,"y":0,"w":400,"text":"LOADING SCREEN — animates live, on a 9s loop.\n\nThe ring strokes itself on like a stamp pressed into a label, then the five things focaccia is made of arrive in turn — Farina, Acqua, Olio d'Oliva, Sale, Tempo — while a dimple presses into the dough for each one. That row of dimples IS the progress bar.\n\nBehind it, a Tuscan courtyard photograph sunk under a burgundy wash. Sugar Haus types a terminal; this proofs dough."},
   {"id":"identity","x":-480,"y":330,"w":400,"text":"OWN IDENTITY, not a Sugar Haus reskin.\n\nType: Bodoni Moda — the Italian didone — with EB Garamond and Italianno. Sugar Haus uses Playfair/Lora/Work Sans.\n\nAnatomy: centred label masthead, oval cartouches, an enamel market sign, a bill of fare with dotted leaders, vertical spine rails. Sugar Haus uses a left-logo navbar and centred card grids."},
   {"id":"gaps","x":-480,"y":700,"w":400,"text":"Palette is the logo's: burgundy #8E1B1B, olive #4E6023, gold #B8862F, paper #F4EFE2.\n\nEvery tan panel is a photo slot. Bracketed text marks the two facts we do not have — prices and a phone number. Nothing invented."}],
  "launch":{"view":"canvas"}}

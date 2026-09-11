@@ -141,8 +141,9 @@ SPLASH_CSS = """
 .splash{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;
   overflow:hidden;background:#240808;
   transition:opacity .85s var(--ease),visibility .85s var(--ease)}
-/* the hill country drifts in and settles, the way a curtain lifts on it */
+/* the courtyard drifts in and settles, the way a curtain lifts on it */
 .splash .scene{position:absolute;inset:0;width:100%;height:100%;opacity:0;transform:scale(1.07);
+  object-fit:cover;object-position:50% 45%;
   transition:opacity 1.8s var(--ease),transform 12s linear}
 .splash .scene.on{opacity:1;transform:scale(1)}
 .splash-badge{position:relative;margin:0 auto;
@@ -252,7 +253,10 @@ SPLASH_JS = """
     setTimeout(function(){ s.remove(); },900);
     document.removeEventListener('keydown',enter);
   }
-  requestAnimationFrame(function(){ if(scene) scene.classList.add('on'); });
+  // fade the photograph in once it has decoded, never half-painted
+  function showScene(){ requestAnimationFrame(function(){ scene.classList.add('on'); }); }
+  if(scene){ if(scene.complete && scene.naturalWidth) showScene();
+             else scene.addEventListener('load',showScene); }
   at(60,function(){ ring.classList.add('on'); });
   at(420,function(){ marks.forEach(function(m){ m.classList.add('on'); }); });
   ings.forEach(function(el,i){
@@ -271,7 +275,7 @@ SPLASH_JS = """
 
 SPLASH_HTML = """
 <div class="splash" id="splash" role="dialog" aria-label="Welcome to Oh! You Fancy Focaccia">
-  __SCENE__
+  <img class="scene" src="./img/splash-scene.webp" alt="" fetchpriority="high" decoding="async">
   <div class="wash"></div><div class="frame"></div><div class="vig"></div>
   <div class="splash-in">
     <div class="splash-badge">
@@ -312,8 +316,6 @@ SPLASH_HTML = """
 </div>
 """
 
-# the artboard source owns the drawing; the page just hosts it
-SPLASH_HTML = SPLASH_HTML.replace("__SCENE__", D.scene_svg())
 
 DOC = """<!doctype html>
 <html lang="en">
@@ -337,7 +339,7 @@ DOC = """<!doctype html>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 {fonts}
 <link rel="stylesheet" href="./style.css">
-{ld}
+{preload}{ld}
 </head>
 <body>
 {splash}
@@ -400,6 +402,8 @@ def build():
             canon=base + ("" if is_home else fname),
             fonts=D.FONTS.replace("&amp;", "&"),
             ld=LD_JSON if is_home else "",
+            preload=('<link rel="preload" as="image" href="./img/splash-scene.webp" '
+                     'fetchpriority="high">\n') if is_home else "",
             splash=SPLASH_HTML if is_home else "",
             body=html,
             script='<script src="./splash.js" defer></script>' if is_home else "",

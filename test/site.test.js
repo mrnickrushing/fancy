@@ -28,9 +28,9 @@ test('the loading screen is on the home page only', async () => {
   assert.doesNotMatch((await request(app).get('/about.html')).text, /id="splash"/);
 });
 
-test('the loading screen carries the hill scene, not a flat wash', async () => {
+test('the loading screen carries the courtyard photograph, not a flat wash', async () => {
   const res = await request(app).get('/');
-  assert.match(res.text, /<svg class="scene"/, 'the drawn scene is missing');
+  assert.match(res.text, /<img class="scene"[^>]*splash-scene\.webp/, 'the courtyard photograph is missing');
   assert.match(res.text, /class="wash"/, 'the burgundy wash over the scene is missing');
   assert.doesNotMatch(res.text, /\.splash\{[^}]*radial-gradient/,
     'the splash fell back to a flat gradient');
@@ -67,7 +67,7 @@ test('no unresolved placeholder links survive', async () => {
 });
 
 test('assets and crawl files serve', async () => {
-  for (const a of ['/style.css', '/splash.js', '/img/logo.webp', '/robots.txt', '/sitemap.xml']) {
+  for (const a of ['/style.css', '/splash.js', '/img/logo.webp', '/img/splash-scene.webp', '/robots.txt', '/sitemap.xml']) {
     assert.strictEqual((await request(app).get(a)).status, 200, `${a} missing`);
   }
 });

@@ -214,8 +214,9 @@ img{max-width:100%;height:auto}
 .splash{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;
   overflow:hidden;background:#240808;
   transition:opacity .85s var(--ease),visibility .85s var(--ease)}
-/* the hill country drifts in and settles, the way a curtain lifts on it */
+/* the courtyard drifts in and settles, the way a curtain lifts on it */
 .splash .scene{position:absolute;inset:0;width:100%;height:100%;opacity:0;transform:scale(1.07);
+  object-fit:cover;object-position:50% 45%;
   transition:opacity 1.8s var(--ease),transform 12s linear}
 .splash .scene.on{opacity:1;transform:scale(1)}
 .splash-badge{position:relative;margin:0 auto;
