@@ -562,6 +562,19 @@ LOADER = f"""
 
 NAV = ["Home","About","Our Breads","Order","Gallery","Reviews","Contact","Policies"]
 
+# Amanda's Oregon Domestic Kitchen license, shown in the footer of every page
+# because a home-kitchen bakery is worth being open about. Set the number and
+# it appears; leave it empty and the line does not render at all, so the site
+# can never publish a half-filled license.
+LICENSE = {"number": "", "expires": "06/2028"}
+
+def license_line():
+    if not LICENSE["number"]:
+        return ""
+    expires = f' &#183; valid through {LICENSE["expires"]}' if LICENSE["expires"] else ''
+    return ('\n      <p style="font-size:var(--xs);opacity:.62;margin-top:var(--s4);max-width:36ch">'
+            f'Oregon Domestic Kitchen Bakery License No. {LICENSE["number"]}{expires}</p>\n      ')
+
 def olive_rule(w=190, flip=False):
     t = ' transform="scale(-1,1) translate(-190,0)"' if flip else ''
     return f"""<svg width="{w}" height="34" viewBox="0 0 190 34" aria-hidden="true">
@@ -701,7 +714,7 @@ FOOTER = f"""<footer style="background:var(--burgundy-ink);color:#D8BFA0;padding
   </div>
   <div class="ftr-cols">
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">The Bakery</p>
-      <p style="font-size:var(--sm);opacity:.82;max-width:36ch">Artisan focaccia and sourdough baked by hand in Brookings, Oregon. Organic ingredients, a living starter, and small batches that sell out.</p></div>
+      <p style="font-size:var(--sm);opacity:.82;max-width:36ch">Artisan focaccia and sourdough baked by hand in Brookings, Oregon. Organic ingredients, a living starter, and small batches that sell out.</p>{license_line()}</div>
     <div><p class="caps" style="color:#C9A46A;margin-bottom:var(--s4)">Explore</p>
       <ul style="display:flex;flex-direction:column;gap:.5rem;font-size:var(--sm)">
       {''.join(f'<li><a href="#" style="color:#D8BFA0">{n}</a></li>' for n in NAV[1:])}</ul></div>
@@ -747,7 +760,7 @@ class Component extends DCLogic {{}}
 PROC = [("I","Bend","The dough comes together slow. Organic flour, water, and a starter that has been going a while."),
         ("II","Snap","Air gets folded in, not beaten out. This is where the crumb is decided."),
         ("III","Stretch","Out to the corners by hand, never pressed flat by a machine."),
-        ("IV","Fold","Rested, dimpled, drowned in good olive oil, and into the oven.")]
+        ("IV","Fold","Rested, dimpled, drowned in extra virgin cold-pressed organic olive oil, and into the oven.")]
 
 HOME = masthead("Home") + f"""
 <section class="hero">
@@ -757,10 +770,10 @@ HOME = masthead("Home") + f"""
     <div>
       <p class="caps kicker kicker-l" style="color:var(--olive)">Artisan Breads</p>
       <h1 class="hero-h">
-        One starter,<br><span style="font-style:italic;font-weight:500">endlessly</span><br>argued over.</h1>
+        One starter.<br><span style="font-style:italic;font-weight:500">Endless flavor</span><br>possibilities.</h1>
       <p class="hero-lede">
         Focaccia and sourdough from one mother starter &#8212; savory and sweet,
-        dimpled and blistered, and shaped by hand on the southern Oregon coast.</p>
+        dimpled and blistered, and made by hand on the southern Oregon coast.</p>
       <div class="hero-cta">
         <a href="#" class="btn btn-fill">Order for Pickup</a>
         <a href="#" class="btn btn-line">See the Bill of Fare</a>
@@ -780,7 +793,7 @@ HOME = masthead("Home") + f"""
   <div class="wrap">
     <p class="caps kicker">Il Processo</p>
     <h2 class="h-sec">Bend, snap, stretch, fold</h2>
-    <p class="lede">Four moves, in that order, every time. It is the whole method and it takes all day.</p>
+    <p class="lede">Four moves, in that order, every time. It is the whole method that consumes the dough days.</p>
     {dimple_rule()}
     <div class="grid g4">
       {''.join(f'''<div class="plate"><p class="roman">{r}</p><h3>{t}</h3><p>{d}</p></div>'''
@@ -794,7 +807,7 @@ HOME = masthead("Home") + f"""
     <div>
       <p class="caps kicker kicker-l">From the Board</p>
       <h2 style="font-size:var(--xl);margin-bottom:var(--s3);text-align:left">What we are baking</h2>
-      <p style="opacity:.78;margin-bottom:var(--s8)">The board turns over with the season and with whatever our neighbours are growing.</p>
+      <p style="opacity:.78;margin-bottom:var(--s8)">The board turns over with the season and with the best and freshest our neighbors are growing.</p>
       <div class="fare"><span class="fare-n">I</span><div class="fare-b">
         <p class="fare-t"><span>Olive &amp; Sun-Dried Tomato Swirl</span></p>
         <p class="fare-d">Green and kalamata olives, sun-dried tomato, herbs, grated cheese. Crisp at the edge, soft through the middle.</p></div></div>
@@ -863,15 +876,15 @@ HOME = masthead("Home") + f"""
       <div style="display:flex;gap:var(--s5);align-items:baseline;padding-block:var(--s5);
         border-bottom:1px solid var(--rule-soft)">
         <span class="fare-n">&#8212;</span><div><h3 style="font-size:var(--lg)">Chetco Gold Raw Honey</h3>
-        <p style="font-size:var(--sm);opacity:.74">Award-winning raw honey from the Chetco River, over our focaccia bites.</p></div></div>
+        <p style="font-size:var(--sm);opacity:.74">Award-winning raw honey from the Chetco River, over our honey focaccia muffins.</p></div></div>
       <div style="display:flex;gap:var(--s5);align-items:baseline;padding-block:var(--s5);
         border-bottom:1px solid var(--rule-soft)">
         <span class="fare-n">&#8212;</span><div><h3 style="font-size:var(--lg)">The Dawg House</h3>
         <p style="font-size:var(--sm);opacity:.74">Monica builds her sandwiches on our bread, two stalls down.</p></div></div>
       <div style="display:flex;gap:var(--s5);align-items:baseline;padding-block:var(--s5);
         border-bottom:1px solid var(--rule-soft)">
-        <span class="fare-n">&#8212;</span><div><h3 style="font-size:var(--lg)">Shalom Coffee Roasting</h3>
-        <p style="font-size:var(--sm);opacity:.74">Our market neighbours, and the right cup beside a warm piece.</p></div></div>
+        <span class="fare-n">&#8212;</span><div><h3 style="font-size:var(--lg)">Sylvia&#8217;s Farm Fresh Produce</h3>
+        <p style="font-size:var(--sm);opacity:.74">Her jalape&#241;os and apples, and so much more, go into the focaccia.</p></div></div>
     </div>
   </div>
 </section>
@@ -908,7 +921,7 @@ CREED = [("Organic, all the way down","We bake with organic ingredients because 
 ("A starter with a history","Everything begins with a bubbly sourdough starter. Mama makes the dough, and the dough takes its time."),
 ("Hands, not machines","No shortcuts and nothing mechanical doing the shaping. Every loaf is worked until it is ready."),
 ("Small batch, always","We bake what we can bake well. That is why we sell out, and why it is always fresh."),
-("Savory and sweet both","There are so many options when it comes to focaccia. We are still finding new ones."),
+("Savory and sweet","There are so many options when it comes to focaccia. We create new flavors every month."),
 ("Baked with love","The one ingredient we cannot buy and will not skip. Our customers taste it, and they say so.")]
 
 ABOUT = masthead("About") + head_band("La Nostra Storia","Welcome to Oh! You Fancy Focaccia",
@@ -922,8 +935,8 @@ ABOUT = masthead("About") + head_band("La Nostra Storia","Welcome to Oh! You Fan
       <p class="caps kicker kicker-l">From Our Kitchen</p>
       <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s6)">From our kitchen<br>to your table</h2>
       <p style="opacity:.8;margin-bottom:var(--s5)">Oh! You Fancy Focaccia is a family-run bakery in Brookings, Oregon, on the Curry County coast.</p>
-      <p style="opacity:.8;margin-bottom:var(--s5)">What started as a love of bread became a booth at the Brookings-Harbor Farmers Market &#8212; and then loaves going out to neighbours, friends, and folks far enough away that we had to start shipping.</p>
-      <p style="opacity:.8;margin-bottom:var(--s5)">We bake savory and sweet focaccia with organic ingredients: olives and garlic and jalape&#241;o, sun-dried tomato and herbs, cinnamon and honey. We infuse our neighbours&#8217; pickles and drizzle our neighbours&#8217; honey.</p>
+      <p style="opacity:.8;margin-bottom:var(--s5)">What started as a love of bread became a booth at the Brookings-Harbor Farmers Market &#8212; and then loaves going out to neighbors, friends, and folks far enough away that we had to start shipping.</p>
+      <p style="opacity:.8;margin-bottom:var(--s5)">We bake savory and sweet focaccia with organic ingredients: olives and garlic and jalape&#241;o, sun-dried tomato and herbs, cinnamon and honey. We infuse our neighbors&#8217; pickles and drizzle our neighbors&#8217; honey.</p>
       <p style="opacity:.8;margin-bottom:var(--s5)">The same mother starter goes into our sourdough loaves &#8212; mixed the day before, left to rise slow, and baked dark alongside everything else.</p>
       <p style="opacity:.8;margin-bottom:var(--s8)">Every Wednesday and Saturday the crates come out, the gold paper bags get filled, and we hand out samples until the last loaf is gone.</p>
       <div style="border-left:2px solid var(--burgundy);padding-left:var(--s6)">
@@ -956,47 +969,69 @@ def fare(n, title, desc):
     return f"""<div class="fare"><span class="fare-n">{n}</span><div class="fare-b">
       <p class="fare-t"><span>{title}</span>{price_html}</p><p class="fare-d">{desc}</p></div></div>"""
 
-def course(title, ital, rows, cap=None):
+def course(title, ital, rows, cap=None, note=""):
     """A run of the bill of fare. Without a photograph it runs full width —
-    better an honest single column than a gap where a picture should be."""
+    better an honest single column than a gap where a picture should be.
+    `note` is for something true of the whole course rather than one bake."""
+    n = (f'<p style="font-size:var(--sm);font-style:italic;opacity:.78;'
+         f'margin-bottom:var(--s5)">{note}</p>') if note else ""
     return f"""<div class="course">
   <div class="course-grid{' has-aside' if cap else ''}">
     <div>
       <p class="caps" style="color:var(--olive);margin-bottom:var(--s2)">{ital}</p>
       <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">{title}</h2>
       <div style="width:64px;height:2px;background:var(--burgundy);margin-bottom:var(--s4)"></div>
-      {''.join(rows)}
+      {n}{''.join(rows)}
     </div>
     {shot(cap[0], 360, cap[1]) if cap else ""}
   </div>
 </div>"""
 
+ROMAN = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
+         "XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII","XXIV","XXV","XXVI","XXVII",
+         "XXVIII","XXIX","XXX","XXXI","XXXII","XXXIII","XXXIV","XXXV"]
+
+# Course display, in the order the bill of fare runs them: the Italian kicker,
+# the English heading, the photograph, and anything true of the whole course.
+COURSE_VIEW = [
+    ("savory",    "I Salati",       "Savory",          ("savory-round.webp", "Jalapeno, olive and red onion focaccia"), ""),
+    ("sourdough", "Il Pane",        "Sourdough",       ("plain-swirl.webp", "Classic artisan Celtic salted sourdough"), ""),
+    ("sweet",     "I Dolci",        "Sweet",           ("sweet-cinnamon.webp", "Brown buttered cinnamon roll focaccia"),
+     "Everything sweet is sweetened with coconut sugar."),
+    ("small",     "I Piccoli",      "Focaccia Muffins", ("muffins-jalapeno.webp", "Jalapeno, garlic and onion focaccia muffins"),
+     "Every flavor on this list can be baked as a focaccia muffin."),
+    ("art",       "L&#8217;Arte",   "Focaccia Art",    ("heart-loaf.webp", "Focaccia baked in a cast iron heart pan"), ""),
+]
+
+# Not in the catalog: it has no fixed price and changes with the season, so it
+# is written here rather than becoming a standing orderable row.
+EXTRA_FARE = {"sweet": [("Seasonal Desserts",
+    "Pumpkin pie focaccia when the pumpkins come in, and cranberry walnut at Christmas. "
+    "Ask what is on this week, or request one through the order page.")]}
+
+def _bill_of_fare():
+    """The bill of fare, built from menu.json so it cannot drift from the
+    order page. Numbering runs straight through every course."""
+    n, out = 0, []
+    for key, ital, title, cap, note in COURSE_VIEW:
+        rows = []
+        for item in MENU_CATALOG:
+            if item["course"] != key:
+                continue
+            n += 1
+            rows.append(fare(ROMAN[n - 1], html.escape(item["name"]), html.escape(item["description"])))
+        for name, desc in EXTRA_FARE.get(key, []):
+            n += 1
+            rows.append(fare(ROMAN[n - 1], html.escape(name), html.escape(desc)))
+        if rows:
+            out.append(course(title, ital, rows, cap, note=note))
+    return "\n".join(out)
+
 BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
   "Prices are shown for the standing menu. Seasonal and custom bakes can be requested through the order page and confirmed by Amanda.") + f"""
 <section class="sec" style="background:var(--paper)">
   <div class="wrap">
-    {course("Savory","I Salati",[
-      fare("I","Olive &amp; Sun-Dried Tomato Swirl","A spiralled round layered with green and kalamata olives, sun-dried tomato, herbs and grated cheese. Crisp at the edges, soft through the middle."),
-      fare("II","Jalape&#241;o, Olive &amp; Red Onion","Our signature round &#8212; fresh jalape&#241;o, mixed olives, red onion and herbs across a golden, dimpled crust."),
-      fare("III","Roasted Garlic &amp; Sea Salt","Simple and perfect. Olive oil, roasted garlic and flaky salt on a pillowy sourdough crumb."),
-      fare("IV","Cheesy Jalape&#241;o","Melted and bubbling, with jalape&#241;o baked right into the top."),
-    ],("savory-round.webp","Jalapeno, olive and red onion focaccia"))}
-    {course("Sourdough","Il Pane",[
-      fare("V","The Country Loaf","Naturally leavened with the same starter that lifts the focaccia &#8212; mixed the day before, left to rise slow, and baked dark."),
-    ])}
-    {course("Sweet","I Dolci",[
-      fare("VII","Cinnamon Swirl with Vanilla Drizzle","A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze."),
-      fare("VIII","Honey Focaccia Bites","Pull-apart bites, boxed and drizzled with award-winning Chetco Gold raw honey from right here on the Chetco River."),
-    ],("sweet-cinnamon.webp","Cinnamon swirl focaccia with vanilla drizzle"))}
-    {course("Muffins &amp; Rolls","I Piccoli",[
-      fare("IX","Jalape&#241;o &amp; Roasted Garlic Muffins","Hand-sized, crisp-edged, crowned with jalape&#241;o and toasted garlic."),
-      fare("X","Peppered Pickle Muffins","Made with Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles infused right into the dough. Organic ingredients only."),
-      fare("XI","Sea Salt Rolls","Soft pull-apart rounds, olive-oil brushed and salt flaked."),
-    ],("muffins-jalapeno.webp","Jalapeno and roasted garlic focaccia muffins"))}
-    {course("Focaccia Art","L&#8217;Arte",[
-      fare("XII","Heart Loaf","Little hand-shaped hearts. They go fast."),
-      fare("XIII","Flower Garden","Hand-painted in vegetables and herbs &#8212; a whole garden across the top of the dough."),
-    ],("heart-loaf.webp","A hand-shaped focaccia heart"))}
+    {_bill_of_fare()}
   </div>
 </section>
 
@@ -1009,7 +1044,7 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
       <div class="plate"><h3>As pizza</h3><p>&#8220;It was delicious the way it is, but turning it into a pizza was super fast and easy.&#8221;</p></div>
       <div class="plate"><h3>As a sandwich</h3><p>Go see Monica at The Dawg House &#8212; she builds hers on our focaccia at the market.</p></div>
       <div class="plate"><h3>As toast</h3><p>Avocado, feta and heirloom tomatoes on a thick slice. A customer sent us that one.</p></div>
-      <div class="plate"><h3>As it comes</h3><p>Warm, torn by hand, with good olive oil. Honestly the best way.</p></div>
+      <div class="plate"><h3>As it comes</h3><p>Warm, torn by hand, with extra virgin cold-pressed organic olive oil. Honestly the best way.</p></div>
     </div>
     <div style="max-width:660px;margin:var(--s16) auto 0;padding:var(--s10);
       background:var(--paper-2);border:1px solid var(--rule);text-align:center">
@@ -1046,7 +1081,7 @@ GAL_SECTIONS = [
    ("garlic-rosemary-sourdough.webp","The Roasted Garlic and Rosemary Sourdough","Roasted garlic and rosemary, wound through the spiral.",300),
    ("plain-swirl.webp","Classic Artisan Celtic Salted Sourdough","Nothing on it but Celtic salt.",300),
    ("caramel-swirl.webp","The Mediterranean Sourdough","Sun dried tomato and olive variety.",300)]),
- ("I Piccoli","Muffins &amp; Rolls", [
+ ("I Piccoli","Focaccia Muffins", [
    ("muffins-jalapeno.webp","The Jalape&#241;o, Garlic and Onion Focaccia Muffins","Jalape&#241;o, garlic and onion, hand-sized.",300),
    ("parm-muffins.webp","The Roasted Garlic Focaccia Muffins","Roasted garlic, hand-sized.",300),
    ("sea-salt-round.webp","The Plain Jane Celtic Salted Focaccia Muffin","Celtic salt, and nothing else.",300),
@@ -1158,7 +1193,7 @@ REVIEWS = masthead("Reviews") + head_band("Parole Gentili","What Our Customers S
     <h2 class="h-sec">Go see Amanda,<br>you will love it</h2>
     {dimple_rule()}
     <div class="grid g2">
-      {quote("Who has tried the Focaccia from the Brookings Farmers market?? They have sweet and savory flavors. The samples were amazing so I bought the &#8216;Oh you Fancy.&#8217; It was delicious the way it is but turning into a pizza was super fast and easy. Go see Amanda, you will love it.","A neighbour in Brookings")}
+      {quote("Who has tried the Focaccia from the Brookings Farmers market?? They have sweet and savory flavors. The samples were amazing so I bought the &#8216;Oh you Fancy.&#8217; It was delicious the way it is but turning into a pizza was super fast and easy. Go see Amanda, you will love it.","A neighbor in Brookings")}
       {quote("OMG! I tried some the other day and it is absolutely the best focaccia I&#8217;ve ever had in my life. My husband agreed.","A market regular")}
       {quote("Super yummy food. Baked with love for sure. So many varieties. Get there early cause this girl sells out quick!","Linnea")}
       {quote("It is the best. My family loved it. All three were gone in a day.","A Brookings customer")}
@@ -1304,8 +1339,8 @@ MOBILE = f"""
 <section style="background:var(--paper);padding:var(--s12) var(--s5)">
   <p class="caps kicker" style="color:var(--olive);font-size:.66rem">Artisan Breads</p>
   <h1 style="font-size:2.6rem;line-height:1.04;text-align:center;margin-bottom:var(--s5)">
-    One starter,<br><span style="font-style:italic;font-weight:500">endlessly</span><br>argued over.</h1>
-  <p style="text-align:center;opacity:.78;margin-bottom:var(--s6)">Focaccia and sourdough from one mother starter &#8212; dimpled, blistered, organic, and shaped by hand.</p>
+    One starter.<br><span style="font-style:italic;font-weight:500">Endless flavor</span><br>possibilities.</h1>
+  <p style="text-align:center;opacity:.78;margin-bottom:var(--s6)">Focaccia and sourdough from one mother starter &#8212; dimpled, blistered, organic, and made by hand.</p>
   <a href="#" class="btn btn-fill" style="width:100%">See the Bill of Fare</a>
   {shot("hero-garden.webp",340,"Focaccia painted in herbs and vegetables","shot-oval","margin-top:var(--s8)")}
 </section>

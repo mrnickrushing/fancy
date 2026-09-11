@@ -325,7 +325,7 @@
         if (notes.value.indexOf(line) === -1) {
           notes.value = notes.value ? notes.value.replace(/\s+$/, '') + '\n' + line : line;
         }
-        say('“' + bake + '” is one of Amanda\u2019s specialties rather than a standing row, so we have noted it in your special requests. Add anything else you would like below.', notes.closest('.field') || notes);
+        say('“' + bake + '” is one of Amanda\u2019s specialties rather than a standing row, so we have put it in your notes for Amanda. Add anything else you would like below.', notes.closest('.field') || notes);
         bring(notes);
       }
     }
