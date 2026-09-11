@@ -50,7 +50,7 @@ ul{list-style:none}
 
 /* ── keyboard focus: one visible ring everywhere, never the UA default ── */
 :focus-visible{outline:2px solid var(--burgundy);outline-offset:3px;border-radius:var(--r-sm)}
-.btn-fill:focus-visible,.enamel :focus-visible,.ribbon :focus-visible,
+.btn-fill:focus-visible,.enamel :focus-visible,
 footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
 
 /* visually hidden, still read aloud */
@@ -101,13 +101,8 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
 .btn-pale:hover{background:var(--gold-pale);color:var(--burgundy-ink);letter-spacing:.32em}
 
 /* ══ masthead ══════════════════════════════════════════════════════
-   The ribbon is one line at every width, and the header shrinks to a
-   slim bar once you start reading. Nothing here is an inline style, so
-   the responsive sheet can restyle it by class. */
-.ribbon{background:var(--burgundy-ink);color:var(--gold-pale);text-align:center;
-  padding:.55rem var(--s5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ribbon-short{display:none}
-
+   The header shrinks to a slim bar once you start reading. Nothing here
+   is an inline style, so the responsive sheet can restyle it by class. */
 .mast{background:var(--paper);border-bottom:1px solid var(--rule);
   padding-block:var(--s6) 0;position:sticky;top:0;z-index:50}
 .mast-in{text-align:center}
@@ -187,7 +182,14 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
 .fare{display:flex;align-items:baseline;gap:var(--s4);padding-block:var(--s5);
   border-bottom:1px solid var(--rule-soft)}
 .fare-n{font-family:var(--serif);font-size:var(--sm);color:var(--gold-read);
-  font-weight:600;width:34px;flex-shrink:0;letter-spacing:.1em}
+  font-weight:600;width:var(--fare-n,34px);flex-shrink:0;letter-spacing:.1em;
+  white-space:nowrap}
+/* The bill of fare runs to XXXIV now. 34px fits about as far as XII, and
+   past that the numerals ran straight into the titles beside them, so the
+   courses get a column wide enough for the longest. In em, so it tracks
+   whatever face is actually serving rather than a pixel guess made against
+   the fallback. The home page board stops at V and keeps the narrow one. */
+.course{--fare-n:4.4em}
 .fare-b{flex-grow:1}
 .fare-t{font-family:var(--serif);font-size:var(--lg);font-weight:600;
   display:flex;align-items:baseline;gap:var(--s3)}
@@ -364,9 +366,6 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
 </helmet>
 <div class="grain">
 
-<div style="background:var(--burgundy-ink);color:var(--gold-pale);text-align:center;
-  padding:.5rem .5rem" class="caps" style="font-size:.58rem">
-  Wed &amp; Sat &#183; 9am &#8216;til sold out</div>
 <header style="background:var(--paper);border-bottom:1px solid var(--rule);
   padding:var(--s6) var(--s5) 0;position:sticky;top:0;z-index:50">
   <div style="display:flex;align-items:flex-start;justify-content:space-between">
@@ -418,19 +417,20 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
   <h2 style="font-size:1.85rem;text-align:center;margin-bottom:var(--s3)">Bend, snap, stretch, fold</h2>
   <div class="dimples"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   <div style="display:flex;flex-direction:column;gap:var(--s5)">
-    <div class="plate" style="padding:var(--s6)"><p class="roman" style="font-size:2rem">I</p><h3 style="font-size:1.2rem">Bend</h3><p>The dough comes together slow. Organic flour, water, and a starter that has been going a while.</p></div><div class="plate" style="padding:var(--s6)"><p class="roman" style="font-size:2rem">II</p><h3 style="font-size:1.2rem">Snap</h3><p>Air gets folded in, not beaten out. This is where the crumb is decided.</p></div><div class="plate" style="padding:var(--s6)"><p class="roman" style="font-size:2rem">III</p><h3 style="font-size:1.2rem">Stretch</h3><p>Out to the corners by hand, never pressed flat by a machine.</p></div>
+    <div class="plate" style="padding:var(--s6)"><p class="roman" style="font-size:2rem">I</p><h3 style="font-size:1.2rem">Bend</h3><p>The dough comes together slow. Organic flour, water, and a starter that has been going on since the silk trade days 900 years ago.</p></div><div class="plate" style="padding:var(--s6)"><p class="roman" style="font-size:2rem">II</p><h3 style="font-size:1.2rem">Snap</h3><p>Air gets folded in, not beaten out. This is where the crumb is decided.</p></div><div class="plate" style="padding:var(--s6)"><p class="roman" style="font-size:2rem">III</p><h3 style="font-size:1.2rem">Stretch</h3><p>Out to the corners by hand, never pressed flat by a machine.</p></div>
   </div>
 </section>
 
 <section style="background:var(--paper);padding:var(--s12) var(--s5)">
   <p class="caps kicker" style="font-size:.66rem">From the Board</p>
-  <h2 style="font-size:1.85rem;text-align:center;margin-bottom:var(--s8)">What we are baking</h2>
+  <h2 style="font-size:1.85rem;text-align:center;margin-bottom:var(--s3)">What we are baking</h2>
+  <p style="font-style:italic;opacity:.78;text-align:center;margin-bottom:var(--s8)">Savory and organic ingredients &#8212; add what you want, leave out what you don&#8217;t.</p>
   <div class="fare"><span class="fare-n">I</span><div class="fare-b">
-      <p class="fare-t"><span>Olive &amp; Sun-Dried Tomato Swirl</span></p><p class="fare-d">Olives, sun-dried tomato, herbs, grated cheese.</p></div></div>
+      <p class="fare-t"><span>Jalapeño, Olive &amp; Red Onion</span></p><p class="fare-d">Fresh jalapeño, mixed olives, red onion and herbs across a golden, dimpled crust.</p></div></div>
   <div class="fare"><span class="fare-n">II</span><div class="fare-b">
-      <p class="fare-t"><span>Jalape&#241;o, Olive &amp; Red Onion</span><span class="fare-price">$15</span></p><p class="fare-d">The round people recognise us by.</p></div></div>
-  <div class="fare"><span class="fare-n">III</span><div class="fare-b">
-      <p class="fare-t"><span>Cinnamon Swirl, Vanilla Drizzle</span><span class="fare-price">$15</span></p><p class="fare-d">Pulled apart in ridges and glazed while warm.</p></div></div>
+      <p class="fare-t"><span>Olive &amp; Sun-Dried Tomato</span></p><p class="fare-d">Green and kalamata olives with sun-dried tomato.</p></div></div>
+  <div class="fare" style="border-bottom:none"><span class="fare-n">III</span><div class="fare-b">
+      <p class="fare-t"><span>The Brown Buttered Cinnamon Roll</span></p><p class="fare-d">Flax seed oil butter. Coconut sugar.</p></div></div>
   <div style="margin-top:var(--s8)"><a href="#" class="btn btn-line" style="width:100%">The Full Bill of Fare</a></div>
 </section>
 

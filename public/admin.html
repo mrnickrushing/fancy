@@ -32,10 +32,7 @@
 <body>
 
 <a class="skip-link" href="#site-content">Skip to content</a>
-<div id="site-content"><div class="ribbon caps">
-  <span class="ribbon-full">Brookings-Harbor Farmers Market &#183; Wednesdays &amp; Saturdays &#183; 9am &#8216;til sold out</span>
-  <span class="ribbon-short">Wed &amp; Sat &#183; from 9am</span></div>
-<header class="mast">
+<div id="site-content"><header class="mast">
   <div class="mast-in">
     <div class="brand-row">
       <svg width="120" height="34" viewBox="0 0 190 34" aria-hidden="true">
@@ -129,9 +126,9 @@
     <div class="adm-panel" data-panel="menu">
       <div class="adm-section">
         <h2>The Bill of Fare</h2>
-        <p style="font-size:var(--sm);opacity:.82;margin-bottom:var(--s5)">What customers can order, and what it costs. An item without a price is still orderable &#8212; you quote it when you confirm. Untick <em>available</em> to take something off the menu for a while.</p>
+        <p style="font-size:var(--sm);opacity:.82;margin-bottom:var(--s5)">What customers can order, and what it costs. An item without a price is still orderable &#8212; you quote it when you confirm. Untick <em>available</em> to take something off the menu for a while. <em>Photo</em> is the file name of a picture in the site&#8217;s image folder, like <code>savory-round.webp</code> &#8212; it shows beside the bake on the order page. Leave it empty for none.</p>
         <div class="table-wrap"><table class="adm" id="menu-table">
-          <thead><tr><th>Course</th><th>Name</th><th>Description</th><th>Price</th><th>Available</th><th></th></tr></thead>
+          <thead><tr><th>Course</th><th>Name</th><th>Description</th><th>Price</th><th>Photo</th><th>Available</th><th></th></tr></thead>
           <tbody id="menu-body"></tbody></table></div>
         <form id="menu-add" style="margin-top:var(--s8);padding:var(--s6);background:var(--paper);border:1px dashed var(--rule)" novalidate>
           <p class="caps" style="color:var(--olive);margin-bottom:var(--s4)">Add an item</p>
@@ -140,6 +137,7 @@
             <div class="field"><label for="mi-name">Name</label><input id="mi-name"></div>
             <div class="field"><label for="mi-price">Price ($)</label><input id="mi-price" type="number" min="0" step="0.01" placeholder="leave blank to quote"></div>
             <div class="field"><label for="mi-desc">Description</label><input id="mi-desc"></div>
+            <div class="field"><label for="mi-image">Photo <span class="opt">(optional)</span></label><input id="mi-image" placeholder="savory-round.webp"></div>
           </div>
           <button type="submit" class="btn btn-fill btn-sm">Add to the Menu</button>
           <div id="menu-msg" class="msg"></div>

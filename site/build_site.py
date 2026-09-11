@@ -164,8 +164,6 @@ img{max-width:100%;height:auto}
   html:not(.js) .nav-link{white-space:nowrap;flex-shrink:0}
 }
 @media (max-width:640px){
-  .ribbon-full{display:none}
-  .ribbon-short{display:inline}
   .brand-script{font-size:2.9rem}
   .brand-caps{font-size:1.02rem;letter-spacing:.28em}
   .brand-mark{width:54px;height:54px}

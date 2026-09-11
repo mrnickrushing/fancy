@@ -12,7 +12,7 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 // The bill of fare is shared by the database seed and the generated public
 // menu. Existing installations keep Amanda's edits; missing catalog entries
 // are added once on startup so the two customer-facing paths cannot drift.
-const MENU_SEED = MENU_CATALOG.map(({ course, name, description, price }) => [course, name, description, price]);
+const MENU_SEED = MENU_CATALOG.map(({ course, name, description, price, image }) => [course, name, description, price, image || null]);
 
 const COURSES = { savory: 'Savory', sourdough: 'Sourdough', sweet: 'Sweet', small: 'Focaccia Muffins', art: 'Focaccia Art' };
 
@@ -61,6 +61,9 @@ async function initSchema() {
     );
   `);
   await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS idempotency_key TEXT`);
+  // The order page shows customers what a bake looks like; the file lives in
+  // public/img and the column holds only its name.
+  await pool.query(`ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS image TEXT`);
   await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS orders_idempotency_key_idx ON orders(idempotency_key) WHERE idempotency_key IS NOT NULL`);
   await pool.query(`
     CREATE TABLE IF NOT EXISTS order_items (
@@ -146,34 +149,35 @@ async function initSchema() {
   await ensureCatalogItems();
   await backfillMenuPrices();
   await alignMenuToCatalog();
+  await backfillMenuImages();
 }
 
 async function seedMenu() {
   const { rows } = await pool.query(`SELECT COUNT(*)::int AS n FROM menu_items`);
   if (rows[0].n > 0) return;
   const values = [];
-  const rowsSql = MENU_SEED.map(([course, name, description, price], i) => {
-    values.push(course, name, description, price, i);
-    const offset = i * 5;
-    return `($${offset + 1},$${offset + 2},$${offset + 3},$${offset + 4},$${offset + 5})`;
+  const rowsSql = MENU_SEED.map(([course, name, description, price, image], i) => {
+    values.push(course, name, description, price, image, i);
+    const offset = i * 6;
+    return `($${offset + 1},$${offset + 2},$${offset + 3},$${offset + 4},$${offset + 5},$${offset + 6})`;
   });
   await pool.query(
-    `INSERT INTO menu_items (course, name, description, price, sort_order) VALUES ${rowsSql.join(',')}`,
+    `INSERT INTO menu_items (course, name, description, price, image, sort_order) VALUES ${rowsSql.join(',')}`,
     values
   );
 }
 
 async function ensureCatalogItems() {
   const values = [];
-  const rowsSql = MENU_SEED.map(([course, name, description, price], i) => {
-    values.push(course, name, description, price, i);
-    const offset = i * 5;
-    return `($${offset + 1},$${offset + 2},$${offset + 3},$${offset + 4},$${offset + 5})`;
+  const rowsSql = MENU_SEED.map(([course, name, description, price, image], i) => {
+    values.push(course, name, description, price, image, i);
+    const offset = i * 6;
+    return `($${offset + 1},$${offset + 2},$${offset + 3},$${offset + 4},$${offset + 5},$${offset + 6})`;
   });
   await pool.query(
-    `INSERT INTO menu_items (course, name, description, price, sort_order)
-    SELECT v.course, v.name, v.description, v.price::numeric, v.sort_order::integer
-     FROM (VALUES ${rowsSql.join(',')}) AS v(course, name, description, price, sort_order)
+    `INSERT INTO menu_items (course, name, description, price, image, sort_order)
+    SELECT v.course, v.name, v.description, v.price::numeric, v.image, v.sort_order::integer
+     FROM (VALUES ${rowsSql.join(',')}) AS v(course, name, description, price, image, sort_order)
      WHERE NOT EXISTS (SELECT 1 FROM menu_items m WHERE m.name = v.name)`,
     values
   );
@@ -212,6 +216,29 @@ async function backfillMenuPrices() {
   );
   const n = seeded.rowCount + rest.rowCount;
   if (n) console.log(`menu: priced ${n} item(s) that had none`);
+}
+
+// The image column arrives on rows that were seeded before it existed, so
+// fill it from the catalog by name. Once only, and never over a value that is
+// already set: clearing an image in the admin is how Amanda takes down a photo
+// she no longer likes, and a backfill on every boot would put it straight back.
+async function backfillMenuImages() {
+  const done = await pool.query(
+    `SELECT 1 FROM settings WHERE key = 'menu_images_backfilled'`
+  );
+  if (done.rowCount) return;
+  const withImage = MENU_SEED.filter(([, , , , image]) => image);
+  const { rowCount } = await pool.query(
+    `UPDATE menu_items m SET image = v.image
+       FROM (SELECT unnest($1::text[]) AS name, unnest($2::text[]) AS image) v
+      WHERE m.name = v.name AND m.image IS NULL`,
+    [withImage.map(([, name]) => name), withImage.map(([, , , , image]) => image)]
+  );
+  await pool.query(
+    `INSERT INTO settings (key, value, updated_at)
+     VALUES ('menu_images_backfilled', '1', now()) ON CONFLICT (key) DO NOTHING`
+  );
+  if (rowCount) console.log(`menu: gave ${rowCount} bake(s) their photo`);
 }
 
 // The order menu was seeded from research names before Amanda sent her own,
@@ -314,17 +341,17 @@ async function getMenuItems(ids) {
   return rows;
 }
 
-async function createMenuItem({ course, name, description, price, available }) {
+async function createMenuItem({ course, name, description, price, image, available }) {
   const { rows: last } = await pool.query(`SELECT COALESCE(MAX(sort_order), -1) + 1 AS n FROM menu_items`);
   const { rows } = await pool.query(
-    `INSERT INTO menu_items (course, name, description, price, available, sort_order)
-     VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
-    [course, name, description || null, price ?? null, available !== false, last[0].n]
+    `INSERT INTO menu_items (course, name, description, price, image, available, sort_order)
+     VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+    [course, name, description || null, price ?? null, image || null, available !== false, last[0].n]
   );
   return rows[0];
 }
 
-const MENU_EDITABLE = { course: 'course', name: 'name', description: 'description', price: 'price', available: 'available', sortOrder: 'sort_order' };
+const MENU_EDITABLE = { course: 'course', name: 'name', description: 'description', price: 'price', image: 'image', available: 'available', sortOrder: 'sort_order' };
 
 async function updateMenuItem(id, fields) {
   const sets = [];

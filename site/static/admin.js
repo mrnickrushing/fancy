@@ -194,6 +194,7 @@
         '<td><input data-field="name" value="' + esc(m.name) + '" style="width:200px"></td>' +
         '<td><input data-field="description" value="' + esc(m.description || '') + '" style="width:100%;min-width:220px"></td>' +
         '<td>$<input type="number" min="0" step="0.01" data-field="price" value="' + (m.price != null ? m.price : '') + '" style="width:90px" placeholder="quote"></td>' +
+        '<td><input data-field="image" value="' + esc(m.image || '') + '" style="width:150px" placeholder="none"></td>' +
         '<td><input type="checkbox" data-field="available"' + (m.available ? ' checked' : '') + '></td>' +
         '<td><div class="actions"><button data-act="save-item">Save</button><button class="bad" data-act="delete-item">Remove</button></div></td></tr>';
     }).join('');
@@ -205,14 +206,14 @@
     var f = function (n) { return tr.querySelector('[data-field="' + n + '"]'); };
     try {
       if (btn.dataset.act === 'delete-item') { if (!confirm('Remove this item from the menu? Past orders keep their copy of it.')) return; await api('/api/admin/menu/' + id, { method: 'DELETE' }); }
-      else await api('/api/admin/menu/' + id, { method: 'PATCH', body: JSON.stringify({ course: f('course').value, name: f('name').value, description: f('description').value, price: f('price').value.trim(), available: f('available').checked }) });
+      else await api('/api/admin/menu/' + id, { method: 'PATCH', body: JSON.stringify({ course: f('course').value, name: f('name').value, description: f('description').value, price: f('price').value.trim(), image: f('image').value.trim(), available: f('available').checked }) });
       await loadMenu();
     } catch (err) { alert(err.message); }
   });
   $('menu-add').addEventListener('submit', async function (e) {
     e.preventDefault();
     try {
-      await api('/api/admin/menu', { method: 'POST', body: JSON.stringify({ course: $('mi-course').value, name: $('mi-name').value, description: $('mi-desc').value, price: $('mi-price').value.trim() }) });
+      await api('/api/admin/menu', { method: 'POST', body: JSON.stringify({ course: $('mi-course').value, name: $('mi-name').value, description: $('mi-desc').value, price: $('mi-price').value.trim(), image: $('mi-image').value.trim() }) });
       $('menu-add').reset(); say('menu-msg', 'Added.', true); await loadMenu();
     } catch (err) { say('menu-msg', err.message, false); }
   });

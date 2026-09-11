@@ -40,7 +40,7 @@ ul{list-style:none}
 
 /* ── keyboard focus: one visible ring everywhere, never the UA default ── */
 :focus-visible{outline:2px solid var(--burgundy);outline-offset:3px;border-radius:var(--r-sm)}
-.btn-fill:focus-visible,.enamel :focus-visible,.ribbon :focus-visible,
+.btn-fill:focus-visible,.enamel :focus-visible,
 footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
 
 /* visually hidden, still read aloud */
@@ -91,13 +91,8 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
 .btn-pale:hover{background:var(--gold-pale);color:var(--burgundy-ink);letter-spacing:.32em}
 
 /* ══ masthead ══════════════════════════════════════════════════════
-   The ribbon is one line at every width, and the header shrinks to a
-   slim bar once you start reading. Nothing here is an inline style, so
-   the responsive sheet can restyle it by class. */
-.ribbon{background:var(--burgundy-ink);color:var(--gold-pale);text-align:center;
-  padding:.55rem var(--s5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ribbon-short{display:none}
-
+   The header shrinks to a slim bar once you start reading. Nothing here
+   is an inline style, so the responsive sheet can restyle it by class. */
 .mast{background:var(--paper);border-bottom:1px solid var(--rule);
   padding-block:var(--s6) 0;position:sticky;top:0;z-index:50}
 .mast-in{text-align:center}
@@ -177,7 +172,14 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
 .fare{display:flex;align-items:baseline;gap:var(--s4);padding-block:var(--s5);
   border-bottom:1px solid var(--rule-soft)}
 .fare-n{font-family:var(--serif);font-size:var(--sm);color:var(--gold-read);
-  font-weight:600;width:34px;flex-shrink:0;letter-spacing:.1em}
+  font-weight:600;width:var(--fare-n,34px);flex-shrink:0;letter-spacing:.1em;
+  white-space:nowrap}
+/* The bill of fare runs to XXXIV now. 34px fits about as far as XII, and
+   past that the numerals ran straight into the titles beside them, so the
+   courses get a column wide enough for the longest. In em, so it tracks
+   whatever face is actually serving rather than a pixel guess made against
+   the fallback. The home page board stops at V and keeps the narrow one. */
+.course{--fare-n:4.4em}
 .fare-b{flex-grow:1}
 .fare-t{font-family:var(--serif);font-size:var(--lg);font-weight:600;
   display:flex;align-items:baseline;gap:var(--s3)}
@@ -408,8 +410,6 @@ img{max-width:100%;height:auto}
   html:not(.js) .nav-link{white-space:nowrap;flex-shrink:0}
 }
 @media (max-width:640px){
-  .ribbon-full{display:none}
-  .ribbon-short{display:inline}
   .brand-script{font-size:2.9rem}
   .brand-caps{font-size:1.02rem;letter-spacing:.28em}
   .brand-mark{width:54px;height:54px}
@@ -546,9 +546,13 @@ body.splashing{overflow:hidden}
 /* ── the menu with quantities ── */
 .menu-course{margin-bottom:var(--s12)}
 .menu-course h2{font-size:var(--xl);text-align:left;margin-bottom:var(--s2)}
-.menu-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s5);align-items:center;
+.menu-item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--s5);align-items:center;
   padding:var(--s5) var(--s4);border-bottom:1px solid var(--rule-soft);
   transition:background .18s ease}
+/* a bake with no photograph yet keeps the same two columns as the rest */
+.menu-item.no-shot{grid-template-columns:minmax(0,1fr) auto}
+.menu-thumb{width:74px;height:74px;object-fit:cover;border:1px solid var(--rule);
+  background:var(--paper-3);flex-shrink:0}
 .menu-item .fare-t{margin-bottom:var(--s1)}
 .price{font-family:var(--serif);font-weight:600;white-space:nowrap}
 .price.tbq{font-weight:400;opacity:.72;font-size:var(--sm);white-space:normal;max-width:9em;text-align:right;line-height:1.3}
@@ -730,7 +734,11 @@ body.splashing{overflow:hidden}
   .order-layout{padding-bottom:var(--s16)}
 }
 @media (max-width:640px){
-  .menu-item{grid-template-columns:1fr;gap:var(--s3)}
+  /* the photograph stays beside the name rather than taking a row of its own;
+     price and stepper drop to a full-width line underneath */
+  .menu-item{grid-template-columns:auto minmax(0,1fr);gap:var(--s3) var(--s4)}
+  .menu-item.no-shot{grid-template-columns:1fr}
+  .menu-item .fare-buy{grid-column:1/-1}
   /* price on the left, stepper on the right, both on one line */
   .fare-buy{justify-content:space-between;flex-wrap:nowrap;gap:var(--s4)}
   .price.tbq{text-align:left;max-width:11em}

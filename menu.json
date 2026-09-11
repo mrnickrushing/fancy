@@ -1,35 +1,233 @@
 [
-  {"course": "savory", "name": "Jalapeño, Olive & Red Onion", "description": "Fresh jalapeño, mixed olives, red onion and herbs across a golden, dimpled crust.", "price": 15},
-  {"course": "savory", "name": "The Jalapeño, Garlic and Onion Focaccia", "description": "Jalapeño, garlic and onion.", "price": 15},
-  {"course": "savory", "name": "The Jalapeño n Chedda n Garlic", "description": "Jalapeño, cheddar and garlic, baked into a golden dimpled round.", "price": 15},
-  {"course": "savory", "name": "The Asian Crisp", "description": "Crunchy garlics and onions, chili peppers, sesame seeds, mushroom powder, scallions and an agave drizzle.", "price": 15},
-  {"course": "savory", "name": "Tomato, Olive & Onion", "description": "Cherry tomatoes, olives and red onion.", "price": 15},
-  {"course": "savory", "name": "Olive & Sun-Dried Tomato", "description": "Green and kalamata olives with sun-dried tomato.", "price": 15},
-  {"course": "savory", "name": "The Italiano", "description": "The true Italian focaccia. Focaccia originated in Rome, Italy, and you can taste it in this loaf. Sage, oregano, thyme, basil and garlic.", "price": 15},
-  {"course": "savory", "name": "The Lemon Pepper", "description": "Black pepper with lemon extract from Meyer lemons, garlic and onion.", "price": 15},
-  {"course": "savory", "name": "The Roasted Garlic Boss", "description": "True garlic lovers want this one. Roasted garlic, garlic oil and minced garlic.", "price": 15},
-  {"course": "savory", "name": "The Mediterranean Olive", "description": "Olive variety and sun dried tomatoes.", "price": 15},
-  {"course": "savory", "name": "The Rosemary and Black Pepper", "description": "Rosemary and cracked black pepper, right across the tray.", "price": 15},
-  {"course": "savory", "name": "The Fall Favorite", "description": "Roasted potatoes, rosemary, garlic, caramelized onions and Fontina cheese.", "price": 15},
-  {"course": "savory", "name": "The Pesto and Cashew Cheese", "description": "Basil pesto and cashew cheese, baked in the pan it is served from.", "price": 15},
-  {"course": "savory", "name": "The Focaccia Queen", "description": "Tomatoes, cheese, onions, garlic and an olive variety — Kalamata, pimento and black olives — with cold pressed olive oil and Celtic sea salt.", "price": 15},
-  {"course": "sourdough", "name": "Jalapeño, Garlic and Chedda Sourdough", "description": "Jalapeño, garlic and cheddar wound through a sourdough spiral.", "price": 15},
-  {"course": "sourdough", "name": "Jalapeño Swirl", "description": "Layer on layer, blistered at the edge.", "price": 15},
-  {"course": "sourdough", "name": "The Classic Sourdough", "description": "The loaf everything else is built on.", "price": 15},
-  {"course": "sourdough", "name": "The Roasted Garlic and Rosemary Sourdough", "description": "Roasted garlic and rosemary, wound through the spiral.", "price": 15},
-  {"course": "sourdough", "name": "Classic Artisan Celtic Salted Sourdough", "description": "Nothing on it but Celtic salt.", "price": 15},
-  {"course": "sourdough", "name": "The Mediterranean Sourdough", "description": "Sun dried tomato and olive variety.", "price": 15},
-  {"course": "sourdough", "name": "The Country Loaf", "description": "Naturally leavened with the same starter that lifts the focaccia — mixed the day before, left to rise slow, and baked dark.", "price": 15},
-  {"course": "sweet", "name": "The Brown Buttered Cinnamon Roll", "description": "Flax seed oil butter. Coconut sugar.", "price": 15},
-  {"course": "sweet", "name": "The Pow Cacao", "description": "A decadent chocolate focaccia dessert, sweetened with coconut sugar so it doesn’t spike your blood sugar like regular refined sugar does.", "price": 15},
-  {"course": "sweet", "name": "The Apple Fritter", "description": "Apple fritter focaccia dessert.", "price": 15},
-  {"course": "sweet", "name": "The Hot Honey", "description": "Focaccia muffins with chili peppers, garlic and local honey from the happiest honey bees.", "price": 2},
-  {"course": "small", "name": "The Jalapeño, Garlic and Onion Focaccia Muffins", "description": "Jalapeño, garlic and onion, hand-sized.", "price": 2},
-  {"course": "small", "name": "The Roasted Garlic Focaccia Muffins", "description": "Roasted garlic, hand-sized.", "price": 2},
-  {"course": "small", "name": "The Plain Jane Celtic Salted Focaccia Muffin", "description": "Celtic salt, and nothing else.", "price": 2},
-  {"course": "small", "name": "The Italiano Focaccia Muffins", "description": "The Italiano in muffin form — sage, oregano, thyme, basil and garlic.", "price": 2},
-  {"course": "small", "name": "Peppered Pickle Focaccia Muffins", "description": "Brookings Pickled Goodies’ spicy bread-and-butter pickles, infused right into the dough.", "price": 2},
-  {"course": "art", "name": "The Everything Focaccia", "description": "Poppy seeds, sesame seeds, onion and garlic.", "price": 15},
-  {"course": "art", "name": "Flower Garden with a Bee", "description": "Hand-painted in vegetables and herbs, with an olive bee.", "price": 15},
-  {"course": "art", "name": "Flower Garden", "description": "Hand-painted in vegetables and herbs — a whole garden across the top of the dough.", "price": 15}
+  {
+    "course": "savory",
+    "name": "Jalapeño, Olive & Red Onion",
+    "description": "Fresh jalapeño, mixed olives, red onion and herbs across a golden, dimpled crust.",
+    "price": 15,
+    "image": "savory-round.webp"
+  },
+  {
+    "course": "savory",
+    "name": "The Jalapeño, Garlic and Onion Focaccia",
+    "description": "Jalapeño, garlic and onion.",
+    "price": 15,
+    "image": "jalapeno-garlic-round.webp"
+  },
+  {
+    "course": "savory",
+    "name": "The Jalapeño n Chedda n Garlic",
+    "description": "Jalapeño, cheddar and garlic, baked into a golden dimpled round.",
+    "price": 15,
+    "image": "jalapeno-dimpled.webp"
+  },
+  {
+    "course": "savory",
+    "name": "The Asian Crisp",
+    "description": "Crunchy garlics and onions, chili peppers, sesame seeds, mushroom powder, scallions and an agave drizzle.",
+    "price": 15,
+    "image": "scallion-chili.webp"
+  },
+  {
+    "course": "savory",
+    "name": "Tomato, Olive & Onion",
+    "description": "Cherry tomatoes, olives and red onion.",
+    "price": 15,
+    "image": "tomato-olive-round.webp"
+  },
+  {
+    "course": "savory",
+    "name": "Olive & Sun-Dried Tomato",
+    "description": "Green and kalamata olives with sun-dried tomato.",
+    "price": 15,
+    "image": "olive-tomato.webp"
+  },
+  {
+    "course": "savory",
+    "name": "The Italiano",
+    "description": "The true Italian focaccia. Focaccia originated in Rome, Italy, and you can taste it in this loaf. Sage, oregano, thyme, basil and garlic.",
+    "price": 15,
+    "image": "garlic-herb-round.webp"
+  },
+  {
+    "course": "savory",
+    "name": "The Lemon Pepper",
+    "description": "Black pepper with lemon extract from Meyer lemons, garlic and onion.",
+    "price": 15,
+    "image": "lemon-pepper.webp"
+  },
+  {
+    "course": "savory",
+    "name": "The Roasted Garlic Boss",
+    "description": "True garlic lovers want this one. Roasted garlic, garlic oil and minced garlic.",
+    "price": 15,
+    "image": "square-focaccia.webp"
+  },
+  {
+    "course": "savory",
+    "name": "The Mediterranean Olive",
+    "description": "Olive variety and sun dried tomatoes.",
+    "price": 15,
+    "image": "olive-slab.webp"
+  },
+  {
+    "course": "savory",
+    "name": "The Rosemary and Black Pepper",
+    "description": "Rosemary and cracked black pepper, right across the tray.",
+    "price": 15,
+    "image": "rosemary-slab.webp"
+  },
+  {
+    "course": "savory",
+    "name": "The Fall Favorite",
+    "description": "Roasted potatoes, rosemary, garlic, caramelized onions and Fontina cheese.",
+    "price": 15,
+    "image": "potato-onion.webp"
+  },
+  {
+    "course": "savory",
+    "name": "The Pesto and Cashew Cheese",
+    "description": "Basil pesto and cashew cheese, baked in the pan it is served from.",
+    "price": 15,
+    "image": "pesto-skillet.webp"
+  },
+  {
+    "course": "savory",
+    "name": "The Focaccia Queen",
+    "description": "Tomatoes, cheese, onions, garlic and an olive variety — Kalamata, pimento and black olives — with cold pressed olive oil and Celtic sea salt.",
+    "price": 15,
+    "image": "wide-slab.webp"
+  },
+  {
+    "course": "sourdough",
+    "name": "Jalapeño, Garlic and Chedda Sourdough",
+    "description": "Jalapeño, garlic and cheddar wound through a sourdough spiral.",
+    "price": 15,
+    "image": "jalapeno-swirl-xl.webp"
+  },
+  {
+    "course": "sourdough",
+    "name": "Jalapeño Swirl",
+    "description": "Layer on layer, blistered at the edge.",
+    "price": 15,
+    "image": "swirl-jalapeno.webp"
+  },
+  {
+    "course": "sourdough",
+    "name": "The Classic Sourdough",
+    "description": "The loaf everything else is built on.",
+    "price": 15,
+    "image": "classic-sourdough.webp"
+  },
+  {
+    "course": "sourdough",
+    "name": "The Roasted Garlic and Rosemary Sourdough",
+    "description": "Roasted garlic and rosemary, wound through the spiral.",
+    "price": 15,
+    "image": "garlic-rosemary-sourdough.webp"
+  },
+  {
+    "course": "sourdough",
+    "name": "Classic Artisan Celtic Salted Sourdough",
+    "description": "Nothing on it but Celtic salt.",
+    "price": 15,
+    "image": "plain-swirl.webp"
+  },
+  {
+    "course": "sourdough",
+    "name": "The Mediterranean Sourdough",
+    "description": "Sun dried tomato and olive variety.",
+    "price": 15,
+    "image": "caramel-swirl.webp"
+  },
+  {
+    "course": "sourdough",
+    "name": "The Country Loaf",
+    "description": "Naturally leavened with the same starter that lifts the focaccia — mixed the day before, left to rise slow, and baked dark.",
+    "price": 15,
+    "image": null
+  },
+  {
+    "course": "sweet",
+    "name": "The Brown Buttered Cinnamon Roll",
+    "description": "Flax seed oil butter. Coconut sugar.",
+    "price": 15,
+    "image": "sweet-cinnamon.webp"
+  },
+  {
+    "course": "sweet",
+    "name": "The Pow Cacao",
+    "description": "A decadent chocolate focaccia dessert, sweetened with coconut sugar so it doesn’t spike your blood sugar like regular refined sugar does.",
+    "price": 15,
+    "image": "cinnamon-drizzle-2.webp"
+  },
+  {
+    "course": "sweet",
+    "name": "The Apple Fritter",
+    "description": "Apple fritter focaccia dessert.",
+    "price": 15,
+    "image": "cinnamon-dark.webp"
+  },
+  {
+    "course": "sweet",
+    "name": "The Hot Honey",
+    "description": "Focaccia muffins with chili peppers, garlic and local honey from the happiest honey bees.",
+    "price": 2,
+    "image": "hot-honey-bites.webp"
+  },
+  {
+    "course": "small",
+    "name": "The Jalapeño, Garlic and Onion Focaccia Muffins",
+    "description": "Jalapeño, garlic and onion, hand-sized.",
+    "price": 2,
+    "image": "muffins-jalapeno.webp"
+  },
+  {
+    "course": "small",
+    "name": "The Roasted Garlic Focaccia Muffins",
+    "description": "Roasted garlic, hand-sized.",
+    "price": 2,
+    "image": "parm-muffins.webp"
+  },
+  {
+    "course": "small",
+    "name": "The Plain Jane Celtic Salted Focaccia Muffin",
+    "description": "Celtic salt, and nothing else.",
+    "price": 2,
+    "image": "sea-salt-round.webp"
+  },
+  {
+    "course": "small",
+    "name": "The Italiano Focaccia Muffins",
+    "description": "The Italiano in muffin form — sage, oregano, thyme, basil and garlic.",
+    "price": 2,
+    "image": "herb-rolls.webp"
+  },
+  {
+    "course": "small",
+    "name": "Peppered Pickle Focaccia Muffins",
+    "description": "Brookings Pickled Goodies’ spicy bread-and-butter pickles, infused right into the dough.",
+    "price": 2,
+    "image": null
+  },
+  {
+    "course": "art",
+    "name": "The Everything Focaccia",
+    "description": "Poppy seeds, sesame seeds, onion and garlic.",
+    "price": 15,
+    "image": "heart-loaf.webp"
+  },
+  {
+    "course": "art",
+    "name": "Flower Garden with a Bee",
+    "description": "Hand-painted in vegetables and herbs, with an olive bee.",
+    "price": 15,
+    "image": "art-garden.webp"
+  },
+  {
+    "course": "art",
+    "name": "Flower Garden",
+    "description": "Hand-painted in vegetables and herbs — a whole garden across the top of the dough.",
+    "price": 15,
+    "image": "hero-garden.webp"
+  }
 ]
