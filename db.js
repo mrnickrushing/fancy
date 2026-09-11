@@ -14,7 +14,7 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 // are added once on startup so the two customer-facing paths cannot drift.
 const MENU_SEED = MENU_CATALOG.map(({ course, name, description, price }) => [course, name, description, price]);
 
-const COURSES = { savory: 'Savory', sourdough: 'Sourdough', sweet: 'Sweet', small: 'Muffins & Rolls', art: 'Focaccia Art' };
+const COURSES = { savory: 'Savory', sourdough: 'Sourdough', sweet: 'Sweet', small: 'Focaccia Muffins', art: 'Focaccia Art' };
 
 // What customers are told about paying. Editable from the admin's Settings
 // tab; these are only the values a fresh install starts with. Nothing here

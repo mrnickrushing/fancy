@@ -1,14 +1,14 @@
 [
-  {"course":"savory","name":"Olive & Sun-Dried Tomato Swirl","description":"A spiralled round layered with green and kalamata olives, sun-dried tomato, herbs and grated cheese. Crisp at the edges, soft through the middle.","price":15},
-  {"course":"savory","name":"Jalapeño, Olive & Red Onion","description":"Our signature round — fresh jalapeño, mixed olives, red onion and herbs across a golden, dimpled crust.","price":15},
-  {"course":"savory","name":"Roasted Garlic & Sea Salt","description":"Simple and perfect. Olive oil, roasted garlic and flaky salt on a pillowy sourdough crumb.","price":15},
-  {"course":"savory","name":"Cheesy Jalapeño","description":"Melted and bubbling, with jalapeño baked right into the top.","price":15},
-  {"course":"sourdough","name":"The Country Loaf","description":"Naturally leavened with the same starter that lifts the focaccia — mixed the day before, left to rise slow, and baked dark.","price":15},
-  {"course":"sweet","name":"Cinnamon Swirl with Vanilla Drizzle","description":"A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze.","price":15},
-  {"course":"sweet","name":"Honey Focaccia Bites","description":"Pull-apart bites, boxed and drizzled with Chetco Gold raw honey.","price":2},
-  {"course":"small","name":"Jalapeño & Roasted Garlic Muffins","description":"Hand-sized, crisp-edged, crowned with jalapeño and toasted garlic.","price":2},
-  {"course":"small","name":"Peppered Pickle Muffins","description":"Brookings Pickled Goodies’ spicy bread-and-butter pickles, infused right into the dough.","price":2},
-  {"course":"small","name":"Sea Salt Rolls","description":"Soft pull-apart rounds, olive-oil brushed and salt flaked.","price":2},
-  {"course":"art","name":"Heart Loaf","description":"A little hand-shaped heart. They go fast.","price":15},
-  {"course":"art","name":"Flower Garden","description":"Hand-painted in vegetables and herbs — a whole garden across the top of the dough.","price":15}
+  {"course": "savory", "name": "Olive & Sun-Dried Tomato Swirl", "description": "A spiralled round layered with green and kalamata olives, sun-dried tomato, herbs and grated cheese. Crisp at the edges, soft through the middle.", "price": 15},
+  {"course": "savory", "name": "Jalapeño, Olive & Red Onion", "description": "Our signature round — fresh jalapeño, mixed olives, red onion and herbs across a golden, dimpled crust.", "price": 15},
+  {"course": "savory", "name": "Roasted Garlic & Sea Salt", "description": "Simple and perfect. Olive oil, roasted garlic and flaky salt on a pillowy sourdough crumb.", "price": 15},
+  {"course": "savory", "name": "Cheesy Jalapeño", "description": "Melted and bubbling, with jalapeño baked right into the top.", "price": 15},
+  {"course": "sourdough", "name": "The Country Loaf", "description": "Naturally leavened with the same starter that lifts the focaccia — mixed the day before, left to rise slow, and baked dark.", "price": 15},
+  {"course": "sweet", "name": "Cinnamon Swirl with Vanilla Drizzle", "description": "A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze.", "price": 15},
+  {"course": "sweet", "name": "Honey Focaccia Bites", "description": "Pull-apart bites, boxed and drizzled with Chetco Gold raw honey.", "price": 2},
+  {"course": "small", "name": "Jalapeño & Roasted Garlic Muffins", "description": "Hand-sized, crisp-edged, crowned with jalapeño and toasted garlic.", "price": 2},
+  {"course": "small", "name": "Peppered Pickle Muffins", "description": "Brookings Pickled Goodies’ spicy bread-and-butter pickles, infused right into the dough.", "price": 2},
+  {"course": "small", "name": "Sea Salt Focaccia Muffins", "description": "Olive-oil brushed and salt flaked. No rolls here — every small one is a focaccia muffin.", "price": 2},
+  {"course": "art", "name": "Heart Loaf", "description": "Baked in a cast iron heart pan. They go fast.", "price": 15},
+  {"course": "art", "name": "Flower Garden", "description": "Hand-painted in vegetables and herbs — a whole garden across the top of the dough.", "price": 15}
 ]

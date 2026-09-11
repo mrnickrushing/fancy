@@ -29,7 +29,7 @@ PAGES = [
     ("about.html",   D.ABOUT,   "About — Oh! You Fancy Focaccia",
      "A small-batch focaccia and sourdough bakery on the southern Oregon coast, run by Amanda."),
     ("breads.html",  D.BREADS,  "The Bill of Fare — Oh! You Fancy Focaccia",
-     "Sourdough loaves, savory and sweet focaccia, muffins, rolls and focaccia art, baked with organic ingredients."),
+     "Sourdough loaves, savory and sweet focaccia, focaccia muffins and focaccia art, baked with organic ingredients."),
     ("gallery.html", D.GALLERY, "Gallery — Oh! You Fancy Focaccia",
      "Thirty-one bakes, straight from the tray and straight from the market table."),
     ("reviews.html", D.REVIEWS, "Reviews — Oh! You Fancy Focaccia",

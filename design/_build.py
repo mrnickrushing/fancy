@@ -747,7 +747,7 @@ class Component extends DCLogic {{}}
 PROC = [("I","Bend","The dough comes together slow. Organic flour, water, and a starter that has been going a while."),
         ("II","Snap","Air gets folded in, not beaten out. This is where the crumb is decided."),
         ("III","Stretch","Out to the corners by hand, never pressed flat by a machine."),
-        ("IV","Fold","Rested, dimpled, drowned in good olive oil, and into the oven.")]
+        ("IV","Fold","Rested, dimpled, drowned in extra virgin cold-pressed organic olive oil, and into the oven.")]
 
 HOME = masthead("Home") + f"""
 <section class="hero">
@@ -760,7 +760,7 @@ HOME = masthead("Home") + f"""
         One starter,<br><span style="font-style:italic;font-weight:500">endlessly</span><br>argued over.</h1>
       <p class="hero-lede">
         Focaccia and sourdough from one mother starter &#8212; savory and sweet,
-        dimpled and blistered, and shaped by hand on the southern Oregon coast.</p>
+        dimpled and blistered, and made by hand on the southern Oregon coast.</p>
       <div class="hero-cta">
         <a href="#" class="btn btn-fill">Order for Pickup</a>
         <a href="#" class="btn btn-line">See the Bill of Fare</a>
@@ -794,7 +794,7 @@ HOME = masthead("Home") + f"""
     <div>
       <p class="caps kicker kicker-l">From the Board</p>
       <h2 style="font-size:var(--xl);margin-bottom:var(--s3);text-align:left">What we are baking</h2>
-      <p style="opacity:.78;margin-bottom:var(--s8)">The board turns over with the season and with whatever our neighbours are growing.</p>
+      <p style="opacity:.78;margin-bottom:var(--s8)">The board turns over with the season and with the best and freshest our neighbours are growing.</p>
       <div class="fare"><span class="fare-n">I</span><div class="fare-b">
         <p class="fare-t"><span>Olive &amp; Sun-Dried Tomato Swirl</span></p>
         <p class="fare-d">Green and kalamata olives, sun-dried tomato, herbs, grated cheese. Crisp at the edge, soft through the middle.</p></div></div>
@@ -870,8 +870,8 @@ HOME = masthead("Home") + f"""
         <p style="font-size:var(--sm);opacity:.74">Monica builds her sandwiches on our bread, two stalls down.</p></div></div>
       <div style="display:flex;gap:var(--s5);align-items:baseline;padding-block:var(--s5);
         border-bottom:1px solid var(--rule-soft)">
-        <span class="fare-n">&#8212;</span><div><h3 style="font-size:var(--lg)">Shalom Coffee Roasting</h3>
-        <p style="font-size:var(--sm);opacity:.74">Our market neighbours, and the right cup beside a warm piece.</p></div></div>
+        <span class="fare-n">&#8212;</span><div><h3 style="font-size:var(--lg)">Sylvia&#8217;s Farm Fresh Produce</h3>
+        <p style="font-size:var(--sm);opacity:.74">Her jalape&#241;os and apples, and so much more, go into the focaccia.</p></div></div>
     </div>
   </div>
 </section>
@@ -956,16 +956,19 @@ def fare(n, title, desc):
     return f"""<div class="fare"><span class="fare-n">{n}</span><div class="fare-b">
       <p class="fare-t"><span>{title}</span>{price_html}</p><p class="fare-d">{desc}</p></div></div>"""
 
-def course(title, ital, rows, cap=None):
+def course(title, ital, rows, cap=None, note=""):
     """A run of the bill of fare. Without a photograph it runs full width —
-    better an honest single column than a gap where a picture should be."""
+    better an honest single column than a gap where a picture should be.
+    `note` is for something true of the whole course rather than one bake."""
+    n = (f'<p style="font-size:var(--sm);font-style:italic;opacity:.78;'
+         f'margin-bottom:var(--s5)">{note}</p>') if note else ""
     return f"""<div class="course">
   <div class="course-grid{' has-aside' if cap else ''}">
     <div>
       <p class="caps" style="color:var(--olive);margin-bottom:var(--s2)">{ital}</p>
       <h2 style="font-size:var(--xl);text-align:left;margin-bottom:var(--s2)">{title}</h2>
       <div style="width:64px;height:2px;background:var(--burgundy);margin-bottom:var(--s4)"></div>
-      {''.join(rows)}
+      {n}{''.join(rows)}
     </div>
     {shot(cap[0], 360, cap[1]) if cap else ""}
   </div>
@@ -988,15 +991,16 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
       fare("VII","Cinnamon Swirl with Vanilla Drizzle","A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze."),
       fare("VIII","Honey Focaccia Bites","Pull-apart bites, boxed and drizzled with award-winning Chetco Gold raw honey from right here on the Chetco River."),
     ],("sweet-cinnamon.webp","Cinnamon swirl focaccia with vanilla drizzle"))}
-    {course("Muffins &amp; Rolls","I Piccoli",[
+    {course("Focaccia Muffins","I Piccoli",[
       fare("IX","Jalape&#241;o &amp; Roasted Garlic Muffins","Hand-sized, crisp-edged, crowned with jalape&#241;o and toasted garlic."),
       fare("X","Peppered Pickle Muffins","Made with Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles infused right into the dough. Organic ingredients only."),
-      fare("XI","Sea Salt Rolls","Soft pull-apart rounds, olive-oil brushed and salt flaked."),
-    ],("muffins-jalapeno.webp","Jalapeno and roasted garlic focaccia muffins"))}
+      fare("XI","Sea Salt Focaccia Muffins","Olive-oil brushed and salt flaked."),
+    ],("muffins-jalapeno.webp","Jalapeno and roasted garlic focaccia muffins"),
+      note="Every flavour on this list can be baked as a focaccia muffin.")}
     {course("Focaccia Art","L&#8217;Arte",[
-      fare("XII","Heart Loaf","Little hand-shaped hearts. They go fast."),
+      fare("XII","Heart Loaf","Baked in a cast iron heart pan. They go fast."),
       fare("XIII","Flower Garden","Hand-painted in vegetables and herbs &#8212; a whole garden across the top of the dough."),
-    ],("heart-loaf.webp","A hand-shaped focaccia heart"))}
+    ],("heart-loaf.webp","Focaccia baked in a cast iron heart pan"))}
   </div>
 </section>
 
@@ -1009,7 +1013,7 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
       <div class="plate"><h3>As pizza</h3><p>&#8220;It was delicious the way it is, but turning it into a pizza was super fast and easy.&#8221;</p></div>
       <div class="plate"><h3>As a sandwich</h3><p>Go see Monica at The Dawg House &#8212; she builds hers on our focaccia at the market.</p></div>
       <div class="plate"><h3>As toast</h3><p>Avocado, feta and heirloom tomatoes on a thick slice. A customer sent us that one.</p></div>
-      <div class="plate"><h3>As it comes</h3><p>Warm, torn by hand, with good olive oil. Honestly the best way.</p></div>
+      <div class="plate"><h3>As it comes</h3><p>Warm, torn by hand, with extra virgin cold-pressed organic olive oil. Honestly the best way.</p></div>
     </div>
     <div style="max-width:660px;margin:var(--s16) auto 0;padding:var(--s10);
       background:var(--paper-2);border:1px solid var(--rule);text-align:center">
@@ -1046,7 +1050,7 @@ GAL_SECTIONS = [
    ("garlic-rosemary-sourdough.webp","The Roasted Garlic and Rosemary Sourdough","Roasted garlic and rosemary, wound through the spiral.",300),
    ("plain-swirl.webp","Classic Artisan Celtic Salted Sourdough","Nothing on it but Celtic salt.",300),
    ("caramel-swirl.webp","The Mediterranean Sourdough","Sun dried tomato and olive variety.",300)]),
- ("I Piccoli","Muffins &amp; Rolls", [
+ ("I Piccoli","Focaccia Muffins", [
    ("muffins-jalapeno.webp","The Jalape&#241;o, Garlic and Onion Focaccia Muffins","Jalape&#241;o, garlic and onion, hand-sized.",300),
    ("parm-muffins.webp","The Roasted Garlic Focaccia Muffins","Roasted garlic, hand-sized.",300),
    ("sea-salt-round.webp","The Plain Jane Celtic Salted Focaccia Muffin","Celtic salt, and nothing else.",300),
@@ -1305,7 +1309,7 @@ MOBILE = f"""
   <p class="caps kicker" style="color:var(--olive);font-size:.66rem">Artisan Breads</p>
   <h1 style="font-size:2.6rem;line-height:1.04;text-align:center;margin-bottom:var(--s5)">
     One starter,<br><span style="font-style:italic;font-weight:500">endlessly</span><br>argued over.</h1>
-  <p style="text-align:center;opacity:.78;margin-bottom:var(--s6)">Focaccia and sourdough from one mother starter &#8212; dimpled, blistered, organic, and shaped by hand.</p>
+  <p style="text-align:center;opacity:.78;margin-bottom:var(--s6)">Focaccia and sourdough from one mother starter &#8212; dimpled, blistered, organic, and made by hand.</p>
   <a href="#" class="btn btn-fill" style="width:100%">See the Bill of Fare</a>
   {shot("hero-garden.webp",340,"Focaccia painted in herbs and vegetables","shot-oval","margin-top:var(--s8)")}
 </section>
