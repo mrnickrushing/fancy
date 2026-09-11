@@ -60,6 +60,23 @@ directory one level under the mount).
 That is all — the code sends the moment the key exists. Until then the order form
 still confirms to the customer on screen and the order lands in the admin.
 
+### Where the bakery's addresses go
+
+Cloudflare Email Routing receives; Resend sends. They are separate systems, and
+an address that can send is not automatically an address that can receive.
+
+| Address | Forwards to | Carries |
+|---|---|---|
+| `info@` | `ohyoufancyfocaccia@gmail.com` | The address printed on the website, the `Reply-To` on every customer email, and new-review notices |
+| `orders@` | `ohyoufancyfocaccia@gmail.com` | New-order notices |
+| `focaccia@` | `mrnickrushing@gmail.com` | Nick |
+
+The catch-all is disabled, so an address with no rule does not arrive at all.
+`info@` went unrouted for a while for exactly that reason: `INFO_EMAIL` is unset
+on `web`, so `mail.js` falls back to `info@ohyoufancyfocaccia.com`, and every
+customer reply and every review notice was lost. Add an address to the site,
+add its route.
+
 ## DNS
 
 Both records are CNAMEs to the Railway service. Cloudflare flattens the apex

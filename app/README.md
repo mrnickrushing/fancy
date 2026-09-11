@@ -94,6 +94,11 @@ npx expo-doctor
 | Apple team | `PH4AKDQ4Q7` |
 | OTA channel | `production`, `runtimeVersion` following `appVersion` |
 
+iOS is the shipping target. `app.json` carries an Android block and every
+screen is cross-platform, but nothing is registered in Play Console and
+`eas.json` has no Android submit profile. Adding them later costs a key and a
+profile, not a rewrite.
+
 The store listing is **Bread Lady**, and `expo.name` matches it, so the name
 under the icon on Amanda's phone is the name in the App Store. The repository,
 the slug and the bundle identifier all still say `ohyoufancyfocaccia`; they are
