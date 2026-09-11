@@ -28,6 +28,37 @@ test('the loading screen is on the home page only', async () => {
   assert.doesNotMatch((await request(app).get('/about.html')).text, /id="splash"/);
 });
 
+test('the loading screen carries the hill scene, not a flat wash', async () => {
+  const res = await request(app).get('/');
+  assert.match(res.text, /<svg class="scene"/, 'the drawn scene is missing');
+  assert.match(res.text, /class="wash"/, 'the burgundy wash over the scene is missing');
+  assert.doesNotMatch(res.text, /\.splash\{[^}]*radial-gradient/,
+    'the splash fell back to a flat gradient');
+});
+
+test('reduced motion mutes the scene, which the script turns on regardless', async () => {
+  const css = (await request(app).get('/style.css')).text;
+  const block = css.slice(css.indexOf('@media (prefers-reduced-motion:reduce)'));
+  assert.ok(block, 'no reduced-motion block at all');
+  assert.match(block.slice(0, block.indexOf('}\n}') + 3), /\.splash \.scene[^}]*transition:none/,
+    'the scene keeps its 12s drift for reduced-motion visitors');
+});
+
+test('every splash mark is driven, not just the first', async () => {
+  const page = (await request(app).get('/')).text;
+  const marks = page.match(/class="splash-mark"/g) || [];
+  assert.ok(marks.length >= 2, `expected the badge and the wordmark, found ${marks.length}`);
+  // querySelector would light the badge and leave the wordmark invisible forever
+  const js = (await request(app).get('/splash.js')).text;
+  assert.match(js, /querySelectorAll\('\.splash-mark'\)/);
+});
+
+test('the bill of fare lists the sourdough', async () => {
+  const res = await request(app).get('/breads.html');
+  assert.match(res.text, /Sourdough/);
+  assert.match(res.text, /The Country Loaf/);
+});
+
 test('no unresolved placeholder links survive', async () => {
   for (const p of PAGES) {
     const res = await request(app).get(p);

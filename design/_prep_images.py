@@ -13,12 +13,18 @@ SRC = "/root/.claude/uploads/01dc96a3-a6dd-5803-8a08-d1aa320808c5"
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "img")
 TARGET = 68 * 1024
 
-def fit(im, path, lo=38, hi=90):
+def fit(im, path, lo=38, hi=90, target=TARGET):
+    """Write `im` as WebP at the highest quality that stays inside `target`.
+
+    Binary search rather than a fixed quality: a flat-lit round and a
+    heavily-blistered crust land decades apart on the quality scale for the
+    same file size. Returns (quality, bytes), or None if even `lo` overshoots
+    — which is the caller's signal to reduce the dimensions instead."""
     best = None
     while lo <= hi:
         q = (lo + hi) // 2
         b = io.BytesIO(); im.save(b, "WEBP", quality=q, method=6)
-        if b.tell() <= TARGET:
+        if b.tell() <= target:
             best = (q, b.getvalue()); lo = q + 1
         else:
             hi = q - 1
@@ -38,8 +44,13 @@ def fit_dim(src, name, w):
         w = int(w * 0.88)
     raise SystemExit(f"{name}: cannot reach budget")
 
-def prepare_logo(stem, size=480):
-    """Crop the label to its circle and mask the white ground away."""
+def prepare_logo(stem, size=480, out="logo", budget=TARGET):
+    """Crop the label to its circle and mask the white ground away.
+
+    Two sizes come out of this: the 480px one every masthead and the favicon
+    use, and a 840px one for the loading screen, where the label is the whole
+    picture and its lettering has to survive being read. The big one is over
+    the gallery budget on purpose — it is the only image on that screen."""
     im = Image.open(f"{SRC}/{stem}-image.png").convert("RGB")
     W, H = im.size; px = im.load()
     minx, miny, maxx, maxy = W, H, 0, 0
@@ -57,7 +68,7 @@ def prepare_logo(stem, size=480):
     m = Image.new("L", (size, size), 0)
     ImageDraw.Draw(m).ellipse((1, 1, size - 2, size - 2), fill=255)
     im.putalpha(m)
-    fit(im, f"{OUT}/logo.webp", lo=60)
+    fit(im, f"{OUT}/{out}.webp", lo=60, hi=92, target=budget)
 
 JOBS = [
     ("d3b4b8ed", "hero-garden", 760), ("37832b3a", "savory-round", 600),
@@ -85,6 +96,7 @@ JOBS = [
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     prepare_logo("c2a2c49b")
+    prepare_logo("c2a2c49b", size=840, out="logo-splash", budget=140 * 1024)
     for stem, name, w in JOBS:
         src = f"{SRC}/{stem}-image.png"
         if not os.path.exists(src):

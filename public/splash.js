@@ -6,7 +6,9 @@
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var ings=[].slice.call(s.querySelectorAll('.ing')),
       dims=[].slice.call(s.querySelectorAll('.dim-rail i')),
-      ring=s.querySelector('.splash-ring'), mark=s.querySelector('.splash-mark'),
+      ring=s.querySelector('.splash-ring'),
+      marks=[].slice.call(s.querySelectorAll('.splash-mark')),
+      scene=s.querySelector('.scene'),
       tag=s.querySelector('.splash-tag'), ent=s.querySelector('.splash-enter'),
       skip=s.querySelector('.splash-skip'), timers=[], done=false;
   function at(ms,fn){ timers.push(setTimeout(fn,reduced?Math.min(ms,120):ms)); }
@@ -18,8 +20,9 @@
     setTimeout(function(){ s.remove(); },900);
     document.removeEventListener('keydown',enter);
   }
+  requestAnimationFrame(function(){ if(scene) scene.classList.add('on'); });
   at(60,function(){ ring.classList.add('on'); });
-  at(420,function(){ mark.classList.add('on'); });
+  at(420,function(){ marks.forEach(function(m){ m.classList.add('on'); }); });
   ings.forEach(function(el,i){
     at(1300+i*760,function(){ el.classList.add('on'); });
     if(i<ings.length-1) at(1300+(i+1)*760,function(){ el.classList.remove('on'); el.classList.add('gone'); });

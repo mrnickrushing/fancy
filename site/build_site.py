@@ -23,12 +23,12 @@ FB    = "https://www.facebook.com/profile.php?id=61584072034572"
 
 PAGES = [
     ("index.html",   D.HOME,    "Oh! You Fancy Focaccia — Artisan Focaccia in Brookings, Oregon",
-     "Small-batch organic focaccia, baked by hand in Brookings, Oregon. Find us at the "
-     "Brookings-Harbor Farmers Market, Wednesdays and Saturdays, 9am 'til sold out."),
+     "Small-batch organic focaccia and sourdough, baked by hand in Brookings, Oregon. Find us "
+     "at the Brookings-Harbor Farmers Market, Wednesdays and Saturdays, 9am 'til sold out."),
     ("about.html",   D.ABOUT,   "About — Oh! You Fancy Focaccia",
-     "A small-batch bakery on the southern Oregon coast, run by Amanda."),
+     "A small-batch focaccia and sourdough bakery on the southern Oregon coast, run by Amanda."),
     ("breads.html",  D.BREADS,  "The Bill of Fare — Oh! You Fancy Focaccia",
-     "Savory and sweet focaccia, muffins, rolls and focaccia art, baked with organic ingredients."),
+     "Sourdough loaves, savory and sweet focaccia, muffins, rolls and focaccia art, baked with organic ingredients."),
     ("gallery.html", D.GALLERY, "Gallery — Oh! You Fancy Focaccia",
      "Twenty-nine bakes, straight from the tray and straight from the market table."),
     ("reviews.html", D.REVIEWS, "Reviews — Oh! You Fancy Focaccia",
@@ -139,9 +139,24 @@ img{max-width:100%;height:auto}
 # runs once, can be skipped, and does not replay as you move around the site.
 SPLASH_CSS = """
 .splash{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;
-  overflow:hidden;background:radial-gradient(ellipse 92% 80% at 50% 42%,#5C1414,#3A0C0C 46%,#240808);
+  overflow:hidden;background:#240808;
   transition:opacity .85s var(--ease),visibility .85s var(--ease)}
+/* the hill country drifts in and settles, the way a curtain lifts on it */
+.splash .scene{position:absolute;inset:0;width:100%;height:100%;opacity:0;transform:scale(1.07);
+  transition:opacity 1.8s var(--ease),transform 12s linear}
+.splash .scene.on{opacity:1;transform:scale(1)}
+.splash-badge{position:relative;margin:0 auto;
+  /* the label is the picture on this screen, so it takes as much of the
+     viewport as the column below it can spare */
+  width:min(460px,40vh,80vw);height:min(460px,40vh,80vw)}
+.splash .wash{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,oklch(.32 .13 28/.58) 0%,oklch(.25 .12 28/.74) 46%,
+    oklch(.15 .08 28/.92) 100%)}
 .splash[hidden]{opacity:0;visibility:hidden;pointer-events:none;display:flex}
+/* a safety net for viewports too short for the column — never a visible bar */
+.splash{overflow-y:auto;scrollbar-width:none}
+.splash::-webkit-scrollbar{display:none}
+.splash-in{margin-block:auto;padding-block:var(--s8) 76px}  /* room for the skip line */
 .splash::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.4;
   background-image:radial-gradient(oklch(.9 .08 75/.10) .6px,transparent .6px);background-size:4px 4px}
 .splash .vig{position:absolute;inset:0;pointer-events:none;
@@ -154,7 +169,7 @@ SPLASH_CSS = """
 .splash-ring circle.draw{stroke-dasharray:604;stroke-dashoffset:604;
   transition:stroke-dashoffset 1.5s var(--ease)}
 .splash-ring.on circle.draw{stroke-dashoffset:0}
-.ing-rail{position:relative;height:96px;margin-top:var(--s8)}
+.ing-rail{position:relative;height:96px;margin-top:var(--s6)}
 .ing{position:absolute;inset:0;opacity:0;transform:translateY(7px);
   transition:opacity .42s var(--ease),transform .42s var(--ease)}
 .ing.on{opacity:1;transform:none}
@@ -176,10 +191,39 @@ SPLASH_CSS = """
 .splash-skip.on{opacity:1}
 body.splashing{overflow:hidden}
 @media (max-width:640px){
-  .ing-w{font-size:1.8rem}.ing-rail{height:76px}
+  .ing-w{font-size:1.8rem}.ing-rail{height:76px;margin-top:var(--s6)}
   .splash .frame{inset:16px}
+  .splash-in p[style*="var(--script)"]{font-size:3.1rem!important}
+  .splash-in p[style*="uppercase"][style*="2.2rem"]{font-size:1.3rem!important}
+  .splash-tag{margin-top:var(--s6)!important}
+  .splash-enter{margin-top:var(--s6)!important}
+  /* a phone has no keyboard to press, and the line only crowds the button */
+  .splash-skip{display:none}
+  .splash-in{padding-block:var(--s6)}
+}
+/* a small old phone (360x640) is the tightest case there is */
+@media (max-width:640px) and (max-height:700px){
+  .ing-rail{height:62px;margin-top:var(--s4)}
+  .splash-in p[style*="var(--script)"]{font-size:2.6rem!important}
+  .splash-in p[style*="uppercase"][style*="2.2rem"]{font-size:1.1rem!important}
+  .splash-tag{margin-top:var(--s4)!important}
+  .splash-enter{margin-top:var(--s4)!important}
+  .splash-in{padding-block:var(--s4)}
+}
+/* a laptop lid is often shorter than the column is tall — give it back.
+   Phones are handled above; this is only for short, wide screens. */
+@media (min-width:641px) and (max-height:860px){
+  .splash-badge{width:min(460px,36vh);height:min(460px,36vh)}
+  .ing-rail{height:76px;margin-top:var(--s5)}
+  .splash-in p[style*="var(--script)"]{font-size:3.8rem!important}
+  .splash-tag{margin-top:var(--s5)!important}
+  .splash-enter{margin-top:var(--s5)!important}
+  .splash-in{padding-block:var(--s5) 64px}
 }
 @media (prefers-reduced-motion:reduce){
+  /* the script adds .on regardless, so the scene needs muting here or a
+     reduced-motion visitor still gets the twelve-second drift */
+  .splash .scene,.splash .scene.on{transition:none;transform:none}
   .splash-ring circle.draw{stroke-dashoffset:0}
   .splash-mark,.ing,.splash-tag,.splash-enter,.splash-skip{transition:none}
 }
@@ -194,7 +238,9 @@ SPLASH_JS = """
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var ings=[].slice.call(s.querySelectorAll('.ing')),
       dims=[].slice.call(s.querySelectorAll('.dim-rail i')),
-      ring=s.querySelector('.splash-ring'), mark=s.querySelector('.splash-mark'),
+      ring=s.querySelector('.splash-ring'),
+      marks=[].slice.call(s.querySelectorAll('.splash-mark')),
+      scene=s.querySelector('.scene'),
       tag=s.querySelector('.splash-tag'), ent=s.querySelector('.splash-enter'),
       skip=s.querySelector('.splash-skip'), timers=[], done=false;
   function at(ms,fn){ timers.push(setTimeout(fn,reduced?Math.min(ms,120):ms)); }
@@ -206,8 +252,9 @@ SPLASH_JS = """
     setTimeout(function(){ s.remove(); },900);
     document.removeEventListener('keydown',enter);
   }
+  requestAnimationFrame(function(){ if(scene) scene.classList.add('on'); });
   at(60,function(){ ring.classList.add('on'); });
-  at(420,function(){ mark.classList.add('on'); });
+  at(420,function(){ marks.forEach(function(m){ m.classList.add('on'); }); });
   ings.forEach(function(el,i){
     at(1300+i*760,function(){ el.classList.add('on'); });
     if(i<ings.length-1) at(1300+(i+1)*760,function(){ el.classList.remove('on'); el.classList.add('gone'); });
@@ -224,18 +271,19 @@ SPLASH_JS = """
 
 SPLASH_HTML = """
 <div class="splash" id="splash" role="dialog" aria-label="Welcome to Oh! You Fancy Focaccia">
-  <div class="frame"></div><div class="vig"></div>
+  __SCENE__
+  <div class="wash"></div><div class="frame"></div><div class="vig"></div>
   <div class="splash-in">
-    <div style="position:relative;width:214px;height:214px;margin:0 auto">
-      <svg class="splash-ring" width="214" height="214" viewBox="0 0 200 200" aria-hidden="true"
-        style="position:absolute;inset:0">
+    <div class="splash-badge">
+      <svg class="splash-ring" viewBox="0 0 200 200" aria-hidden="true"
+        style="position:absolute;inset:0;width:100%;height:100%">
         <circle cx="100" cy="100" r="96" class="draw" fill="none" stroke="#D9A94E" stroke-width="1.5"
           transform="rotate(-90 100 100)" stroke-linecap="round"/>
         <circle cx="100" cy="100" r="91" fill="none" stroke="#D9A94E" stroke-width=".5" opacity=".4"/>
       </svg>
-      <img src="./img/logo.webp" alt="Oh! You Fancy Focaccia" class="splash-mark"
-        width="182" height="182"
-        style="position:absolute;inset:16px;width:182px;height:182px;border-radius:50%">
+      <img src="./img/logo-splash.webp" alt="Oh! You Fancy Focaccia" class="splash-mark"
+        width="840" height="840"
+        style="position:absolute;inset:7.5%;width:85%;height:85%;border-radius:50%">
     </div>
     <div class="splash-mark" style="margin-top:var(--s6)">
       <p style="font-family:var(--script);font-size:4.6rem;line-height:.78;color:#F2DFC0">Oh! You Fancy</p>
@@ -250,7 +298,7 @@ SPLASH_HTML = """
       <div class="ing"><p class="ing-w">Tempo</p><p class="ing-g">time</p></div>
     </div>
     <div class="dim-rail"><i></i><i></i><i></i><i></i><i></i></div>
-    <div class="splash-tag" style="margin-top:var(--s10)">
+    <div class="splash-tag" style="margin-top:var(--s8)">
       <p style="font-family:var(--serif);font-size:.78rem;font-weight:600;letter-spacing:.46em;
         text-transform:uppercase;color:#D9A94E">Pane &#183; Amore &#183; Sempre</p>
     </div>
@@ -263,6 +311,9 @@ SPLASH_HTML = """
     Press any key to skip</p></div>
 </div>
 """
+
+# the artboard source owns the drawing; the page just hosts it
+SPLASH_HTML = SPLASH_HTML.replace("__SCENE__", D.scene_svg())
 
 DOC = """<!doctype html>
 <html lang="en">
@@ -302,7 +353,7 @@ LD_JSON = """<script type="application/ld+json">
   "@type": "Bakery",
   "name": "Oh! You Fancy Focaccia",
   "url": "https://ohyoufancyfocaccia.com/",
-  "description": "Small-batch organic focaccia baked by hand in Brookings, Oregon.",
+  "description": "Small-batch organic focaccia and sourdough baked by hand in Brookings, Oregon.",
   "email": "ohyoufancyfocaccia@gmail.com",
   "sameAs": ["https://www.facebook.com/profile.php?id=61584072034572"],
   "servesCuisine": "Italian",
