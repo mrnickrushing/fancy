@@ -1009,7 +1009,7 @@ GAL_SECTIONS = [
    ("rosemary-slab.webp","The Rosemary and Black Pepper","Rosemary and cracked black pepper, right across the tray.",390),
    ("potato-onion.webp","The Fall Favorite","Roasted potatoes, rosemary, garlic, caramelized onions and Fontina cheese.",380),
    ("pesto-skillet.webp","The Pesto and Cashew Cheese","Basil pesto and cashew cheese, baked in the pan it is served from.",250),
-   ("wide-slab.webp","The Focaccia Queen","Tomatoes, cheese, onions, garlic and an olive variety &#8212; Kalamata, pimento and black olives &#8212; with cold pressed olive oil.",250)]),
+   ("wide-slab.webp","The Focaccia Queen","Tomatoes, cheese, onions, garlic and an olive variety &#8212; Kalamata, pimento and black olives &#8212; with cold pressed olive oil and Celtic sea salt.",250)]),
  ("Le Spirali","Swirls", [
    ("jalapeno-swirl-xl.webp","Jalape&#241;o, Garlic and Chedda Sourdough","Jalape&#241;o, garlic and cheddar wound through a sourdough spiral.",300),
    ("swirl-jalapeno.webp","Jalape&#241;o Swirl","Layer on layer, blistered at the edge.",300),
