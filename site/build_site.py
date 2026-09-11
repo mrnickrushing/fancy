@@ -31,7 +31,7 @@ PAGES = [
     ("breads.html",  D.BREADS,  "The Bill of Fare — Oh! You Fancy Focaccia",
      "Sourdough loaves, savory and sweet focaccia, muffins, rolls and focaccia art, baked with organic ingredients."),
     ("gallery.html", D.GALLERY, "Gallery — Oh! You Fancy Focaccia",
-     "Twenty-nine bakes, straight from the tray and straight from the market table."),
+     "Thirty-one bakes, straight from the tray and straight from the market table."),
     ("reviews.html", D.REVIEWS, "Reviews — Oh! You Fancy Focaccia",
      "100% recommend across 9 reviews. What our customers say."),
     ("contact.html", D.CONTACT, "Contact — Oh! You Fancy Focaccia",

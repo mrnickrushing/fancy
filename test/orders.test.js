@@ -77,11 +77,18 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     admin = cookieOf(login);
   });
 
-  await t.test('the menu is seeded from the bill of fare, unpriced', async () => {
+  await t.test('the menu is seeded from the bill of fare, priced by course', async () => {
     const res = await request(app).get('/api/menu');
     assert.equal(res.status, 200);
     assert.ok(res.body.items.length >= 10);
-    assert.ok(res.body.items.every((i) => i.price === null));
+    // Nothing ships unpriced any more, so nothing falls back to "quoted".
+    // Checked against MENU_SEED rather than a by-course rule: the honey bites
+    // are $2 despite being a sweet, and a rule would not have caught that.
+    const expected = new Map(db.MENU_SEED.map(([, name, , price]) => [name, price]));
+    for (const i of res.body.items) {
+      assert.ok(expected.has(i.name), `${i.name} is not in MENU_SEED`);
+      assert.equal(Number(i.price), expected.get(i.name), `${i.name} priced wrong`);
+    }
     assert.equal(res.body.courses.savory, 'Savory');
   });
 
@@ -345,7 +352,9 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     assert.equal(Number(r.body.item.price), 12.5);
     const order = await db.getOrder(created.body.orderId);
     assert.equal(order.items[0].name, menu[0].name);
-    assert.equal(order.items[0].unit_price, null);
+    // the snapshot holds what it cost when it was ordered — 15 — and not the
+    // 12.50 the menu item was just changed to
+    assert.equal(Number(order.items[0].unit_price), 15);
     r = await A(request(app).post('/api/admin/menu')).send({ course: 'sweet', name: 'Hot Honey Slab', price: 9 });
     assert.equal(r.status, 201);
     r = await A(request(app).post('/api/admin/menu')).send({ course: 'nope', name: 'X' });

@@ -692,6 +692,10 @@ FOOTER = f"""<footer style="background:var(--burgundy-ink);color:#D8BFA0;padding
   </div>
 </div></footer>"""
 
+FOOTER_HOME = FOOTER.replace("</div></footer>", """  <p style="text-align:center;margin-top:var(--s5)">
+    <a href="./admin" class="caps" style="color:oklch(.72 .05 60/.45);font-size:.62rem">Order Book</a></p>
+</div></footer>""")
+
 def page(body, pw, ph, extra_css=""):
     return f"""<!doctype html>
 <html>
@@ -860,7 +864,7 @@ HOME = masthead("Home") + f"""
       Love always, Oh! You Fancy Focaccia</p>
   </div>
 </section>
-""" + FOOTER
+""" + FOOTER_HOME
 
 def head_band(kick, title, sub):
     return f"""<section style="background:var(--paper-3);border-bottom:1px solid var(--rule);
@@ -941,7 +945,7 @@ def course(title, ital, rows, cap=None):
 </div>"""
 
 BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
-  "What comes out of the oven changes with the season, and with whatever our neighbours are growing.") + f"""
+  "What comes out of the oven changes with the season, and with whatever our neighbours are growing. Every bread is $15, focaccia or sourdough alike; muffins and honey buns are $2 each.") + f"""
 <section class="sec" style="background:var(--paper)">
   <div class="wrap">
     {course("Savory","I Salati",[
@@ -995,40 +999,42 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
 # ══ GALLERY ═══════════════════════════════════════════════════════════
 GAL_SECTIONS = [
  ("I Salati","Savory", [
-   ("savory-round.webp","Jalape&#241;o, Olive &amp; Red Onion","The round people recognise us by.",300),
-   ("jalapeno-garlic-round.webp","Jalape&#241;o &amp; Roasted Garlic","Toasted garlic right across the top.",300),
-   ("jalapeno-dimpled.webp","Jalape&#241;o &amp; Cheese","Cheese browned into every ridge, jalape&#241;o set down in the wells.",300),
-   ("scallion-chili.webp","Scallion &amp; Chilli Crisp","Spring onion, toasted sesame and chilli crisp. The one that is not Italian at all.",280),
-   ("tomato-olive-round.webp","Tomato, Olive &amp; Onion","Cherry tomatoes burst against the dough.",300),
-   ("olive-tomato.webp","Olive &amp; Sun-Dried Tomato","Crisp at the edge, soft through the middle.",300),
-   ("garlic-herb-round.webp","Roasted Garlic &amp; Herb","Whole cloves gone soft and golden, under sage, oregano and thyme.",280),
-   ("lemon-pepper.webp","Lemon Pepper &amp; Garlic","Cracked pepper, lemon zest, plenty of oil.",300),
-   ("sea-salt-round.webp","Sea Salt Round","Olive-oil brushed, salt flaked, still warm.",300),
-   ("square-focaccia.webp","Garlic &amp; Herb Square","Baked in the pan, corners and all.",300)]),
+   ("savory-round.webp","Jalape&#241;o, Olive &amp; Red Onion","Specialty made to order.",300),
+   ("jalapeno-garlic-round.webp","The Jalape&#241;o, Garlic and Onion Focaccia","Jalape&#241;o, garlic and onion.",300),
+   ("jalapeno-dimpled.webp","The Jalape&#241;o n Chedda n Garlic","Jalape&#241;o, cheddar and garlic, baked into a golden dimpled round.",300),
+   ("scallion-chili.webp","The Asian Crisp","Crunchy garlics and onions, chili peppers, sesame seeds, mushroom powder, scallions and an agave drizzle.",280),
+   ("tomato-olive-round.webp","Tomato, Olive &amp; Onion","Specialty made to order.",300),
+   ("olive-tomato.webp","Olive &amp; Sun-Dried Tomato","Specialty made to order.",300),
+   ("garlic-herb-round.webp","The Italiano","The true Italian focaccia. Focaccia originated in Rome, Italy, and you can taste it in this loaf. Sage, oregano, thyme, basil and garlic.",280),
+   ("lemon-pepper.webp","The Lemon Pepper","Black pepper with lemon extract from Meyer lemons, garlic and onion.",300),
+   ("square-focaccia.webp","The Roasted Garlic Boss","True garlic lovers want this one. Roasted garlic, garlic oil and minced garlic.",300)]),
  ("Le Teglie","Slabs &amp; Pans", [
-   ("olive-slab.webp","Olive &amp; Sun-Dried Tomato Slab","Green and black olives with sun-dried tomato, pressed into the dimples.",400),
-   ("rosemary-slab.webp","Rosemary &amp; Cracked Pepper","The plain one. Hardest to get right.",390),
-   ("potato-onion.webp","Potato, Caramelised Onion &amp; Rosemary","Sliced potato and slow onions under cracked pepper and parmesan.",380),
-   ("pesto-skillet.webp","Pesto &amp; Parmesan, in Cast Iron","Basil pesto and shredded parmesan, baked in the pan it is served from.",250),
-   ("wide-slab.webp","Cheese, Sun-Dried Tomato &amp; Olive","The long tray. What a market morning looks like.",250)]),
+   ("olive-slab.webp","The Mediterranean Olive","Olive variety and sun dried tomatoes.",400),
+   ("rosemary-slab.webp","The Rosemary and Black Pepper","Rosemary and cracked black pepper, right across the tray.",390),
+   ("potato-onion.webp","The Fall Favorite","Roasted potatoes, rosemary, garlic, caramelized onions and Fontina cheese.",380),
+   ("pesto-skillet.webp","The Pesto and Cashew Cheese","Basil pesto and cashew cheese, baked in the pan it is served from.",250),
+   ("wide-slab.webp","The Focaccia Queen","Tomatoes, cheese, onions, garlic and an olive variety &#8212; Kalamata, pimento and black olives &#8212; with cold pressed olive oil and Celtic sea salt.",250)]),
  ("Le Spirali","Swirls", [
-   ("jalapeno-swirl-xl.webp","Jalape&#241;o Cheese Swirl","Cheese caught and caramelised in the coils.",300),
+   ("jalapeno-swirl-xl.webp","Jalape&#241;o, Garlic and Chedda Sourdough","Jalape&#241;o, garlic and cheddar wound through a sourdough spiral.",300),
    ("swirl-jalapeno.webp","Jalape&#241;o Swirl","Layer on layer, blistered at the edge.",300),
-   ("plain-swirl.webp","The Plain Swirl","No toppings to hide behind.",300),
-   ("caramel-swirl.webp","Caramelised Swirl","Dark at the edges, glossy, unwinding in rings.",300)]),
+   ("classic-sourdough.webp","The Classic Sourdough","The loaf everything else is built on.",300),
+   ("garlic-rosemary-sourdough.webp","The Roasted Garlic and Rosemary Sourdough","Roasted garlic and rosemary, wound through the spiral.",300),
+   ("plain-swirl.webp","Classic Artisan Celtic Salted Sourdough","Nothing on it but Celtic salt.",300),
+   ("caramel-swirl.webp","The Mediterranean Sourdough","Sun dried tomato and olive variety.",300)]),
  ("I Piccoli","Muffins &amp; Rolls", [
-   ("muffins-jalapeno.webp","Jalape&#241;o &amp; Garlic Muffins","Hand-sized, crowned with toasted garlic.",300),
-   ("parm-muffins.webp","Garlic Parmesan Muffins","Crisp-edged and golden all over.",300),
-   ("herb-rolls.webp","Herb Rolls","Sage, rosemary and garlic, pulled apart warm.",300)]),
+   ("muffins-jalapeno.webp","The Jalape&#241;o, Garlic and Onion Focaccia Muffins","Jalape&#241;o, garlic and onion, hand-sized.",300),
+   ("parm-muffins.webp","The Roasted Garlic Focaccia Muffins","Roasted garlic, hand-sized.",300),
+   ("sea-salt-round.webp","The Plain Jane Celtic Salted Focaccia Muffin","Celtic salt, and nothing else.",300),
+   ("herb-rolls.webp","The Italiano Focaccia Muffins","The Italiano in muffin form &#8212; sage, oregano, thyme, basil and garlic.",300)]),
  ("I Dolci","Sweet", [
-   ("sweet-cinnamon.webp","Cinnamon Swirl","A whole pan, pulled apart in ridges and glazed.",420),
-   ("cinnamon-drizzle-2.webp","Cinnamon, Drizzled","Vanilla glaze laid across the top in ribbons.",410),
-   ("cinnamon-dark.webp","Deep Cinnamon","Taken further in the oven, glossy and dark.",400),
-   ("hot-honey-bites.webp","Hot Honey Bites","Chilli flake and sesame, drizzled with Chetco Gold raw honey. Boxed by the dozen.",360)]),
+   ("sweet-cinnamon.webp","The Brown Buttered Cinnamon Roll","Flax seed oil butter. Coconut sugar.",420),
+   ("cinnamon-drizzle-2.webp","The Pow Cacao","A decadent chocolate focaccia dessert, sweetened with coconut sugar so it doesn&#8217;t spike your blood sugar like regular refined sugar does.",410),
+   ("cinnamon-dark.webp","The Apple Fritter","Apple fritter focaccia dessert.",400),
+   ("hot-honey-bites.webp","The Hot Honey","Chili peppers, garlic and local honey from the happiest honey bees.",360)]),
  ("L&#8217;Arte","Focaccia Art", [
-   ("heart-loaf.webp","Everything Heart","Sesame, poppy, garlic and onion over a hand-shaped heart. They go fast.",300),
-   ("art-garden.webp","Flower Garden","Painted in herbs and vegetables, one stem at a time.",395),
-   ("hero-garden.webp","Flower Garden, Again","No two are ever laid out the same way.",390)]),
+   ("heart-loaf.webp","The Everything Focaccia","Poppy seeds, sesame seeds, onion and garlic.",300),
+   ("art-garden.webp","Flower Garden with a Bee","Specialty made to order.",395),
+   ("hero-garden.webp","Flower Garden","Specialty made to order.",390)]),
 ]
 
 def gal_block(kicker, title, items):
@@ -1084,7 +1090,7 @@ LIGHTBOX = """
 </dialog>"""
 
 GALLERY = masthead("Gallery") + head_band("La Galleria","Fresh From the Oven",
-  "Twenty-nine bakes, straight from the tray and straight from the market table.") + f"""
+  "Thirty-one bakes, straight from the tray and straight from the market table.") + f"""
 <section class="sec" style="background:var(--paper)">
   <div class="wrap">
     {"".join(gal_block(k,t,items) for k,t,items in GAL_SECTIONS)}
@@ -1145,7 +1151,7 @@ FAQ = [("Do you have a storefront?","Not yet. You will find us at the Brookings-
 ("Can you make something custom?","Tell us the occasion. We have made hearts, flower gardens, and plenty of things that were never on a menu."),
 ("How do I change or cancel?","Email info@ohyoufancyfocaccia.com as soon as possible; orders are not final until Amanda confirms them."),
 ("What about allergies?","Tell us in the order notes. We cannot promise an allergen-free kitchen; Amanda will confirm what can be accommodated."),
-("How much does it cost?","Prices may vary by bake and some items are quoted; the final total is confirmed before payment."),
+("How much does it cost?","$15 for any bread, focaccia or sourdough, and $2 each for the muffin-sized focaccia and the honey buns. Delivery and shipping are quoted separately, and the final total is confirmed before payment."),
 ("What time should I come?","Early. We bake in small batches and we sell out most market days.")]
 
 def contact_row(icon, title, body, link=None):

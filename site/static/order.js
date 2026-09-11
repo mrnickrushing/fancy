@@ -23,7 +23,7 @@
   function fulfillment() { return app.querySelector('input[name="fulfillment"]:checked').value; }
 
   // ── menu ──
-  // Each course is a <details> so a phone is not asked to scroll twenty-nine
+  // Each course is a <details> so a phone is not asked to scroll thirty-one
   // rows before it reaches step II. Wide screens keep every course open and
   // the summary behaves as a plain heading.
   var narrow = window.matchMedia('(max-width:900px)');
