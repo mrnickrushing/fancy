@@ -13,6 +13,7 @@ the Brookings-Harbor Farmers Market and ships and delivers.
 | `design/` | The design source: `_build.py` owns the content and tokens and emits the canvas artboards; `img/` is the prepared photography |
 | `site/` | Turns the design into the served site — `build_site.py`, the server-only pages in `pages.py`, their scripts in `static/`. See `site/README.md` |
 | `public/` | Generated output, committed. What Railway serves |
+| `app/` | The same order book as an Expo app for Amanda's phone — accept an order at the market, and hear about a new one as it arrives. See `app/README.md` |
 | `server.js`, `db.js`, `mail.js` | The order book: API, Postgres, emails |
 | `test/` | `site.test.js` needs nothing; `orders.test.js` needs `TEST_DATABASE_URL` |
 | `research/` | The research brief everything traces back to — identity, contact, products, reviews, open questions |

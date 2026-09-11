@@ -114,6 +114,57 @@ async function processEmailOutbox() {
   await Promise.all(rows.map((row) => deliverOutbox(row)));
   return rows.length;
 }
+// ── push, so a new order reaches Amanda away from the laptop ─────────────
+const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
+
+// Never throws. A push is a courtesy; the order is the thing that matters,
+// and the customer is already waiting on the response.
+async function pushNewOrder(order) {
+  let tokens;
+  try {
+    tokens = await db.listPushTokens();
+  } catch (err) {
+    console.error('Could not read push tokens:', err);
+    return;
+  }
+  if (!tokens.length) return;
+
+  const name = `${order.first_name} ${order.last_name}`.trim();
+  const bakes = (order.items || []).reduce((n, it) => n + Number(it.quantity), 0);
+  const messages = tokens.map((to) => ({
+    to,
+    sound: 'default',
+    title: 'New order request 🥖',
+    body: `${name} — ${bakes} ${bakes === 1 ? 'bake' : 'bakes'} for ${mail.formatDate(order.needed_date)}`,
+    data: { type: 'order', orderId: order.id },
+  }));
+
+  try {
+    const res = await fetch(EXPO_PUSH_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(messages),
+    });
+    if (!res.ok) {
+      console.error('Expo push rejected the request:', res.status);
+      return;
+    }
+    const body = await res.json();
+    const tickets = Array.isArray(body?.data) ? body.data : [];
+    // One ticket per message, in the order they were sent, so the index is
+    // what says which device a failure belongs to.
+    await Promise.all(tickets.map(async (ticket, i) => {
+      if (ticket?.status !== 'error') return;
+      console.error('Push failed for a device:', ticket.message);
+      if (ticket.details?.error === 'DeviceNotRegistered') {
+        await db.deletePushToken(tokens[i]).catch(() => {});
+      }
+    }));
+  } catch (err) {
+    console.error('Could not reach the Expo push service:', err);
+  }
+}
+
 const str = (v) => (typeof v === 'string' ? v.trim() : '');
 const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 function isIsoDate(v) {
@@ -139,6 +190,18 @@ function verifyPassword(password, stored) {
   const a = Buffer.from(hash, 'hex');
   const b = crypto.scryptSync(password, salt, 64);
   return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
+// The app has no cookie jar, so it presents HTTP Basic on every request. The
+// password may itself contain a colon; only the first one separates.
+function parseBasicAuth(req) {
+  const header = req.headers.authorization || '';
+  if (!/^Basic /i.test(header)) return null;
+  let decoded;
+  try { decoded = Buffer.from(header.slice(6).trim(), 'base64').toString('utf8'); } catch { return null; }
+  const colon = decoded.indexOf(':');
+  if (colon < 1) return null;
+  return { user: decoded.slice(0, colon), pass: decoded.slice(colon + 1) };
 }
 
 // Use UTC for the business date so the API and browser calendar agree across
@@ -216,11 +279,20 @@ async function checkLogin(username, password) {
   return null;
 }
 
+// Two ways in, and both have to keep working: the browser admin presents the
+// session cookie, and Amanda's phone presents Basic on every request because
+// it holds no cookie. Basic runs through checkLogin, so a password changed
+// from the Settings tab takes effect for the app at the same moment.
 async function adminAuth(req, res, next) {
   try {
     const creds = await db.getAdminCredentials();
     const token = readCookie(req, SESSION_COOKIE);
     if (creds && token && verifySession(token, creds.password_hash)) return next();
+    const provided = parseBasicAuth(req);
+    if (provided) {
+      const result = await checkLogin(provided.user, provided.pass);
+      if (result && !result.unconfigured) return next();
+    }
   } catch (err) {
     return next(err);
   }
@@ -242,6 +314,21 @@ const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, limit: Number(process.env.LOGIN_RATE_LIMIT) || 10,
   skipSuccessfulRequests: true, standardHeaders: true, legacyHeaders: false,
   message: { error: 'Too many sign-in attempts. Please try again later.' },
+});
+// The app sends credentials on every single request, so counting the
+// successful ones would lock Amanda out in the middle of a market morning.
+// Only failures are budgeted, and a request carrying nothing at all is just a
+// browser on its way to the sign-in page.
+const adminAuthLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, limit: Number(process.env.ADMIN_RATE_LIMIT) || 20,
+  skipSuccessfulRequests: true,
+  // Only a rejected credential spends the budget. Counting every failed
+  // response would let a morning of ordinary validation mistakes — a blank
+  // name, a bad date — lock Amanda out of her own order book.
+  requestWasSuccessful: (_req, res) => res.statusCode !== 401,
+  skip: (req) => !req.headers.authorization && !readCookie(req, SESSION_COOKIE),
+  standardHeaders: true, legacyHeaders: false,
+  message: { error: 'Too many attempts. Please try again later.' },
 });
 
 // Without a database there is no order book. The pages still serve; the
@@ -269,8 +356,28 @@ app.post('/admin/logout', (_req, res) => {
   res.status(204).end();
 });
 
-app.use(['/admin', '/admin.html', '/api/admin'], adminAuth);
+app.use(['/admin', '/admin.html', '/api/admin'], adminAuthLimiter, adminAuth);
 app.get('/admin', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'admin.html')));
+
+// ── the app's push registration ──────────────────────────────────────────
+// The app registers on every launch, so this doubles as a heartbeat. Only
+// Expo's own token format is stored; anything else is refused here rather
+// than kept and left to fail later at send time.
+app.post('/api/admin/push-token', asyncHandler(async (req, res) => {
+  const token = str(req.body?.token);
+  if (!/^Expo(nent)?PushToken\[[^\]]+\]$/.test(token)) {
+    return res.status(400).json({ error: 'That is not an Expo push token.' });
+  }
+  await db.savePushToken(token);
+  res.json({ ok: true });
+}));
+
+// Signing out, or turning notifications off, should actually stop them.
+app.delete('/api/admin/push-token', asyncHandler(async (req, res) => {
+  const token = str(req.body?.token);
+  if (token) await db.deletePushToken(token);
+  res.json({ ok: true });
+}));
 
 // ── public API ───────────────────────────────────────────────────────────
 app.get('/api/menu', asyncHandler(async (_req, res) => {
@@ -360,6 +467,9 @@ app.post('/api/order', writeLimiter, asyncHandler(async (req, res) => {
     queueAndDeliver({ orderId: saved.id, kind: 'order_notice', to: mail.ORDERS_INBOX, replyTo: mail.INFO_EMAIL, ...mail.buildBakeryNotice(full, respondUrl) }),
     queueAndDeliver({ orderId: saved.id, kind: 'order_thank_you', to: order.email, replyTo: mail.INFO_EMAIL, ...mail.buildThankYou(full, settings) }),
   ]);
+  // Deliberately not awaited alongside the emails: the push must never hold
+  // up or fail the response the customer is waiting on.
+  pushNewOrder(full);
   res.status(201).json({ ok: true, orderId: saved.id, emailSent: thanks.sent && notice1.sent });
 }));
 
@@ -489,6 +599,12 @@ app.post('/api/admin/orders/:id/status', asyncHandler(async (req, res) => {
 app.delete('/api/admin/orders/:id', asyncHandler(async (req, res) => {
   if (!await db.deleteOrder(req.params.id)) return res.status(404).json({ error: 'Order not found' });
   res.json({ ok: true });
+}));
+
+app.get('/api/admin/orders/:id/payments', asyncHandler(async (req, res) => {
+  const order = await db.getOrder(req.params.id);
+  if (!order) return res.status(404).json({ error: 'Order not found' });
+  res.json({ payments: order.payments });
 }));
 
 app.post('/api/admin/orders/:id/amount', asyncHandler(async (req, res) => {

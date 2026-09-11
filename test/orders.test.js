@@ -9,6 +9,7 @@ process.env.ADMIN_USERNAME = 'test-admin';
 process.env.ADMIN_PASSWORD = 'test-password';
 process.env.WRITE_RATE_LIMIT = '1000';
 process.env.LOGIN_RATE_LIMIT = '1000';
+process.env.ADMIN_RATE_LIMIT = '1000';
 process.env.API_RATE_LIMIT = '100000';
 process.env.BASE_URL = 'https://base-url.test';
 delete process.env.RESEND_API_KEY;   // no email in tests; the code path is exercised via mail.send's result
@@ -117,7 +118,7 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
   t.beforeEach(async () => {
     // The menu is reseeded too, so a test that prices, renames or removes an
     // item cannot leak into the next one.
-    await db.pool.query('TRUNCATE email_outbox, payments, order_items, orders, blocks, reviews, settings, admin_credentials, menu_items RESTART IDENTITY CASCADE');
+    await db.pool.query('TRUNCATE email_outbox, payments, order_items, orders, blocks, reviews, settings, admin_credentials, menu_items, push_tokens RESTART IDENTITY CASCADE');
     await db.initSchema();
     menu = await db.listMenu();
     const login = await request(app).post('/admin/login').send({ username: 'test-admin', password: 'test-password' });
@@ -343,6 +344,118 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
       assert.equal((await request(app).get('/api/admin/orders').set('Cookie', admin)).status, 401);
       const relogin = await request(app).post('/admin/login').send({ username: 'test-admin', password: 'a-new-password' });
       assert.equal(relogin.status, 200);
+    });
+    // The app holds no cookie at all, so it presents Basic on every request.
+    // The two schemes are additive: taking Basic away locks the app out.
+    await t.test('the app signs in with Basic on every request', async () => {
+      const basic = (u, p) => `Basic ${Buffer.from(`${u}:${p}`).toString('base64')}`;
+      assert.equal((await request(app).get('/api/admin/orders').set('Authorization', basic('test-admin', 'test-password'))).status, 200);
+      assert.equal((await request(app).get('/api/admin/orders').set('Authorization', basic('test-admin', 'nope'))).status, 401);
+      assert.equal((await request(app).get('/api/admin/orders').set('Authorization', basic('nobody', 'test-password'))).status, 401);
+      assert.equal((await request(app).get('/api/admin/orders').set('Authorization', 'Basic not-base64')).status, 401);
+    });
+    // Changing it from the Settings tab has to move the app over too, and a
+    // password may itself contain a colon.
+    await t.test('a changed password is the app password, colon and all', async () => {
+      const basic = (u, p) => `Basic ${Buffer.from(`${u}:${p}`).toString('base64')}`;
+      const res = await request(app).post('/api/admin/password').set('Cookie', admin)
+        .send({ currentPassword: 'test-password', newPassword: 'has:a:colon' });
+      assert.equal(res.status, 200);
+      assert.equal((await request(app).get('/api/admin/orders').set('Authorization', basic('test-admin', 'has:a:colon'))).status, 200);
+      assert.equal((await request(app).get('/api/admin/orders').set('Authorization', basic('test-admin', 'test-password'))).status, 401);
+    });
+  });
+
+  // Amanda's phone. The push is wrapped around the order rather than part of
+  // it, so these care as much about Expo being unreachable as about delivery.
+  await t.test('push notifications', async (t) => {
+    const TOKEN = 'ExpoPushToken[aaaaaaaaaaaaaaaaaaaaaa]';
+    const OTHER = 'ExpoPushToken[bbbbbbbbbbbbbbbbbbbbbb]';
+    const B = (req) => req.set('Authorization', `Basic ${Buffer.from('test-admin:test-password').toString('base64')}`);
+    const realFetch = globalThis.fetch;
+    let calls = [];
+
+    // The push is deliberately not awaited by the request, so the assertions
+    // wait for it to land rather than assuming it already has.
+    const settle = async (check, ms = 2000) => {
+      const until = Date.now() + ms;
+      for (;;) {
+        if (await check()) return true;
+        if (Date.now() > until) return false;
+        await new Promise((r) => setTimeout(r, 10));
+      }
+    };
+
+    t.beforeEach(() => {
+      calls = [];
+      globalThis.fetch = async (url, init) => {
+        calls.push({ url, body: JSON.parse(init.body) });
+        return { ok: true, json: async () => ({ data: [{ status: 'ok' }] }) };
+      };
+    });
+    t.after(() => { globalThis.fetch = realFetch; });
+
+    await t.test('registering the same device twice is a heartbeat, not a duplicate', async () => {
+      assert.equal((await B(request(app).post('/api/admin/push-token')).send({ token: TOKEN })).status, 200);
+      assert.equal((await B(request(app).post('/api/admin/push-token')).send({ token: TOKEN })).status, 200);
+      assert.deepEqual(await db.listPushTokens(), [TOKEN]);
+    });
+
+    await t.test('anything that is not an Expo token is refused rather than stored', async () => {
+      for (const bad of ['', '   ', 'not-a-token', 'fcm:abc', 'ExpoPushToken[]']) {
+        assert.equal((await B(request(app).post('/api/admin/push-token')).send({ token: bad })).status, 400);
+      }
+      assert.deepEqual(await db.listPushTokens(), []);
+    });
+
+    await t.test('registering needs admin auth', async () => {
+      assert.equal((await request(app).post('/api/admin/push-token').send({ token: TOKEN })).status, 401);
+      assert.equal((await request(app).delete('/api/admin/push-token').send({ token: TOKEN })).status, 401);
+    });
+
+    await t.test('a signed-out device stops receiving them', async () => {
+      await B(request(app).post('/api/admin/push-token')).send({ token: TOKEN });
+      assert.equal((await B(request(app).delete('/api/admin/push-token')).send({ token: TOKEN })).status, 200);
+      assert.deepEqual(await db.listPushTokens(), []);
+    });
+
+    await t.test('a website order notifies every registered device, once', async () => {
+      await B(request(app).post('/api/admin/push-token')).send({ token: TOKEN });
+      await B(request(app).post('/api/admin/push-token')).send({ token: OTHER });
+      assert.equal((await request(app).post('/api/order').send(good())).status, 201);
+      assert.ok(await settle(() => calls.length === 1), 'expected one call to Expo');
+      assert.equal(calls[0].url, 'https://exp.host/--/api/v2/push/send');
+      assert.equal(calls[0].body.length, 2);
+      assert.deepEqual(calls[0].body.map((m) => m.to).sort(), [TOKEN, OTHER].sort());
+      assert.match(calls[0].body[0].title, /New order request/);
+      assert.equal(calls[0].body[0].data.type, 'order');
+    });
+
+    await t.test('it says nothing to Expo when no device is registered', async () => {
+      assert.equal((await request(app).post('/api/order').send(good())).status, 201);
+      assert.ok(!(await settle(() => calls.length > 0, 150)), 'expected no call to Expo');
+    });
+
+    await t.test('an order still saves when the push service is down', async () => {
+      await B(request(app).post('/api/admin/push-token')).send({ token: TOKEN });
+      globalThis.fetch = async () => { throw new Error('network down'); };
+      assert.equal((await request(app).post('/api/order').send(good())).status, 201);
+      assert.deepEqual(await db.listPushTokens(), [TOKEN]);
+    });
+
+    await t.test('a device Expo calls dead is dropped; one that merely failed is kept', async () => {
+      await B(request(app).post('/api/admin/push-token')).send({ token: TOKEN });
+      await B(request(app).post('/api/admin/push-token')).send({ token: OTHER });
+      globalThis.fetch = async () => ({
+        ok: true,
+        json: async () => ({ data: [
+          { status: 'error', message: 'gone', details: { error: 'DeviceNotRegistered' } },
+          { status: 'error', message: 'slow down', details: { error: 'MessageRateExceeded' } },
+        ] }),
+      });
+      assert.equal((await request(app).post('/api/order').send(good())).status, 201);
+      assert.ok(await settle(async () => (await db.listPushTokens()).length === 1), 'expected the dead token to be dropped');
+      assert.deepEqual(await db.listPushTokens(), [OTHER]);
     });
   });
 

@@ -1,0 +1,44 @@
+name: CI (app)
+
+# Only when the app changes. The website suite in ci.yml needs Postgres and
+# has nothing to say about a React Native screen.
+on:
+  push:
+    branches: [main]
+    paths: ['app/**', '.github/workflows/ci-app.yml']
+  pull_request:
+    branches: [main]
+    paths: ['app/**', '.github/workflows/ci-app.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-app-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Set up Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Run tests
+        run: npm test
+      # Bundling is the check that catches a dependency which only resolves
+      # because something else happened to hoist it.
+      - name: Bundle
+        run: npx expo export --platform ios --output-dir /tmp/expo-export
