@@ -974,35 +974,51 @@ def course(title, ital, rows, cap=None, note=""):
   </div>
 </div>"""
 
+ROMAN = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
+         "XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII","XXIV","XXV","XXVI","XXVII",
+         "XXVIII","XXIX","XXX","XXXI","XXXII","XXXIII","XXXIV","XXXV"]
+
+# Course display, in the order the bill of fare runs them: the Italian kicker,
+# the English heading, the photograph, and anything true of the whole course.
+COURSE_VIEW = [
+    ("savory",    "I Salati",       "Savory",          ("savory-round.webp", "Jalapeno, olive and red onion focaccia"), ""),
+    ("sourdough", "Il Pane",        "Sourdough",       ("plain-swirl.webp", "Classic artisan Celtic salted sourdough"), ""),
+    ("sweet",     "I Dolci",        "Sweet",           ("sweet-cinnamon.webp", "Brown buttered cinnamon roll focaccia"),
+     "Everything sweet is sweetened with coconut sugar."),
+    ("small",     "I Piccoli",      "Focaccia Muffins", ("muffins-jalapeno.webp", "Jalapeno, garlic and onion focaccia muffins"),
+     "Every flavour on this list can be baked as a focaccia muffin."),
+    ("art",       "L&#8217;Arte",   "Focaccia Art",    ("heart-loaf.webp", "Focaccia baked in a cast iron heart pan"), ""),
+]
+
+# Not in the catalog: it has no fixed price and changes with the season, so it
+# is written here rather than becoming a standing orderable row.
+EXTRA_FARE = {"sweet": [("Seasonal Desserts",
+    "Pumpkin pie focaccia when the pumpkins come in, and cranberry walnut at Christmas. "
+    "Ask what is on this week, or request one through the order page.")]}
+
+def _bill_of_fare():
+    """The bill of fare, built from menu.json so it cannot drift from the
+    order page. Numbering runs straight through every course."""
+    n, out = 0, []
+    for key, ital, title, cap, note in COURSE_VIEW:
+        rows = []
+        for item in MENU_CATALOG:
+            if item["course"] != key:
+                continue
+            n += 1
+            rows.append(fare(ROMAN[n - 1], html.escape(item["name"]), html.escape(item["description"])))
+        for name, desc in EXTRA_FARE.get(key, []):
+            n += 1
+            rows.append(fare(ROMAN[n - 1], html.escape(name), html.escape(desc)))
+        if rows:
+            out.append(course(title, ital, rows, cap, note=note))
+    return "\n".join(out)
+
 BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
   "Prices are shown for the standing menu. Seasonal and custom bakes can be requested through the order page and confirmed by Amanda.") + f"""
 <section class="sec" style="background:var(--paper)">
   <div class="wrap">
-    {course("Savory","I Salati",[
-      fare("I","Olive &amp; Sun-Dried Tomato Swirl","A spiralled round layered with green and kalamata olives, sun-dried tomato, herbs and grated cheese. Crisp at the edges, soft through the middle."),
-      fare("II","Jalape&#241;o, Olive &amp; Red Onion","Our signature round &#8212; fresh jalape&#241;o, mixed olives, red onion and herbs across a golden, dimpled crust."),
-      fare("III","Roasted Garlic &amp; Sea Salt","Simple and perfect. Olive oil, roasted garlic and flaky salt on a pillowy sourdough crumb."),
-      fare("IV","Cheesy Jalape&#241;o","Melted and bubbling, with jalape&#241;o baked right into the top."),
-    ],("savory-round.webp","Jalapeno, olive and red onion focaccia"))}
-    {course("Sourdough","Il Pane",[
-      fare("V","The Country Loaf","Naturally leavened with the same starter that lifts the focaccia &#8212; mixed the day before, left to rise slow, and baked dark."),
-    ])}
-    {course("Sweet","I Dolci",[
-      fare("VI","Cinnamon Swirl with Vanilla Drizzle","A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze."),
-      fare("VII","Honey Focaccia Muffins","Focaccia muffins, boxed and drizzled with award-winning Chetco Gold raw honey from right here on the Chetco River."),
-      fare("VIII","Seasonal Desserts","Pumpkin pie focaccia when the pumpkins come in, and cranberry walnut at Christmas. Ask what is on this week, or request one through the order page."),
-    ],("sweet-cinnamon.webp","Cinnamon swirl focaccia with vanilla drizzle"),
-      note="Everything sweet is sweetened with coconut sugar.")}
-    {course("Focaccia Muffins","I Piccoli",[
-      fare("IX","Jalape&#241;o &amp; Roasted Garlic Muffins","Hand-sized, crisp-edged, crowned with jalape&#241;o and toasted garlic."),
-      fare("X","Peppered Pickle Muffins","Made with Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles infused right into the dough. Organic ingredients only."),
-      fare("XI","Sea Salt Focaccia Muffins","Olive-oil brushed and salt flaked."),
-    ],("muffins-jalapeno.webp","Jalapeno and roasted garlic focaccia muffins"),
-      note="Every flavour on this list can be baked as a focaccia muffin.")}
-    {course("Focaccia Art","L&#8217;Arte",[
-      fare("XII","Heart Loaf","Baked in a cast iron heart pan. They go fast."),
-      fare("XIII","Flower Garden","Hand-painted in vegetables and herbs &#8212; a whole garden across the top of the dough."),
-    ],("heart-loaf.webp","Focaccia baked in a cast iron heart pan"))}
+    {_bill_of_fare()}
   </div>
 </section>
 

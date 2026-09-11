@@ -145,6 +145,7 @@ async function initSchema() {
   await seedMenu();
   await ensureCatalogItems();
   await backfillMenuPrices();
+  await alignMenuToCatalog();
 }
 
 async function seedMenu() {
@@ -211,6 +212,62 @@ async function backfillMenuPrices() {
   );
   const n = seeded.rowCount + rest.rowCount;
   if (n) console.log(`menu: priced ${n} item(s) that had none`);
+}
+
+// The order menu was seeded from research names before Amanda sent her own,
+// so the live rows and the gallery drifted into two different lists: of the
+// thirty-one bakes on the gallery only two could actually be ordered. The
+// catalog is now built from her names, and ensureCatalogItems() above puts a
+// row on the order page for every bake in it. This is the other half of that
+// move: retiring the nine research names she renamed, and putting what is
+// left in the order the catalog lists it.
+//
+// Named one by one rather than "anything missing from the catalog", because
+// that description also fits a bake Amanda added herself in the admin. These
+// nine are the rows the seed put there, each with a successor in the catalog
+// under her own name for it.
+const SUPERSEDED_MENU_NAMES = [
+  'Olive & Sun-Dried Tomato Swirl',      // -> Olive & Sun-Dried Tomato
+  'Roasted Garlic & Sea Salt',           // -> The Roasted Garlic Boss
+  'Cheesy Jalapeño',                     // -> The Jalapeño n Chedda n Garlic
+  'Cinnamon Swirl with Vanilla Drizzle', // -> The Brown Buttered Cinnamon Roll
+  'Honey Focaccia Muffins',              // -> The Hot Honey
+  'Jalapeño & Roasted Garlic Muffins',   // -> The Jalapeño, Garlic and Onion Focaccia Muffins
+  'Peppered Pickle Muffins',             // -> Peppered Pickle Focaccia Muffins
+  'Sea Salt Focaccia Muffins',           // -> The Plain Jane Celtic Salted Focaccia Muffin
+  'Heart Loaf',                          // -> The Everything Focaccia
+];
+
+// Marked unavailable rather than deleted, so past orders keep the item they
+// referenced and Amanda can put any of them back from the admin. The same
+// pass puts the surviving rows in catalog order: the ones already there were
+// numbered by the old twelve-item seed, so without this the order page lists
+// a course in a different order from the numbered bill of fare on the breads
+// page. Anything she added herself keeps its own number and sorts after.
+//
+// Once only, guarded by a marker, so a row she puts back or reorders herself
+// is not undone by the next restart.
+async function alignMenuToCatalog() {
+  const done = await pool.query(
+    `SELECT 1 FROM settings WHERE key = 'menu_catalog_v2_synced'`
+  );
+  if (done.rowCount) return;
+  const { rowCount: retired } = await pool.query(
+    `UPDATE menu_items SET available = false
+      WHERE available AND name = ANY($1::text[])`,
+    [SUPERSEDED_MENU_NAMES]
+  );
+  await pool.query(
+    `UPDATE menu_items m SET sort_order = v.ord - 1
+       FROM unnest($1::text[]) WITH ORDINALITY AS v(name, ord)
+      WHERE m.name = v.name AND m.sort_order IS DISTINCT FROM v.ord - 1`,
+    [MENU_SEED.map(([, name]) => name)]
+  );
+  await pool.query(
+    `INSERT INTO settings (key, value, updated_at)
+     VALUES ('menu_catalog_v2_synced', '1', now()) ON CONFLICT (key) DO NOTHING`
+  );
+  if (retired) console.log(`menu: retired ${retired} renamed bake(s)`);
 }
 
 function toIsoDate(d) {

@@ -77,10 +77,15 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     admin = cookieOf(login);
   });
 
-  await t.test('the menu is seeded from the bill of fare, priced by course', async () => {
+  await t.test('every bake in the catalog can be ordered, at the catalog price', async () => {
     const res = await request(app).get('/api/menu');
     assert.equal(res.status, 200);
-    assert.ok(res.body.items.length >= 10);
+    // Every bake on the gallery, not just the ones the first seed happened to
+    // carry: the two lists drifted once and the order page lost all but two.
+    const orderable = new Set(res.body.items.map((i) => i.name));
+    for (const [, name] of db.MENU_SEED) {
+      assert.ok(orderable.has(name), `${name} is on the menu but cannot be ordered`);
+    }
     // Nothing ships unpriced any more, so nothing falls back to "quoted".
     // Checked against MENU_SEED rather than a by-course rule: the honey bites
     // are $2 despite being a sweet, and a rule would not have caught that.
@@ -90,6 +95,43 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
       assert.equal(Number(i.price), expected.get(i.name), `${i.name} priced wrong`);
     }
     assert.equal(res.body.courses.savory, 'Savory');
+  });
+
+  await t.test('the rename migration retires the old names and nothing else', async () => {
+    // What production looks like before the deploy: rows under the research
+    // names, plus one Amanda added herself in the admin.
+    await db.pool.query(
+      `INSERT INTO menu_items (course, name, description, price, sort_order)
+       VALUES ('art','Heart Loaf','',15,90),
+              ('small','Sea Salt Focaccia Muffins','',2,91),
+              ('savory','Market Special','Whatever is best this week',15,92)`
+    );
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_catalog_v2_synced'`);
+    await db.initSchema();
+
+    const byName = new Map((await db.pool.query(
+      `SELECT name, available FROM menu_items`
+    )).rows.map((r) => [r.name, r.available]));
+    assert.equal(byName.get('Heart Loaf'), false);
+    assert.equal(byName.get('Sea Salt Focaccia Muffins'), false);
+    // Named one by one for exactly this reason — hers is not in the catalog
+    // either, and a "retire anything missing" rule would have taken it too.
+    assert.equal(byName.get('Market Special'), true);
+
+    // and the surviving rows come out in catalog order, so the order page
+    // reads down a course the same way the numbered bill of fare does.
+    const live = await db.listMenu({ availableOnly: true });
+    const catalog = db.MENU_SEED.map(([, name]) => name);
+    assert.deepEqual(
+      live.map((r) => r.name).filter((n) => catalog.includes(n)),
+      catalog
+    );
+
+    // And she can put one back: the marker stops the next restart undoing it.
+    await db.pool.query(`UPDATE menu_items SET available = true WHERE name = 'Heart Loaf'`);
+    await db.initSchema();
+    const { rows } = await db.pool.query(`SELECT available FROM menu_items WHERE name = 'Heart Loaf'`);
+    assert.equal(rows[0].available, true);
   });
 
   await t.test('availability reports market days, notice and blocks', async () => {
