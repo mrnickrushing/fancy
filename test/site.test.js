@@ -2,12 +2,19 @@ const test = require('node:test');
 const assert = require('node:assert');
 const request = require('supertest');
 const app = require('../server');
+const catalog = require('../menu.json');
 
 const PAGES = ['/', '/about.html', '/breads.html', '/gallery.html', '/reviews.html', '/contact.html'];
 
 test('health check responds', async () => {
   const res = await request(app).get('/healthz');
   assert.strictEqual(res.status, 200);
+});
+
+test('readiness makes database absence explicit', async () => {
+  const res = await request(app).get('/readyz');
+  assert.strictEqual(res.status, 503);
+  assert.equal(res.body.reason, 'database_not_configured');
 });
 
 test('every page serves', async () => {
@@ -59,6 +66,17 @@ test('the bill of fare lists the sourdough', async () => {
   assert.match(res.text, /The Country Loaf/);
 });
 
+test('the public standing menu exposes every catalog item and price', async () => {
+  const res = await request(app).get('/breads.html');
+  const text = res.text
+    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
+    .replace(/&amp;/g, '&');
+  for (const item of catalog) {
+    assert.ok(text.includes(item.name), `missing catalog item: ${item.name}`);
+    assert.ok(text.includes(`$${item.price}`), `missing catalog price for: ${item.name}`);
+  }
+});
+
 test('no unresolved placeholder links survive', async () => {
   for (const p of PAGES) {
     const res = await request(app).get(p);
@@ -67,9 +85,16 @@ test('no unresolved placeholder links survive', async () => {
 });
 
 test('assets and crawl files serve', async () => {
-  for (const a of ['/style.css', '/splash.js', '/img/logo.webp', '/img/splash-scene.webp', '/robots.txt', '/sitemap.xml']) {
+  for (const a of ['/style.css', '/splash.js', '/nav.js', '/img/logo.webp', '/favicon.ico', '/site.webmanifest', '/img/splash-scene.webp', '/robots.txt', '/sitemap.xml']) {
     assert.strictEqual((await request(app).get(a)).status, 200, `${a} missing`);
   }
+});
+
+test('social metadata and install metadata are present', async () => {
+  const html = (await request(app).get('/')).text;
+  assert.match(html, /name="twitter:image"/);
+  assert.match(html, /rel="manifest" href="\.\/site\.webmanifest"/);
+  assert.match(html, /rel="icon" href="\.\/favicon\.ico"/);
 });
 
 test('images are cached hard, html is not', async () => {

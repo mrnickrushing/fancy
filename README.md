@@ -28,8 +28,9 @@ npm test                  # the static-site suite
 
 For the order book locally, and the database-backed tests, see `DEPLOY.md`.
 
-## Still to come from Amanda
+## Client handoff checks
 
-- Prices — entered per item in the admin's Menu tab; unpriced items are quoted on confirmation
-- A Resend API key, so the emails actually send (`DEPLOY.md`)
-- A sourdough photograph for the bill of fare, and a portrait for the About page if she wants one
+- Confirm the market address, seasonal schedule, delivery area, shipping destinations, allergen wording, and organic-ingredient wording with Amanda before publishing.
+- Verify Resend domain authentication and the `info@` / `orders@` forwarding paths in Railway (`DEPLOY.md`).
+- Keep the public bill of fare and the admin menu aligned; `menu.json` is the shared standing-menu source and the database migration adds missing catalog rows without overwriting Amanda's edits.
+- A real portrait of Amanda, a market-stall photograph, and a confirmed map/location image are the final brand assets that would make the handoff feel complete.

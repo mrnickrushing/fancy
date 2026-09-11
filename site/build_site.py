@@ -9,7 +9,7 @@ the head metadata a live site needs.
 
     python3 site/build_site.py
 """
-import os, re, sys, shutil
+import os, re, sys, shutil, json
 
 ROOT   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DESIGN = os.path.join(ROOT, "design")
@@ -300,10 +300,8 @@ SPLASH_JS = """
   function showScene(){ requestAnimationFrame(function(){ scene.classList.add('on'); }); }
   if(scene){ if(scene.complete && scene.naturalWidth) showScene();
              else scene.addEventListener('load',showScene); }
-  // The ingredient roll used to run at 760ms a step and the whole screen
-  // held for eleven seconds. Nobody waits eleven seconds to read a bakery
-  // menu, so the same choreography now plays out in about six, and the
-  // way out appears inside two.
+  // The loader is a brand hello, not a gate. The choreography is short and
+  // the way out appears before the visitor has finished reading the page.
   at(60,function(){ ring.classList.add('on'); });
   at(320,function(){ marks.forEach(function(m){ m.classList.add('on'); }); });
   ings.forEach(function(el,i){
@@ -311,9 +309,9 @@ SPLASH_JS = """
     if(i<ings.length-1) at(900+(i+1)*500,function(){ el.classList.remove('on'); el.classList.add('gone'); });
   });
   dims.forEach(function(el,i){ at(1020+i*500,function(){ el.classList.add('on'); }); });
-  at(1700,function(){ tag.classList.add('on'); });
-  at(1900,function(){ ent.classList.add('on'); skip.classList.add('on'); });
-  at(6000,enter);                        // never trap anyone behind it
+  at(1400,function(){ tag.classList.add('on'); });
+  at(1600,function(){ ent.classList.add('on'); skip.classList.add('on'); });
+  at(4000,enter);                        // never trap anyone behind it
   ent.addEventListener('click',function(e){ e.preventDefault(); enter(); });
   s.addEventListener('click',enter);
   document.addEventListener('keydown',enter);
@@ -379,6 +377,11 @@ DOC = """<!doctype html>
 <meta property="og:description" content="{desc}">
 <meta property="og:image" content="https://ohyoufancyfocaccia.com/img/hero-garden.webp">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{title}">
+<meta name="twitter:description" content="{desc}">
+<meta name="twitter:image" content="https://ohyoufancyfocaccia.com/img/hero-garden.webp">
+<link rel="manifest" href="./site.webmanifest">
+<link rel="icon" href="./favicon.ico" sizes="any">
 <link rel="icon" href="./img/logo.webp" type="image/webp">
 <link rel="apple-touch-icon" href="./img/logo.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -403,9 +406,13 @@ LD_JSON = """<script type="application/ld+json">
   "name": "Oh! You Fancy Focaccia",
   "url": "https://ohyoufancyfocaccia.com/",
   "description": "Small-batch organic focaccia and sourdough baked by hand in Brookings, Oregon.",
+  "image": "https://ohyoufancyfocaccia.com/img/hero-garden.webp",
   "email": "info@ohyoufancyfocaccia.com",
+  "priceRange": "$$",
+  "hasMenu": "https://ohyoufancyfocaccia.com/breads.html",
   "sameAs": ["https://www.facebook.com/profile.php?id=61584072034572"],
   "servesCuisine": "Italian",
+  "areaServed": {"@type":"City", "name":"Brookings"},
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "Brookings",
@@ -427,13 +434,26 @@ def build():
     os.makedirs(os.path.join(PUBLIC, "img"))
 
     for f in sorted(os.listdir(os.path.join(DESIGN, "img"))):
+        if f == "favicon.ico":
+            continue
         shutil.copy2(os.path.join(DESIGN, "img", f), os.path.join(PUBLIC, "img", f))
+    shutil.copy2(os.path.join(DESIGN, "img", "favicon.ico"), os.path.join(PUBLIC, "favicon.ico"))
 
     with open(os.path.join(PUBLIC, "style.css"), "w", encoding="utf-8") as fh:
         fh.write(D.TOKENS + RESPONSIVE + SPLASH_CSS + P.FORMS_CSS)
     # kept out of the document so the server can run a CSP without unsafe-inline scripts
     with open(os.path.join(PUBLIC, "splash.js"), "w", encoding="utf-8") as fh:
         fh.write(SPLASH_JS.strip() + "\n")
+    with open(os.path.join(PUBLIC, "site.webmanifest"), "w", encoding="utf-8") as fh:
+        fh.write(json.dumps({
+            "name": "Oh! You Fancy Focaccia",
+            "short_name": "Fancy Focaccia",
+            "start_url": "/",
+            "display": "standalone",
+            "background_color": "#F4EFE2",
+            "theme_color": "#8E1B1B",
+            "icons": [{"src": "/img/logo.webp", "sizes": "512x512", "type": "image/webp"}],
+        }, indent=2) + "\n")
     static = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
     for f in sorted(os.listdir(static)):
         shutil.copy2(os.path.join(static, f), os.path.join(PUBLIC, f))

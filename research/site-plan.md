@@ -1,7 +1,10 @@
 # Site plan — Oh! You Fancy Focaccia
 
-Built in Gamma, structured after **Sugar Haus** (`mrnickrushing/sugarhaus`), with the
-ordering flow removed at the client's request.
+Built in Gamma, structured after **Sugar Haus** (`mrnickrushing/sugarhaus`), then
+extended into a production site with a public request flow and private admin.
+
+The historical planning notes below describe the original Gamma brief. The current
+repository is the source of truth for shipped behavior.
 
 ## Structure mapping
 
@@ -10,13 +13,13 @@ Sugar Haus ships these public pages (`sugarhaus/public/`):
 
 | Sugar Haus | Oh! You Fancy Focaccia | Note |
 |---|---|---|
-| `index.html` — hero → How to Order (4 steps) → What We Create (6 tiles) → CTA | **Home** — hero → Where to Find Us (4) → What We Bake (6) → Local partners → CTA | "How to Order" became "Where to Find Us" since there's no ordering |
+| `index.html` — hero → How to Order (4 steps) → What We Create (6 tiles) → CTA | **Home** — hero → Where to Find Us (4) → What We Bake (6) → Local partners → CTA | Current site also links directly into the request flow |
 | `about.html` — Welcome → Baking Philosophy (6) → Kitchen to Celebration → CTA | **About** — Welcome → Our Baking Philosophy (6) → From Our Kitchen to Your Table → CTA | Same skeleton |
-| `pricing.html` — Price List by category | **Our Breads** — menu by category, **no prices** | No price data exists publicly; nothing was invented. Add prices once Amanda supplies them |
+| `pricing.html` — Price List by category | **Our Breads** — menu by category with standing prices | Prices are shared with the order database through the root `menu.json` catalog |
 | `gallery.html` | **Gallery** | |
-| `reviews.html` — reviews + submit form | **Reviews** — real reviews only, no submit form | Submission form omitted with ordering |
+| `reviews.html` — reviews + submit form | **Reviews** — real reviews plus a submission form | Submissions are moderated through the admin workflow |
 | `contact.html` — contact → message form → FAQ | **Contact** — email/Facebook → market details → FAQ | Form replaced with a plain email prompt |
-| `order.html` | *(omitted)* | Per client instruction |
+| `order.html` | **Order** — request form with availability, delivery, and shipping choices | A request is confirmed by Amanda before it becomes final |
 
 ## Theme
 
@@ -29,11 +32,21 @@ Image direction given to Gamma: overhead editorial food photography on white Car
 marble, soft natural daylight, blistered golden crust, flaky sea salt and fresh herbs,
 cream / olive-green / burgundy palette — matching the client's own product photos.
 
+## Current implementation status
+
+- Standing menu prices live in `menu.json` and are used by both the public menu and
+  database seed/backfill logic.
+- Public requests, email outbox delivery, admin order management, review moderation,
+  readiness checks, generated sitemap/robots files, and operational smoke/backup
+  scripts are implemented.
+- Dates shown in customer-facing site copy and admin views use month-day-year format.
+
 ## Content rules applied
 
 Every factual claim traces to `facebook-research.md`. Specifically **not** invented:
 
-- No prices anywhere
+- Prices are shown only for the standing catalog; custom and seasonal requests are
+  confirmed individually.
 - No phone number
 - No street address presented as a storefront — the site says plainly "Not yet" to
   *Do you have a storefront?* and points at the market
@@ -41,18 +54,18 @@ Every factual claim traces to `facebook-research.md`. Specifically **not** inven
 - No Instagram handle (still unknown — see open questions)
 - Reviews reproduced verbatim; no invented reviewers, ratings, or dates
 
-## Still to do
+## Client handoff confirmations
 
 Blocked on Amanda (full list in `facebook-research.md`):
 
-1. Prices → populate the Our Breads page
-2. Confirm which market and the winter schedule
-3. Phone number, if she wants one public
-4. Instagram handle
-5. Shipping cost, destinations, lead time
-6. Delivery area
-7. Real product photography to replace Gamma's AI images
-8. Confirm the "organic" wording is legally accurate for her
+1. Confirm the market address/name and current/winter schedule
+2. Confirm delivery area, shipping destinations, cost, and lead time
+3. Confirm allergen language and whether "organic" is legally accurate
+4. Confirm the public contact/social details and final policy copy
+5. Verify Resend, Cloudflare forwarding, Railway variables, and one controlled
+   production order end to end
+6. Replace remaining placeholder/illustrative art with approved product, portrait,
+   market-stall, and location photography where desired
 
 ## Built sites
 

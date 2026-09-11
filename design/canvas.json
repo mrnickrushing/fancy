@@ -102,7 +102,7 @@
       "x": -480,
       "y": 700,
       "w": 400,
-      "text": "Palette is the logo's: burgundy #8E1B1B, olive #4E6023, gold #B8862F, paper #F4EFE2.\n\nEvery tan panel is a photo slot. Bracketed text marks the two facts we do not have \u2014 prices and a phone number. Nothing invented."
+      "text": "Palette is the logo's: burgundy #8E1B1B, olive #4E6023, gold #B8862F, paper #F4EFE2.\n\nThe standing menu prices are shared from menu.json. Remaining client confirmations are the market schedule/address, delivery and shipping boundaries, allergen/organic wording, and final brand photography."
     }
   ],
   "launch": {

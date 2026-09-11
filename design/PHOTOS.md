@@ -1,6 +1,6 @@
 # Photography
 
-All 30 images Amanda supplied are catalogued here. **All 29 product shots are embedded**, plus the logo. Nothing is held back.
+The prepared image set is catalogued here. **All 31 product shots are embedded**, plus the logo and supporting brand imagery. Nothing is held back.
 
 ## Preparing images for the canvas
 
@@ -12,11 +12,11 @@ WebP at a searched quality does the work. Heavily-textured crusts resist
 compression, so two images (`hero-garden`, `sweet-cinnamon`) bottomed out at
 minimum quality and had to be reduced in pixel dimensions instead.
 
-Current total: **2.0 MB across 30 files**, seeded page ~5.1 MB (cap is 16 MB).
+Current total varies with supporting assets; keep the seeded page under the 16 MB editor cap.
 
 ## The gallery
 
-Twenty-nine bakes, grouped into six courses rather than one flat wall:
+Thirty-one bakes, grouped into six courses rather than one flat wall:
 
 | Course | Count |
 |---|---|
@@ -33,6 +33,7 @@ Twenty-nine bakes, grouped into six courses rather than one flat wall:
 |---|---|
 | `logo.webp` | Loading screen, masthead, footer — cropped to its circle, white ground masked to alpha |
 | `hero-garden.webp` | Home hero oval, phone hero |
+| `amanda-market.webp` | About page portrait and market context |
 | `art-garden.webp` | About oval |
 | `savory-round.webp` | Home board, Bill of Fare (Savory) |
 | `sweet-cinnamon.webp` | Home board, Bill of Fare (Sweet) |
@@ -45,7 +46,7 @@ Twenty-nine bakes, grouped into six courses rather than one flat wall:
 Nothing in the source material names any of these bakes, so every caption was
 read off the photograph itself.
 
-**All 29 have now been seen at full resolution**, which matters: the first pass
+**All product shots have now been seen at full resolution**, which matters: the first pass
 was written from a 300px contact sheet and got nine of them wrong. Corrected:
 
 | Was | Is actually |
@@ -68,10 +69,10 @@ Four files were renamed to match: `rosemary-oval` → `potato-onion`,
 about what is in the dough — the dark swirl is still captioned by appearance
 ("Caramelised Swirl") because its flavour cannot be read off the picture.
 
-## Still missing
+## Remaining preferred assets
 
-- **A portrait of Amanda.** The About page carries a bracketed note where one
-  should go. A person on an About page outperforms another loaf.
-- **The market stall.** Crates, gold bags, the Tuscan backdrop — the one shot on
-  Facebook is too low-resolution to use.
-- **A map** of the Port of Brookings Harbor — the only remaining placeholder slot.
+- A higher-resolution approved portrait of Amanda, if the current market image is
+  not the final client-approved selection.
+- A dedicated market-stall photograph with the preferred crates, bags, or backdrop.
+- A map or location illustration for the Port of Brookings Harbor once the exact
+  public location is confirmed.

@@ -183,6 +183,7 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
   display:flex;align-items:baseline;gap:var(--s3)}
 .fare-t::after{content:'';flex-grow:1;border-bottom:1.5px dotted var(--rule);
   transform:translateY(-4px)}
+.fare-price{font-size:.78em;white-space:nowrap;color:var(--burgundy);font-weight:700}
 /* the description is read, not decorated: roman, a size up, and lifted
    out of the low-contrast range italic at .72 opacity put it in */
 .fare-d{font-size:1rem;opacity:.82;max-width:70ch;margin-top:var(--s2);

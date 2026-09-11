@@ -74,6 +74,15 @@ if (CANONICAL_HOST) {
 }
 
 app.get('/healthz', (_req, res) => res.status(200).send('ok'));
+app.get('/readyz', asyncHandler(async (_req, res) => {
+  if (!process.env.DATABASE_URL) return res.status(503).json({ ok: false, reason: 'database_not_configured' });
+  try {
+    await db.pool.query('SELECT 1');
+    return res.json({ ok: true, emailConfigured: mail.configured() });
+  } catch (_err) {
+    return res.status(503).json({ ok: false, reason: 'database_unavailable' });
+  }
+}));
 
 // ── helpers ──────────────────────────────────────────────────────────────
 function asyncHandler(fn) {

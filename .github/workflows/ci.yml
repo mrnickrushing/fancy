@@ -37,6 +37,8 @@ jobs:
         run: npm ci
       - name: Build generated site
         run: npm run build:site
+      - name: Check operational scripts
+        run: bash -n scripts/backup_db.sh scripts/production_smoke.sh
       - name: Run tests
         run: npm test -- --test-concurrency=1
         env:

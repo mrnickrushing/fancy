@@ -24,10 +24,8 @@
   function showScene(){ requestAnimationFrame(function(){ scene.classList.add('on'); }); }
   if(scene){ if(scene.complete && scene.naturalWidth) showScene();
              else scene.addEventListener('load',showScene); }
-  // The ingredient roll used to run at 760ms a step and the whole screen
-  // held for eleven seconds. Nobody waits eleven seconds to read a bakery
-  // menu, so the same choreography now plays out in about six, and the
-  // way out appears inside two.
+  // The loader is a brand hello, not a gate. The choreography is short and
+  // the way out appears before the visitor has finished reading the page.
   at(60,function(){ ring.classList.add('on'); });
   at(320,function(){ marks.forEach(function(m){ m.classList.add('on'); }); });
   ings.forEach(function(el,i){
@@ -35,9 +33,9 @@
     if(i<ings.length-1) at(900+(i+1)*500,function(){ el.classList.remove('on'); el.classList.add('gone'); });
   });
   dims.forEach(function(el,i){ at(1020+i*500,function(){ el.classList.add('on'); }); });
-  at(1700,function(){ tag.classList.add('on'); });
-  at(1900,function(){ ent.classList.add('on'); skip.classList.add('on'); });
-  at(6000,enter);                        // never trap anyone behind it
+  at(1400,function(){ tag.classList.add('on'); });
+  at(1600,function(){ ent.classList.add('on'); skip.classList.add('on'); });
+  at(4000,enter);                        // never trap anyone behind it
   ent.addEventListener('click',function(e){ e.preventDefault(); enter(); });
   s.addEventListener('click',enter);
   document.addEventListener('keydown',enter);

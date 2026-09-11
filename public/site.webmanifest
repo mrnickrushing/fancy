@@ -1,0 +1,15 @@
+{
+  "name": "Oh! You Fancy Focaccia",
+  "short_name": "Fancy Focaccia",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4EFE2",
+  "theme_color": "#8E1B1B",
+  "icons": [
+    {
+      "src": "/img/logo.webp",
+      "sizes": "512x512",
+      "type": "image/webp"
+    }
+  ]
+}

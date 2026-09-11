@@ -11,8 +11,19 @@ Identity notes (deliberately NOT Sugar Haus):
           Tempo) while dimples press into the dough — against Sugar
           Haus's typewriter terminal.
 """
-import os, json
+import os, json, html, re
 OUT = os.path.dirname(os.path.abspath(__file__))
+
+with open(os.path.join(os.path.dirname(OUT), "menu.json"), encoding="utf-8") as _fh:
+    MENU_CATALOG = json.load(_fh)
+CATALOG_PRICES = {item["name"]: item["price"] for item in MENU_CATALOG}
+CATALOG_PRICES.update({
+    "Jalapeño & Roasted Garlic": 2,
+    "Peppered Pickle": 2,
+    "Heart Loaves": 15,
+    "Flower Gardens": 15,
+    "Cinnamon Swirl, Vanilla Drizzle": 15,
+})
 
 FONTS = ('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?'
          # Nothing in the stylesheet asks for a weight above 700, and italic
@@ -210,6 +221,7 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
   display:flex;align-items:baseline;gap:var(--s3)}
 .fare-t::after{content:'';flex-grow:1;border-bottom:1.5px dotted var(--rule);
   transform:translateY(-4px)}
+.fare-price{font-size:.78em;white-space:nowrap;color:var(--burgundy);font-weight:700}
 /* the description is read, not decorated: roman, a size up, and lifted
    out of the low-contrast range italic at .72 opacity put it in */
 .fare-d{font-size:1rem;opacity:.82;max-width:70ch;margin-top:var(--s2);
@@ -904,7 +916,7 @@ ABOUT = masthead("About") + head_band("La Nostra Storia","Welcome to Oh! You Fan
 <section class="sec" style="background:var(--paper)">
   <div class="wrap duo duo-b">
     <div style="display:flex;flex-direction:column;align-items:center;gap:var(--s4)">
-      {shot("art-garden.webp",500,"A flower garden painted across focaccia","shot-oval","width:400px")}
+    {shot("amanda-market.webp",500,"Amanda at the farmers market stall","shot-oval","width:400px")}
     </div>
     <div>
       <p class="caps kicker kicker-l">From Our Kitchen</p>
@@ -938,8 +950,11 @@ ABOUT = masthead("About") + head_band("La Nostra Storia","Welcome to Oh! You Fan
 
 # ══ OUR BREADS ════════════════════════════════════════════════════════
 def fare(n, title, desc):
+    label = html.unescape(re.sub(r"<[^>]+>", "", title))
+    price = CATALOG_PRICES.get(label)
+    price_html = f'<span class="fare-price">${price:g}</span>' if price is not None else ''
     return f"""<div class="fare"><span class="fare-n">{n}</span><div class="fare-b">
-      <p class="fare-t"><span>{title}</span></p><p class="fare-d">{desc}</p></div></div>"""
+      <p class="fare-t"><span>{title}</span>{price_html}</p><p class="fare-d">{desc}</p></div></div>"""
 
 def course(title, ital, rows, cap=None):
     """A run of the bill of fare. Without a photograph it runs full width —
@@ -957,7 +972,7 @@ def course(title, ital, rows, cap=None):
 </div>"""
 
 BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
-  "What comes out of the oven changes with the season, and with whatever our neighbours are growing. Every bread is $15, focaccia or sourdough alike; muffins and honey buns are $2 each.") + f"""
+  "Prices are shown for the standing menu. Seasonal and custom bakes can be requested through the order page and confirmed by Amanda.") + f"""
 <section class="sec" style="background:var(--paper)">
   <div class="wrap">
     {course("Savory","I Salati",[
@@ -968,21 +983,19 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
     ],("savory-round.webp","Jalapeno, olive and red onion focaccia"))}
     {course("Sourdough","Il Pane",[
       fare("V","The Country Loaf","Naturally leavened with the same starter that lifts the focaccia &#8212; mixed the day before, left to rise slow, and baked dark."),
-      fare("VI","Sourdough Through the Week","What goes into the oven changes with the week. Ask at the market table, or write ahead and we will set one by for you."),
     ])}
     {course("Sweet","I Dolci",[
       fare("VII","Cinnamon Swirl with Vanilla Drizzle","A whole pan of cinnamon-laced focaccia pulled apart in golden ridges and finished with a vanilla glaze."),
       fare("VIII","Honey Focaccia Bites","Pull-apart bites, boxed and drizzled with award-winning Chetco Gold raw honey from right here on the Chetco River."),
     ],("sweet-cinnamon.webp","Cinnamon swirl focaccia with vanilla drizzle"))}
     {course("Muffins &amp; Rolls","I Piccoli",[
-      fare("IX","Jalape&#241;o &amp; Roasted Garlic","Hand-sized, crisp-edged, crowned with jalape&#241;o and toasted garlic."),
-      fare("X","Peppered Pickle","Made with Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles infused right into the dough. Organic ingredients only."),
+      fare("IX","Jalape&#241;o &amp; Roasted Garlic Muffins","Hand-sized, crisp-edged, crowned with jalape&#241;o and toasted garlic."),
+      fare("X","Peppered Pickle Muffins","Made with Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles infused right into the dough. Organic ingredients only."),
       fare("XI","Sea Salt Rolls","Soft pull-apart rounds, olive-oil brushed and salt flaked."),
     ],("muffins-jalapeno.webp","Jalapeno and roasted garlic focaccia muffins"))}
     {course("Focaccia Art","L&#8217;Arte",[
-      fare("XII","Heart Loaves","Little hand-shaped hearts. They go fast."),
-      fare("XIII","Flower Gardens","Hand-painted in vegetables and herbs &#8212; a whole garden across the top of the dough."),
-      fare("XIV","Seasonal &amp; Custom","Tell us the occasion. We have made a great many things that were never on a list."),
+      fare("XII","Heart Loaf","Little hand-shaped hearts. They go fast."),
+      fare("XIII","Flower Garden","Hand-painted in vegetables and herbs &#8212; a whole garden across the top of the dough."),
     ],("heart-loaf.webp","A hand-shaped focaccia heart"))}
   </div>
 </section>
@@ -1369,7 +1382,7 @@ canvas = {"artboards":[
  "annotations":[
   {"id":"loader","x":-480,"y":0,"w":400,"text":"LOADING SCREEN — animates live, on a 9s loop.\n\nThe ring strokes itself on like a stamp pressed into a label, then the five things focaccia is made of arrive in turn — Farina, Acqua, Olio d'Oliva, Sale, Tempo — while a dimple presses into the dough for each one. That row of dimples IS the progress bar.\n\nBehind it, a Tuscan courtyard photograph sunk under a burgundy wash. Sugar Haus types a terminal; this proofs dough."},
   {"id":"identity","x":-480,"y":330,"w":400,"text":"OWN IDENTITY, not a Sugar Haus reskin.\n\nType: Bodoni Moda — the Italian didone — with EB Garamond and Italianno. Sugar Haus uses Playfair/Lora/Work Sans.\n\nAnatomy: centred label masthead, oval cartouches, an enamel market sign, a bill of fare with dotted leaders, vertical spine rails. Sugar Haus uses a left-logo navbar and centred card grids."},
-  {"id":"gaps","x":-480,"y":700,"w":400,"text":"Palette is the logo's: burgundy #8E1B1B, olive #4E6023, gold #B8862F, paper #F4EFE2.\n\nEvery tan panel is a photo slot. Bracketed text marks the two facts we do not have — prices and a phone number. Nothing invented."}],
+  {"id":"gaps","x":-480,"y":700,"w":400,"text":"Palette is the logo's: burgundy #8E1B1B, olive #4E6023, gold #B8862F, paper #F4EFE2.\n\nThe standing menu prices are shared from menu.json. Remaining client confirmations are the market schedule/address, delivery and shipping boundaries, allergen/organic wording, and final brand photography."}],
  "launch":{"view":"canvas"}}
 with open(os.path.join(OUT,"canvas.json"),"w",encoding="utf-8") as f:
     json.dump(canvas,f,indent=2)

@@ -23,7 +23,7 @@ Merges to `main` deploy themselves.
 | `INFO_EMAIL` | Public contact address and reply-to for customer correspondence |
 | `ORDERS_INBOX` | Where new website-order notices go |
 | `EMAIL_FROM` | The sender. Must be on a domain verified in Resend |
-| `RESEND_API_KEY` | **Not set yet.** Without it, orders still save and the admin works, but nothing is emailed — the Settings tab says so |
+| `RESEND_API_KEY` | Resend API key for transactional email. Without it, orders still save and the admin works, but nothing is emailed — the Settings tab says so |
 
 The `Postgres` service carries `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` and
 `PGDATA=/var/lib/postgresql/data/pgdata` (the official image needs the data
@@ -58,8 +58,7 @@ take a Railway Postgres snapshot and keep an off-platform dump as well. From a
 trusted shell with the production `DATABASE_URL` loaded (never commit it):
 
 ```bash
-mkdir -p backups
-pg_dump --format=custom --no-owner --file="backups/fancy-$(date +%F).dump" "$DATABASE_URL"
+./scripts/backup_db.sh
 ```
 
 Keep several dated dumps outside the repository and restrict their permissions.
@@ -78,6 +77,7 @@ After Railway reports a successful deploy, verify the actual service:
 
 ```bash
 curl -fsS https://ohyoufancyfocaccia.com/healthz
+curl -fsS https://ohyoufancyfocaccia.com/readyz
 curl -fsS https://ohyoufancyfocaccia.com/robots.txt
 curl -fsS https://ohyoufancyfocaccia.com/sitemap.xml
 curl -sSI https://ohyoufancyfocaccia.com/order.html
@@ -92,6 +92,10 @@ controlled order according to the confirmed business policy.
 Check `/admin` for the email outbox status after the test. Failed messages can
 be retried there once the Resend configuration or domain verification issue is
 fixed.
+
+The same route checks are available locally with `BASE_URL=... ./scripts/production_smoke.sh`.
+`/readyz` is the database-backed release gate; `/healthz` only confirms that
+the process is responding.
 
 ## Build
 
