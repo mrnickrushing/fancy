@@ -277,7 +277,7 @@ app.get('/api/menu', asyncHandler(async (_req, res) => {
   const [items, settings] = await Promise.all([db.listMenu({ availableOnly: true }), db.getSettings()]);
   res.json({
     courses: db.COURSES,
-    items: items.map((m) => ({ id: m.id, course: m.course, name: m.name, description: m.description, price: m.price })),
+    items: items.map((m) => ({ id: m.id, course: m.course, name: m.name, description: m.description, price: m.price, image: m.image })),
     paymentInstructions: settings.payment_instructions,
   });
 }));
@@ -576,6 +576,16 @@ function menuFields(body, { partial }) {
     const p = body.price === null || body.price === '' ? null : Number(body.price);
     if (p !== null && (!Number.isFinite(p) || p < 0)) return { error: 'Price must be a number, zero or more.' };
     out.price = p;
+  }
+  if (has('image')) {
+    const v = str(body.image).trim();
+    // A bare file name from public/img and nothing else. It is written into a
+    // src attribute on the order page, so a path or a URL from here must not
+    // be able to point it somewhere other than our own images.
+    if (!v) out.image = null;
+    else if (!/^[A-Za-z0-9][A-Za-z0-9._-]*\.(webp|jpg|jpeg|png)$/.test(v)) {
+      return { error: 'Image must be a file name in public/img, like savory-round.webp.' };
+    } else out.image = v;
   }
   if (has('available')) out.available = Boolean(body.available);
   if (has('sortOrder')) {

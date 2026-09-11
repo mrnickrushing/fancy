@@ -17,13 +17,17 @@ OUT = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(os.path.dirname(OUT), "menu.json"), encoding="utf-8") as _fh:
     MENU_CATALOG = json.load(_fh)
 CATALOG_PRICES = {item["name"]: item["price"] for item in MENU_CATALOG}
-CATALOG_PRICES.update({
-    "Jalapeño & Roasted Garlic": 2,
-    "Peppered Pickle": 2,
-    "Heart Loaves": 15,
-    "Flower Gardens": 15,
-    "Cinnamon Swirl, Vanilla Drizzle": 15,
-})
+ROMAN = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
+         "XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII","XXIV","XXV","XXVI","XXVII",
+         "XXVIII","XXIX","XXX","XXXI","XXXII","XXXIII","XXXIV","XXXV"]
+
+def fare(n, title, desc, price=True, extra=""):
+    label = html.unescape(re.sub(r"<[^>]+>", "", title))
+    price = CATALOG_PRICES.get(label) if price else None
+    price_html = f'<span class="fare-price">${price:g}</span>' if price is not None else ''
+    return f"""<div class="fare"{extra}><span class="fare-n">{n}</span><div class="fare-b">
+      <p class="fare-t"><span>{title}</span>{price_html}</p><p class="fare-d">{desc}</p></div></div>"""
+
 
 FONTS = ('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?'
          # Nothing in the stylesheet asks for a weight above 700, and italic
@@ -761,7 +765,33 @@ class Component extends DCLogic {{}}
 </html>"""
 
 # ══ HOME ══════════════════════════════════════════════════════════════
-PROC = [("I","Bend","The dough comes together slow. Organic flour, water, and a starter that has been going a while."),
+# The five bakes the home page leads with. Named, not written out: the board
+# was kept by hand and drifted, so it went on advertising four bakes under
+# names the rename had retired, and a customer following it to the bill of
+# fare found none of them. Naming them means a rename either carries through
+# or fails the build here, which is what the lookup below is for.
+FEATURED = [
+    "Jalape\u00f1o, Olive & Red Onion",     # the round people know us by
+    "Olive & Sun-Dried Tomato",
+    "The Brown Buttered Cinnamon Roll",  # photographed alongside
+    "Peppered Pickle Focaccia Muffins",
+    "The Everything Focaccia",
+]
+
+def _featured_board(count=None, indent="      "):
+    by_name = {i["name"]: i for i in MENU_CATALOG}
+    names = FEATURED[:count] if count else FEATURED
+    rows = []
+    for n, name in enumerate(names, 1):
+        item = by_name[name]     # a KeyError here means a rename orphaned the
+                                 # home page; better a failed build than a
+                                 # customer chasing a bake that is not there
+        last = ' style="border-bottom:none"' if n == len(names) else ""
+        rows.append(fare(ROMAN[n - 1], html.escape(item["name"]),
+                         html.escape(item["description"]), price=False, extra=last))
+    return ("\n" + indent).join(rows)
+
+PROC = [("I","Bend","The dough comes together slow. Organic flour, water, and a starter that has been going on since the silk trade days 900 years ago."),
         ("II","Snap","Air gets folded in, not beaten out. This is where the crumb is decided."),
         ("III","Stretch","Out to the corners by hand, never pressed flat by a machine."),
         ("IV","Fold","Rested, dimpled, drowned in extra virgin cold-pressed organic olive oil, and into the oven.")]
@@ -812,26 +842,12 @@ HOME = masthead("Home") + f"""
       <p class="caps kicker kicker-l">From the Board</p>
       <h2 style="font-size:var(--xl);margin-bottom:var(--s3);text-align:left">What we are baking</h2>
       <p style="opacity:.78;margin-bottom:var(--s8)">The board turns over with the season and with the best and freshest our neighbors are growing.</p>
-      <div class="fare"><span class="fare-n">I</span><div class="fare-b">
-        <p class="fare-t"><span>Olive &amp; Sun-Dried Tomato Swirl</span></p>
-        <p class="fare-d">Green and kalamata olives, sun-dried tomato, herbs, grated cheese. Crisp at the edge, soft through the middle.</p></div></div>
-      <div class="fare"><span class="fare-n">II</span><div class="fare-b">
-        <p class="fare-t"><span>Jalape&#241;o, Olive &amp; Red Onion</span></p>
-        <p class="fare-d">The round people recognise us by. Golden, dimpled, generous.</p></div></div>
-      <div class="fare"><span class="fare-n">III</span><div class="fare-b">
-        <p class="fare-t"><span>Cinnamon Swirl, Vanilla Drizzle</span></p>
-        <p class="fare-d">A whole pan pulled apart in ridges and glazed while still warm.</p></div></div>
-      <div class="fare"><span class="fare-n">IV</span><div class="fare-b">
-        <p class="fare-t"><span>Peppered Pickle Muffins</span></p>
-        <p class="fare-d">Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles folded straight into the dough.</p></div></div>
-      <div class="fare" style="border-bottom:none"><span class="fare-n">V</span><div class="fare-b">
-        <p class="fare-t"><span>Hearts &amp; Flower Gardens</span></p>
-        <p class="fare-d">Focaccia painted in vegetables and herbs. Almost too pretty to tear into.</p></div></div>
+      {_featured_board()}
       <div style="margin-top:var(--s8)"><a href="#" class="btn btn-line">The Full Bill of Fare</a></div>
     </div>
     <div style="display:flex;flex-direction:column;gap:var(--s6)">
       {shot("savory-round.webp",330,"Jalapeno, olive and red onion focaccia")}
-      {shot("sweet-cinnamon.webp",300,"Cinnamon swirl focaccia with vanilla drizzle")}
+      {shot("sweet-cinnamon.webp",300,"Brown buttered cinnamon roll focaccia")}
     </div>
   </div>
 </section>
@@ -966,12 +982,6 @@ ABOUT = masthead("About") + head_band("La Nostra Storia","Welcome to Oh! You Fan
 """ + FOOTER
 
 # ══ OUR BREADS ════════════════════════════════════════════════════════
-def fare(n, title, desc):
-    label = html.unescape(re.sub(r"<[^>]+>", "", title))
-    price = CATALOG_PRICES.get(label)
-    price_html = f'<span class="fare-price">${price:g}</span>' if price is not None else ''
-    return f"""<div class="fare"><span class="fare-n">{n}</span><div class="fare-b">
-      <p class="fare-t"><span>{title}</span>{price_html}</p><p class="fare-d">{desc}</p></div></div>"""
 
 def course(title, ital, rows, cap=None, note=""):
     """A run of the bill of fare. Without a photograph it runs full width —
@@ -991,9 +1001,6 @@ def course(title, ital, rows, cap=None, note=""):
   </div>
 </div>"""
 
-ROMAN = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
-         "XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII","XXIV","XXV","XXVI","XXVII",
-         "XXVIII","XXIX","XXX","XXXI","XXXII","XXXIII","XXXIV","XXXV"]
 
 # Course display, in the order the bill of fare runs them: the Italian kicker,
 # the English heading, the photograph, and anything true of the whole course.
@@ -1369,9 +1376,7 @@ MOBILE = f"""
 <section style="background:var(--paper);padding:var(--s12) var(--s5)">
   <p class="caps kicker" style="font-size:.66rem">From the Board</p>
   <h2 style="font-size:1.85rem;text-align:center;margin-bottom:var(--s8)">What we are baking</h2>
-  {fare("I","Olive &amp; Sun-Dried Tomato Swirl","Olives, sun-dried tomato, herbs, grated cheese.")}
-  {fare("II","Jalape&#241;o, Olive &amp; Red Onion","The round people recognise us by.")}
-  {fare("III","Cinnamon Swirl, Vanilla Drizzle","Pulled apart in ridges and glazed while warm.")}
+  {_featured_board(3, indent="  ")}
   <div style="margin-top:var(--s8)"><a href="#" class="btn btn-line" style="width:100%">The Full Bill of Fare</a></div>
 </section>
 

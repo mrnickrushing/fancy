@@ -44,9 +44,13 @@ FORMS_CSS = """
 /* ── the menu with quantities ── */
 .menu-course{margin-bottom:var(--s12)}
 .menu-course h2{font-size:var(--xl);text-align:left;margin-bottom:var(--s2)}
-.menu-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s5);align-items:center;
+.menu-item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--s5);align-items:center;
   padding:var(--s5) var(--s4);border-bottom:1px solid var(--rule-soft);
   transition:background .18s ease}
+/* a bake with no photograph yet keeps the same two columns as the rest */
+.menu-item.no-shot{grid-template-columns:minmax(0,1fr) auto}
+.menu-thumb{width:74px;height:74px;object-fit:cover;border:1px solid var(--rule);
+  background:var(--paper-3);flex-shrink:0}
 .menu-item .fare-t{margin-bottom:var(--s1)}
 .price{font-family:var(--serif);font-weight:600;white-space:nowrap}
 .price.tbq{font-weight:400;opacity:.72;font-size:var(--sm);white-space:normal;max-width:9em;text-align:right;line-height:1.3}
@@ -228,7 +232,11 @@ FORMS_CSS = """
   .order-layout{padding-bottom:var(--s16)}
 }
 @media (max-width:640px){
-  .menu-item{grid-template-columns:1fr;gap:var(--s3)}
+  /* the photograph stays beside the name rather than taking a row of its own;
+     price and stepper drop to a full-width line underneath */
+  .menu-item{grid-template-columns:auto minmax(0,1fr);gap:var(--s3) var(--s4)}
+  .menu-item.no-shot{grid-template-columns:1fr}
+  .menu-item .fare-buy{grid-column:1/-1}
   /* price on the left, stepper on the right, both on one line */
   .fare-buy{justify-content:space-between;flex-wrap:nowrap;gap:var(--s4)}
   .price.tbq{text-align:left;max-width:11em}
@@ -454,9 +462,9 @@ ADMIN = D.masthead("Order") + f"""
     <div class="adm-panel" data-panel="menu">
       <div class="adm-section">
         <h2>The Bill of Fare</h2>
-        <p style="font-size:var(--sm);opacity:.82;margin-bottom:var(--s5)">What customers can order, and what it costs. An item without a price is still orderable &#8212; you quote it when you confirm. Untick <em>available</em> to take something off the menu for a while.</p>
+        <p style="font-size:var(--sm);opacity:.82;margin-bottom:var(--s5)">What customers can order, and what it costs. An item without a price is still orderable &#8212; you quote it when you confirm. Untick <em>available</em> to take something off the menu for a while. <em>Photo</em> is the file name of a picture in the site&#8217;s image folder, like <code>savory-round.webp</code> &#8212; it shows beside the bake on the order page. Leave it empty for none.</p>
         <div class="table-wrap"><table class="adm" id="menu-table">
-          <thead><tr><th>Course</th><th>Name</th><th>Description</th><th>Price</th><th>Available</th><th></th></tr></thead>
+          <thead><tr><th>Course</th><th>Name</th><th>Description</th><th>Price</th><th>Photo</th><th>Available</th><th></th></tr></thead>
           <tbody id="menu-body"></tbody></table></div>
         <form id="menu-add" style="margin-top:var(--s8);padding:var(--s6);background:var(--paper);border:1px dashed var(--rule)" novalidate>
           <p class="caps" style="color:var(--olive);margin-bottom:var(--s4)">Add an item</p>
@@ -465,6 +473,7 @@ ADMIN = D.masthead("Order") + f"""
             <div class="field"><label for="mi-name">Name</label><input id="mi-name"></div>
             <div class="field"><label for="mi-price">Price ($)</label><input id="mi-price" type="number" min="0" step="0.01" placeholder="leave blank to quote"></div>
             <div class="field"><label for="mi-desc">Description</label><input id="mi-desc"></div>
+            <div class="field"><label for="mi-image">Photo <span class="opt">(optional)</span></label><input id="mi-image" placeholder="savory-round.webp"></div>
           </div>
           <button type="submit" class="btn btn-fill btn-sm">Add to the Menu</button>
           <div id="menu-msg" class="msg"></div>

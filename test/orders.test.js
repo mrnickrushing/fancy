@@ -16,6 +16,8 @@ delete process.env.RESEND_API_KEY;   // no email in tests; the code path is exer
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const request = require('supertest');
+const fs = require('node:fs');
+const path = require('node:path');
 const db = require('../db');
 const mail = require('../mail');
 const app = require('../server');
@@ -452,6 +454,56 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     // the item added above is removed; the order that referenced menu[0] keeps its snapshot
     const after = await db.getOrder(created.body.orderId);
     assert.equal(after.items.length, 2);
+  });
+
+  await t.test('the order page is given a photograph for every bake that has one', async () => {
+    const res = await request(app).get('/api/menu');
+    const byName = new Map(res.body.items.map((i) => [i.name, i.image]));
+    for (const [, name, , , image] of db.MENU_SEED) {
+      assert.equal(byName.get(name), image ?? null, `${name} has the wrong image`);
+    }
+    // and the file is really in public/img, not a name that 404s at the customer
+    const dir = path.join(__dirname, '..', 'public', 'img');
+    for (const image of new Set(res.body.items.map((i) => i.image).filter(Boolean))) {
+      assert.ok(fs.existsSync(path.join(dir, image)), `public/img/${image} is missing`);
+    }
+  });
+
+  await t.test('an image name has to be a file in public/img', async () => {
+    const A = (req) => req.set('Cookie', admin);
+    const id = menu[0].id;
+    // it is written into a src attribute, so the admin must not be able to
+    // point it anywhere but our own images
+    for (const bad of ['../../../etc/passwd', '/etc/passwd', 'https://example.com/x.webp',
+                       'x.webp" onerror="alert(1)', 'nope.svg', '../secret.webp']) {
+      const r = await A(request(app).patch(`/api/admin/menu/${id}`)).send({ image: bad });
+      assert.equal(r.status, 400, `${bad} was accepted`);
+    }
+    let r = await A(request(app).patch(`/api/admin/menu/${id}`)).send({ image: 'sea-salt-round.webp' });
+    assert.equal(r.status, 200);
+    assert.equal(r.body.item.image, 'sea-salt-round.webp');
+    // and clearing it is how she takes a photo down
+    r = await A(request(app).patch(`/api/admin/menu/${id}`)).send({ image: '' });
+    assert.equal(r.status, 200);
+    assert.equal(r.body.item.image, null);
+  });
+
+  await t.test('rows seeded before the image column get their photograph once', async () => {
+    await db.pool.query(`UPDATE menu_items SET image = NULL`);
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_images_backfilled'`);
+    await db.initSchema();
+    const { rows } = await db.pool.query(
+      `SELECT name, image FROM menu_items WHERE name = ANY($1::text[])`,
+      [db.MENU_SEED.filter(([, , , , img]) => img).map(([, name]) => name)]
+    );
+    assert.ok(rows.length > 25);
+    for (const r of rows) assert.ok(r.image, `${r.name} did not get its image back`);
+
+    // and one she clears herself stays cleared through the next restart
+    await db.pool.query(`UPDATE menu_items SET image = NULL WHERE name = $1`, [rows[0].name]);
+    await db.initSchema();
+    const after = await db.pool.query(`SELECT image FROM menu_items WHERE name = $1`, [rows[0].name]);
+    assert.equal(after.rows[0].image, null);
   });
 
   await t.test('blocks, reviews and settings', async () => {

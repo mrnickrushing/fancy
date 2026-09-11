@@ -36,7 +36,13 @@
       var items = byCourse[key]; if (!items || !items.length) return;
       var rows = items.map(function (it) {
         var q = cart[it.id] || 0;
-        return '<div class="menu-item' + (q ? ' is-chosen' : '') + '" data-id="' + it.id + '"><div>' +
+        // people buy bread with their eyes, and every one of these already has
+        // a photograph in the gallery; a bake without one keeps the old layout
+        var shot = it.image
+          ? '<img class="menu-thumb" src="./img/' + esc(it.image) + '" alt="" loading="lazy" decoding="async" width="74" height="74">'
+          : '';
+        return '<div class="menu-item' + (q ? ' is-chosen' : '') + (shot ? '' : ' no-shot') +
+          '" data-id="' + it.id + '">' + shot + '<div>' +
           '<p class="fare-t"><span>' + esc(it.name) + '</span></p>' +
           (it.description ? '<p class="fare-d">' + esc(it.description) + '</p>' : '') + '</div>' +
           '<div class="fare-buy">' +
