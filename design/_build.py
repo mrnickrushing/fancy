@@ -692,6 +692,10 @@ FOOTER = f"""<footer style="background:var(--burgundy-ink);color:#D8BFA0;padding
   </div>
 </div></footer>"""
 
+FOOTER_HOME = FOOTER.replace("</div></footer>", """  <p style="text-align:center;margin-top:var(--s5)">
+    <a href="./admin" class="caps" style="color:oklch(.72 .05 60/.45);font-size:.62rem">Order Book</a></p>
+</div></footer>""")
+
 def page(body, pw, ph, extra_css=""):
     return f"""<!doctype html>
 <html>
@@ -860,7 +864,7 @@ HOME = masthead("Home") + f"""
       Love always, Oh! You Fancy Focaccia</p>
   </div>
 </section>
-""" + FOOTER
+""" + FOOTER_HOME
 
 def head_band(kick, title, sub):
     return f"""<section style="background:var(--paper-3);border-bottom:1px solid var(--rule);
