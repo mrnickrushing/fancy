@@ -833,7 +833,8 @@ HOME = masthead("Home") + f"""
     <div>
       <p class="caps kicker kicker-l">From the Board</p>
       <h2 style="font-size:var(--xl);margin-bottom:var(--s3);text-align:left">What we are baking</h2>
-      <p style="opacity:.78;margin-bottom:var(--s8)">The board turns over with the season and with the best and freshest our neighbors are growing.</p>
+      <p style="opacity:.78;margin-bottom:var(--s3)">The board turns over with the season and with the best and freshest our neighbors are growing.</p>
+      <p style="font-style:italic;opacity:.78;margin-bottom:var(--s8)">Savory and organic ingredients &#8212; add what you want, leave out what you don&#8217;t.</p>
       {_featured_board()}
       <div style="margin-top:var(--s8)"><a href="#" class="btn btn-line">The Full Bill of Fare</a></div>
     </div>
@@ -1364,7 +1365,8 @@ MOBILE = f"""
 
 <section style="background:var(--paper);padding:var(--s12) var(--s5)">
   <p class="caps kicker" style="font-size:.66rem">From the Board</p>
-  <h2 style="font-size:1.85rem;text-align:center;margin-bottom:var(--s8)">What we are baking</h2>
+  <h2 style="font-size:1.85rem;text-align:center;margin-bottom:var(--s3)">What we are baking</h2>
+  <p style="font-style:italic;opacity:.78;text-align:center;margin-bottom:var(--s8)">Savory and organic ingredients &#8212; add what you want, leave out what you don&#8217;t.</p>
   {_featured_board(3, indent="  ")}
   <div style="margin-top:var(--s8)"><a href="#" class="btn btn-line" style="width:100%">The Full Bill of Fare</a></div>
 </section>
