@@ -89,6 +89,7 @@ FORMS_CSS = """
 .cal-day.selected{background:var(--burgundy);color:var(--paper-2);border-color:var(--burgundy)}
 .cal-day.selected::after{background:var(--gold-pale)}
 .cal-note{font-size:var(--xs);opacity:.78;margin-top:var(--s3);line-height:1.5}
+.field-help{font-size:var(--xs);opacity:.75;margin:0;line-height:1.5;max-width:56ch}
 
 /* ── confirmation ── */
 .confirm{background:var(--paper-2);border:1px solid var(--rule);padding:var(--s12);text-align:center;
@@ -292,8 +293,9 @@ ORDER = D.masthead("Order") + D.head_band("Ordina", "Place an Order",
         </div>
             <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email"><p class="err" data-for="email"></p></div>
             <div class="field"><label for="phone">Phone <span class="opt">(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel"></div>
-            <div class="field"><label for="notes">Anything we should know? <span class="opt">(optional)</span></label>
-              <textarea id="notes" name="notes" rows="3" placeholder="An occasion, an allergy, a favourite&#8230;"></textarea></div>
+            <div class="field"><label for="notes">Notes for Amanda <span class="opt">(optional)</span></label>
+              <p class="field-help">Anything we should know &#8212; an occasion, an allergy, or a request for one of the bakes.</p>
+              <textarea id="notes" name="notes" rows="3" placeholder="Extra crisp on the Roasted Garlic Boss, please&#8230;"></textarea></div>
             <div class="order-submit">
               <button type="submit" class="btn btn-fill" id="submit">Send the Order</button>
               <p class="cal-note">Nothing is charged online. We confirm availability, costs, and every order by email.</p>

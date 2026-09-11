@@ -71,9 +71,9 @@ function shell(inner) {
 }
 
 function rowsToHtml(rows) {
-  return `<table style="border-collapse:collapse;width:100%;">${rows.map(([label, val]) =>
+  return `<table style="border-collapse:collapse;width:100%;">${rows.map(({ label, value }) =>
     `<tr><td style="padding:6px 10px 6px 0;color:${C.olive};font-size:13px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;vertical-align:top;border-bottom:1px solid ${C.rule};">${escapeHtml(label)}</td>
-     <td style="padding:6px 0;vertical-align:top;border-bottom:1px solid ${C.rule};">${escapeHtml(val)}</td></tr>`).join('')}</table>`;
+     <td style="padding:6px 0;vertical-align:top;border-bottom:1px solid ${C.rule};">${escapeHtml(value)}</td></tr>`).join('')}</table>`;
 }
 
 function itemsToHtml(items) {
@@ -86,17 +86,29 @@ function itemsToHtml(items) {
   }).join('')}</table>`;
 }
 
-// The order as a customer would read it. `o` is a db row with items.
+// The order as a table. `o` is a db row with items. Each row carries a `key`
+// saying what it is, because the customer's own emails leave out the three
+// rows that only read their details back to them — and picking those off by
+// position silently took the date with them whenever a row above was absent,
+// which is every order without a phone number.
+const WHO_ROWS = ['name', 'email', 'phone'];
+
 function orderRows(o) {
   return [
-    ['Name', `${o.first_name} ${o.last_name}`],
-    o.email ? ['Email', o.email] : null,
-    o.phone ? ['Phone', o.phone] : null,
-    [o.fulfillment === 'pickup' ? 'Pickup' : 'Needed by', formatDate(o.needed_date)],
-    ['How', FULFILLMENT_LABELS[o.fulfillment] || o.fulfillment],
-    o.address ? ['Address', o.address] : null,
-    o.notes ? ['Notes', o.notes] : null,
+    { key: 'name', label: 'Name', value: `${o.first_name} ${o.last_name}` },
+    o.email ? { key: 'email', label: 'Email', value: o.email } : null,
+    o.phone ? { key: 'phone', label: 'Phone', value: o.phone } : null,
+    { key: 'when', label: o.fulfillment === 'pickup' ? 'Pickup' : 'Needed by', value: formatDate(o.needed_date) },
+    { key: 'how', label: 'How', value: FULFILLMENT_LABELS[o.fulfillment] || o.fulfillment },
+    o.address ? { key: 'address', label: 'Address', value: o.address } : null,
+    o.notes ? { key: 'notes', label: 'Notes', value: o.notes } : null,
   ].filter(Boolean);
+}
+
+// What to read back to the customer: the date, how, where, and whatever they
+// asked us for in their notes. Not their own name and contact details.
+function customerRows(o) {
+  return orderRows(o).filter((r) => !WHO_ROWS.includes(r.key));
 }
 
 // Sent to the bakery when an order comes in from the website.
@@ -122,7 +134,7 @@ function buildThankYou(o, settings) {
       <h2 style="margin:0 0 10px;font-weight:600;">Thank you, ${escapeHtml(o.first_name)}!</h2>
       <p>We have your order below. We will get back to you shortly to confirm it and let you know the total.</p>
       ${itemsToHtml(o.items)}
-      ${rowsToHtml(orderRows(o).slice(3))}
+      ${rowsToHtml(customerRows(o))}
       <p style="margin-top:18px;">${escapeHtml(settings.payment_instructions)}</p>
       <p>Questions in the meantime? Reply to this email or write to ${INFO_EMAIL}.</p>
       <p>— Amanda</p>`),
@@ -148,7 +160,7 @@ function buildConfirmation(o, settings) {
       <h2 style="margin:0 0 10px;font-weight:600;">Confirmed, ${escapeHtml(o.first_name)}!</h2>
       <p>Your order is in the book for <strong>${formatDate(o.needed_date)}</strong>.</p>
       ${itemsToHtml(o.items)}
-      ${rowsToHtml(orderRows(o).slice(3))}
+      ${rowsToHtml(customerRows(o))}
       ${money}
       <div style="margin-top:18px;padding:16px;background:${C.paper};border:1px dashed ${C.rule};">
         <p style="margin:0 0 6px;color:${C.olive};font-size:12px;letter-spacing:.2em;text-transform:uppercase;">Paying</p>
@@ -169,10 +181,10 @@ function buildReceipt(o, payment) {
   const paidInFull = o.payment_status === 'paid' || (hasTotal && paid >= total);
   const balance = hasTotal ? Math.max(total - paid, 0) : null;
   const money = [
-    ['This payment', formatMoney(payment.amount)],
-    paid !== Number(payment.amount) ? ['Paid to date', formatMoney(paid)] : null,
-    hasTotal ? ['Order total', formatMoney(total)] : null,
-    balance !== null ? ['Balance remaining', formatMoney(paidInFull ? 0 : balance)] : null,
+    { label: 'This payment', value: formatMoney(payment.amount) },
+    paid !== Number(payment.amount) ? { label: 'Paid to date', value: formatMoney(paid) } : null,
+    hasTotal ? { label: 'Order total', value: formatMoney(total) } : null,
+    balance !== null ? { label: 'Balance remaining', value: formatMoney(paidInFull ? 0 : balance) } : null,
   ].filter(Boolean);
   return {
     subject: paidInFull ? `Paid in full — thank you — ${BAKERY_NAME}` : `Payment received — ${BAKERY_NAME}`,
@@ -198,7 +210,7 @@ function buildReviewNotice(review) {
     subject: `New review to approve — ${BAKERY_NAME}`,
     html: shell(`
       <h2 style="margin:0 0 14px;font-weight:600;">New review</h2>
-      ${rowsToHtml([['Name', review.name], ['Rating', `${review.rating}/5`]])}
+      ${rowsToHtml([{ label: 'Name', value: review.name }, { label: 'Rating', value: `${review.rating}/5` }])}
       <p style="margin-top:18px;white-space:pre-wrap;">${escapeHtml(review.review)}</p>
       <p style="margin-top:18px;">Approve or reject it from the admin Reviews tab.</p>`),
   };

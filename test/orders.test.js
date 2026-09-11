@@ -63,6 +63,51 @@ test('email roles keep public correspondence separate from order notices', () =>
   }).html, /info@ohyoufancyfocaccia\.com/);
 });
 
+// Phone is optional, so an order without one is the ordinary case. The
+// customer's emails used to drop their three "who" rows by position, which
+// took the date with them the moment a row above was missing.
+test('customer emails keep the date and the notes, with or without a phone', () => {
+  const base = {
+    first_name: 'Jane', last_name: 'Doe', email: 'jane@example.com',
+    fulfillment: 'pickup', needed_date: '2027-02-03',
+    notes: 'No olives please, allergy', items: [],
+  };
+  const shapes = {
+    'with a phone': { ...base, phone: '555-0100' },
+    'without a phone': base,
+    'phone but no email': { ...base, email: '', phone: '555-0100' },
+    'delivery, with an address': { ...base, fulfillment: 'delivery', address: '12 Chetco Ave' },
+  };
+  for (const [shape, o] of Object.entries(shapes)) {
+    for (const [which, built] of [
+      ['thank-you', mail.buildThankYou(o, { payment_instructions: 'x' })],
+      ['confirmation', mail.buildConfirmation(o, { payment_instructions: 'x', pickup_note: 'y', deposit_percent: '0' })],
+    ]) {
+      assert.match(built.html, /02-03-2027/, `${which}, ${shape}: no date`);
+      assert.match(built.html, /No olives please, allergy/, `${which}, ${shape}: no notes`);
+      // and still not reading their own name and address back at them
+      assert.doesNotMatch(built.html, /Jane Doe/, `${which}, ${shape}: repeats their name`);
+    }
+    assert.match(mail.buildBakeryNotice({ ...o, id: 1 }, 'https://x').html, /No olives please, allergy/,
+      `bakery notice, ${shape}: no notes`);
+  }
+});
+
+// These two build their rows by hand rather than from an order.
+test('the receipt and the review notice still fill their tables', () => {
+  const receipt = mail.buildReceipt({
+    first_name: 'Jane', amount: 45, paid_amount: 20, payment_status: 'partial',
+    items: [{ name: 'The Italiano', quantity: 3, unit_price: 15 }],
+  }, { amount: 20 });
+  assert.match(receipt.html, /This payment/);
+  assert.match(receipt.html, /\$20\.00/);
+  assert.doesNotMatch(receipt.html, /undefined/);
+  const notice = mail.buildReviewNotice({ name: 'Sam', rating: 5, review: 'Wonderful' });
+  assert.match(notice.html, /Sam/);
+  assert.match(notice.html, /5\/5/);
+  assert.doesNotMatch(notice.html, /undefined/);
+});
+
 test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
   await db.initSchema();
   let menu, admin;

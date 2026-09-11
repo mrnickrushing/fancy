@@ -591,6 +591,7 @@ body.splashing{overflow:hidden}
 .cal-day.selected{background:var(--burgundy);color:var(--paper-2);border-color:var(--burgundy)}
 .cal-day.selected::after{background:var(--gold-pale)}
 .cal-note{font-size:var(--xs);opacity:.78;margin-top:var(--s3);line-height:1.5}
+.field-help{font-size:var(--xs);opacity:.75;margin:0;line-height:1.5;max-width:56ch}
 
 /* ── confirmation ── */
 .confirm{background:var(--paper-2);border:1px solid var(--rule);padding:var(--s12);text-align:center;
