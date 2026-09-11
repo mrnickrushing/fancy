@@ -42,10 +42,25 @@ Twenty-nine bakes, grouped into six courses rather than one flat wall:
 
 ## Captions
 
-Written from what is visible in each photograph. Where a flavour is not stated
-anywhere in the source material it is described by appearance instead — the dark
-swirl is "caramelised," not "cinnamon," because nothing confirms which it is.
-Correct any that are wrong.
+Written from what is visible in each photograph — nothing in the source material
+names these bakes, so appearance is the only evidence.
+
+Seeing five of them again at full resolution turned up real errors, since
+corrected:
+
+| Was | Is actually |
+|---|---|
+| "Rosemary Oval — hand-stretched long rather than round" | **Potato, Caramelised Onion & Rosemary** — sliced potato, slow onions, cracked pepper, parmesan |
+| "Skillet Focaccia — green with herbs" | **Pesto & Parmesan, in Cast Iron** — basil pesto, shredded parmesan |
+| "Olive Slab — green and kalamata" | **Olive & Sun-Dried Tomato Slab** — the tomato was missed entirely |
+| "Rosemary & Sea Salt" | **Rosemary & Cracked Pepper** |
+| "The Long Tray" | **Cheese, Sun-Dried Tomato & Olive** |
+
+Two files were renamed to match: `rosemary-oval` → `potato-onion`,
+`skillet` → `pesto-skillet`.
+
+**Amanda should still read every caption.** She knows what she calls these; a
+thumbnail can only show what a topping looks like, not what is in the dough.
 
 ## Still missing
 

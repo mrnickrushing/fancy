@@ -737,11 +737,11 @@ GAL_SECTIONS = [
    ("sea-salt-round.webp","Sea Salt Round","Olive-oil brushed, salt flaked, still warm.",300),
    ("square-focaccia.webp","Square Cut","Baked in the pan, corners and all.",300)]),
  ("Le Teglie","Slabs &amp; Pans", [
-   ("olive-slab.webp","Olive Slab","Green and kalamata, pressed into the dimples.",400),
-   ("rosemary-slab.webp","Rosemary &amp; Sea Salt","The plain one. Hardest to get right.",390),
-   ("rosemary-oval.webp","Rosemary Oval","Hand-stretched long rather than round.",380),
-   ("skillet.webp","Skillet Focaccia","Baked in cast iron, green with herbs.",240),
-   ("wide-slab.webp","The Long Tray","What a market morning looks like.",250)]),
+   ("olive-slab.webp","Olive &amp; Sun-Dried Tomato Slab","Green and black olives with sun-dried tomato, pressed into the dimples.",400),
+   ("rosemary-slab.webp","Rosemary &amp; Cracked Pepper","The plain one. Hardest to get right.",390),
+   ("potato-onion.webp","Potato, Caramelised Onion &amp; Rosemary","Sliced potato and slow onions under cracked pepper and parmesan.",380),
+   ("pesto-skillet.webp","Pesto &amp; Parmesan, in Cast Iron","Basil pesto and shredded parmesan, baked in the pan it is served from.",250),
+   ("wide-slab.webp","Cheese, Sun-Dried Tomato &amp; Olive","The long tray. What a market morning looks like.",250)]),
  ("Le Spirali","Swirls", [
    ("jalapeno-swirl-xl.webp","Jalape&#241;o Cheese Swirl","Cheese caught and caramelised in the coils.",300),
    ("swirl-jalapeno.webp","Jalape&#241;o Swirl","Layer on layer, blistered at the edge.",300),
