@@ -114,6 +114,13 @@
     }).filter(Boolean);
   }
 
+  // Flat, and only on shipping. The figure comes from /api/availability so a
+  // change in the admin reaches the page without a rebuild.
+  function shippingFee() {
+    if (fulfillment() !== 'shipping') return 0;
+    return (avail && Number(avail.shippingFee)) || 0;
+  }
+
   function renderCart() {
     var items = cartItems();
     var lines = $('cart-lines'), total = 0, unpriced = false;
@@ -129,6 +136,11 @@
       else { unpriced = true; line = 'quoted'; }
       return '<div class="cart-line"><span>' + esc(it.name) + ' <span style="opacity:.6">&times; ' + it.quantity + '</span></span><span>' + line + '</span></div>';
     }).join('');
+    var ship = shippingFee();
+    if (ship > 0) {
+      total += ship;
+      lines.innerHTML += '<div class="cart-line cart-line-fee"><span>Shipping</span><span>' + money(ship) + '</span></div>';
+    }
     var shown = unpriced ? (total ? money(total) + ' +' : 'Quoted') : money(total);
     $('cart-total').textContent = shown;
     $('cart-note').textContent = unpriced ? 'Some items are quoted when we confirm; the total will follow by email.' : '';
@@ -194,6 +206,7 @@
     if (selected && !allowed(new Date(selected + 'T00:00:00'))) { selected = null; $('needed-date').value = ''; }
     $('cal-note').textContent = pickup ? 'Gold dot — a market day.' : (selected ? 'Needed ' + longDate(selected) + '.' : 'Any day we are baking.');
     renderCal();
+    renderCart();
   });
 
   // ── errors ──

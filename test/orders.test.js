@@ -111,6 +111,53 @@ test('the receipt and the review notice still fill their tables', () => {
   assert.doesNotMatch(notice.html, /undefined/);
 });
 
+// The logo goes on everything; the payment block only on the emails a customer
+// might actually pay from.
+const MAIL_O = { first_name: 'Jane', items: [], email: 'j@example.com', needed_date: '2027-02-03', fulfillment: 'pickup' };
+const MAIL_SETTINGS = { payment_instructions: 'x', pickup_note: 'y', deposit_percent: '0' };
+
+test('every email carries the logo, and only the money ones carry the payment block', () => {
+  const paid = { ...MAIL_SETTINGS, venmo_handle: '@amanda-bakes', apple_pay_contact: '541-555-0142' };
+  const customer = [
+    mail.buildThankYou(MAIL_O, paid),
+    mail.buildConfirmation(MAIL_O, paid),
+    mail.buildReceipt({ ...MAIL_O, amount: 40, paid_amount: 40, payment_status: 'paid' }, { amount: 40 }, paid),
+    mail.buildPlain('Hello', 'A note', paid),
+  ];
+  const toAmanda = [
+    mail.buildBakeryNotice({ ...MAIL_O, id: 1 }, 'https://x'),
+    mail.buildReviewNotice({ name: 'Sam', rating: 5, review: 'Lovely' }),
+  ];
+
+  for (const built of [...customer, ...toAmanda]) {
+    assert.match(built.html, /img\/email-logo\.png/, 'no logo');
+    // The wordmark stays for anyone whose client blocks images.
+    assert.match(built.html, /Oh! You Fancy/);
+  }
+  for (const built of customer) {
+    assert.match(built.html, /How to pay/);
+    assert.match(built.html, /https:\/\/venmo\.com\/u\/amanda-bakes/);
+    assert.match(built.html, /541-555-0142/);
+  }
+  for (const built of toAmanda) assert.doesNotMatch(built.html, /How to pay/);
+});
+
+test('the payment block stays out until there is something to put in it', () => {
+  const empty = { ...MAIL_SETTINGS, venmo_handle: '', apple_pay_contact: '' };
+  assert.doesNotMatch(mail.buildThankYou(MAIL_O, empty).html, /How to pay/);
+  // either one on its own is enough
+  assert.match(mail.buildThankYou(MAIL_O, { ...empty, apple_pay_contact: 'a@example.com' }).html, /How to pay/);
+  assert.match(mail.buildThankYou(MAIL_O, { ...empty, venmo_handle: 'amanda' }).html, /How to pay/);
+});
+
+test('a Venmo handle is understood however it is written down', () => {
+  for (const given of ['amanda-bakes', '@amanda-bakes', 'https://venmo.com/u/amanda-bakes']) {
+    const html = mail.buildThankYou(MAIL_O, { ...MAIL_SETTINGS, venmo_handle: given }).html;
+    assert.match(html, /https:\/\/venmo\.com\/u\/amanda-bakes/, given);
+    assert.match(html, /@amanda-bakes/, given);
+  }
+});
+
 test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
   await db.initSchema();
   let menu, admin;
@@ -363,6 +410,65 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
       assert.equal(res.status, 200);
       assert.equal((await request(app).get('/api/admin/orders').set('Authorization', basic('test-admin', 'has:a:colon'))).status, 200);
       assert.equal((await request(app).get('/api/admin/orders').set('Authorization', basic('test-admin', 'test-password'))).status, 401);
+    });
+  });
+
+  // Shipping is the one charge the customer meets before Amanda has priced
+  // anything, so it has to be right on the order page and right on the order.
+  await t.test('shipping is a flat fee, snapshotted', async (t) => {
+    const B = (req) => req.set('Authorization', `Basic ${Buffer.from('test-admin:test-password').toString('base64')}`);
+    const shippedOrder = (over = {}) => ({
+      firstName: 'Ada', lastName: 'Byron', email: 'ada@example.com',
+      fulfillment: 'shipping', neededDate: dateOffset(6), address: '1 Long Road, Denver CO',
+      items: [{ id: menu[0].id, quantity: 2 }], ...over,
+    });
+
+    await t.test('the order page is told the fee, so nobody meets it first in an email', async () => {
+      const res = await request(app).get('/api/availability');
+      assert.equal(res.status, 200);
+      assert.equal(res.body.shippingFee, 10);
+    });
+
+    await t.test('it lands on shipped orders and on nothing else', async () => {
+      const ship = await request(app).post('/api/order').send(shippedOrder());
+      assert.equal(ship.status, 201);
+      assert.equal(Number((await db.getOrder(ship.body.orderId)).shipping_fee), 10);
+
+      const pickup = await request(app).post('/api/order').send(good());
+      assert.equal(pickup.status, 201);
+      assert.equal(Number((await db.getOrder(pickup.body.orderId)).shipping_fee), 0);
+
+      const deliver = await request(app).post('/api/order').send(shippedOrder({
+        fulfillment: 'delivery', email: 'del@example.com',
+      }));
+      assert.equal(deliver.status, 201);
+      assert.equal(Number((await db.getOrder(deliver.body.orderId)).shipping_fee), 0);
+    });
+
+    // The whole reason it is a column and not a lookup.
+    await t.test('raising the fee does not reprice an order already taken', async () => {
+      const before = await request(app).post('/api/order').send(shippedOrder());
+      assert.equal(before.status, 201);
+
+      const put = await B(request(app).put('/api/admin/settings')).send({ shipping_fee: 25 });
+      assert.equal(put.status, 200);
+      assert.equal(put.body.settings.shipping_fee, '25.00');
+
+      assert.equal(Number((await db.getOrder(before.body.orderId)).shipping_fee), 10);
+      const after = await request(app).post('/api/order').send(shippedOrder({ email: 'later@example.com' }));
+      assert.equal(Number((await db.getOrder(after.body.orderId)).shipping_fee), 25);
+    });
+
+    await t.test('an order taken by hand is charged it too', async () => {
+      const res = await B(request(app).post('/api/admin/orders')).send(shippedOrder());
+      assert.equal(res.status, 201);
+      assert.equal(Number(res.body.order.shipping_fee), 10);
+    });
+
+    await t.test('the fee has to be an amount', async () => {
+      for (const bad of [-1, 1001, 'free']) {
+        assert.equal((await B(request(app).put('/api/admin/settings')).send({ shipping_fee: bad })).status, 400);
+      }
     });
   });
 

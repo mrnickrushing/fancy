@@ -24,6 +24,14 @@ const SETTINGS_DEFAULTS = {
   payment_instructions: 'We will confirm your order and let you know the total. Payment is taken when you collect at the market, or as arranged for delivery and shipping.',
   pickup_note: 'Brookings-Harbor Farmers Market, Wednesdays and Saturdays from 9am.',
   min_notice_days: '2',
+  // A flat fee added to every shipped order, whatever is in the box. Editable
+  // from the admin, so a change in postage does not need a deploy.
+  shipping_fee: '10.00',
+  // How Amanda is paid. Empty until she fills them in, and the emails simply
+  // leave the block out until then — this file will not invent somewhere for
+  // a customer's money to go.
+  venmo_handle: '',
+  apple_pay_contact: '',
 };
 
 async function initSchema() {
@@ -61,6 +69,9 @@ async function initSchema() {
     );
   `);
   await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS idempotency_key TEXT`);
+  // Snapshotted at order time like the item prices above it: raising the fee
+  // next month must not silently reprice an order already taken.
+  await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_fee NUMERIC(10,2) NOT NULL DEFAULT 0`);
   // The order page shows customers what a bake looks like; the file lives in
   // public/img and the column holds only its name.
   await pool.query(`ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS image TEXT`);
@@ -420,11 +431,12 @@ async function createOrder(order, items) {
     await client.query('BEGIN');
     const respondToken = crypto.randomBytes(20).toString('hex');
     const { rows } = await client.query(
-      `INSERT INTO orders (first_name, last_name, email, phone, fulfillment, needed_date, address, notes, source, respond_token, idempotency_key)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id, respond_token`,
+      `INSERT INTO orders (first_name, last_name, email, phone, fulfillment, needed_date, address, notes, source, respond_token, idempotency_key, shipping_fee)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id, respond_token`,
       [order.firstName, order.lastName, order.email || null, order.phone || null,
        order.fulfillment, order.neededDate, order.address || null, order.notes || null,
-       order.source || 'website', respondToken, order.idempotencyKey || null]
+       order.source || 'website', respondToken, order.idempotencyKey || null,
+       order.shippingFee || 0]
     );
     const saved = rows[0];
     if (items.length) {
