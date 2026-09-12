@@ -117,7 +117,7 @@ const MAIL_O = { first_name: 'Jane', items: [], email: 'j@example.com', needed_d
 const MAIL_SETTINGS = { payment_instructions: 'x', pickup_note: 'y', deposit_percent: '0' };
 
 test('every email carries the logo, and only the money ones carry the payment block', () => {
-  const paid = { ...MAIL_SETTINGS, venmo_handle: '@amanda-bakes', apple_pay_contact: '541-555-0142' };
+  const paid = { ...MAIL_SETTINGS, venmo_handle: '@amanda-bakes', apple_pay_accepted: '1' };
   const customer = [
     mail.buildThankYou(MAIL_O, paid),
     mail.buildConfirmation(MAIL_O, paid),
@@ -137,17 +137,25 @@ test('every email carries the logo, and only the money ones carry the payment bl
   for (const built of customer) {
     assert.match(built.html, /How to pay/);
     assert.match(built.html, /https:\/\/venmo\.com\/u\/amanda-bakes/);
-    assert.match(built.html, /541-555-0142/);
+    assert.match(built.html, /Apple&nbsp;Pay/);
   }
   for (const built of toAmanda) assert.doesNotMatch(built.html, /How to pay/);
 });
 
 test('the payment block stays out until there is something to put in it', () => {
-  const empty = { ...MAIL_SETTINGS, venmo_handle: '', apple_pay_contact: '' };
+  const empty = { ...MAIL_SETTINGS, venmo_handle: '', apple_pay_accepted: '' };
   assert.doesNotMatch(mail.buildThankYou(MAIL_O, empty).html, /How to pay/);
   // either one on its own is enough
-  assert.match(mail.buildThankYou(MAIL_O, { ...empty, apple_pay_contact: 'a@example.com' }).html, /How to pay/);
+  assert.match(mail.buildThankYou(MAIL_O, { ...empty, apple_pay_accepted: '1' }).html, /How to pay/);
   assert.match(mail.buildThankYou(MAIL_O, { ...empty, venmo_handle: 'amanda' }).html, /How to pay/);
+});
+
+test('the bakery ships with her Venmo and Apple Pay already on', () => {
+  assert.equal(db.SETTINGS_DEFAULTS.venmo_handle, 'OHYOUFANCYFOCACCIA');
+  assert.equal(db.SETTINGS_DEFAULTS.apple_pay_accepted, '1');
+  const html = mail.buildThankYou(MAIL_O, { ...MAIL_SETTINGS, ...db.SETTINGS_DEFAULTS }).html;
+  assert.match(html, /venmo\.com\/u\/OHYOUFANCYFOCACCIA/);
+  assert.match(html, /Apple&nbsp;Pay/);
 });
 
 test('a Venmo handle is understood however it is written down', () => {

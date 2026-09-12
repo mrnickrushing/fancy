@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Button } from '../../src/components/Button';
 import { Card } from '../../src/components/Card';
@@ -26,7 +26,7 @@ export default function SettingsScreen() {
   const [deposit, setDeposit] = useState('');
   const [shipping, setShipping] = useState('');
   const [venmo, setVenmo] = useState('');
-  const [applePay, setApplePay] = useState('');
+  const [applePay, setApplePay] = useState(false);
   const [instructions, setInstructions] = useState('');
   const [pickup, setPickup] = useState('');
   const [shopStatus, setShopStatus] = useState<{ tone: 'success' | 'error'; message: string } | null>(null);
@@ -44,7 +44,7 @@ export default function SettingsScreen() {
     setDeposit(data.settings.deposit_percent);
     setShipping(data.settings.shipping_fee);
     setVenmo(data.settings.venmo_handle || '');
-    setApplePay(data.settings.apple_pay_contact || '');
+    setApplePay(data.settings.apple_pay_accepted === '1');
     setInstructions(data.settings.payment_instructions);
     setPickup(data.settings.pickup_note);
   }, [data]);
@@ -57,7 +57,7 @@ export default function SettingsScreen() {
         deposit_percent: deposit.trim(),
         shipping_fee: shipping.trim(),
         venmo_handle: venmo.trim(),
-        apple_pay_contact: applePay.trim(),
+        apple_pay_accepted: applePay ? '1' : '',
         payment_instructions: instructions.trim(),
         pickup_note: pickup.trim(),
       });
@@ -162,14 +162,18 @@ export default function SettingsScreen() {
                   placeholder="@handle"
                   hint="Shown at the foot of customer emails. Leave it empty to keep it out."
                 />
-                <Input
-                  label="Apple Pay"
-                  value={applePay}
-                  onChangeText={setApplePay}
-                  autoCapitalize="none"
-                  placeholder="phone or email"
-                  hint="Where Apple Cash should go."
-                />
+                <View style={styles.switchRow}>
+                  <View style={styles.switchText}>
+                    <Text style={styles.switchLabel}>Apple Pay</Text>
+                    <Text style={styles.switchHint}>Says in your emails that you take Apple Pay too.</Text>
+                  </View>
+                  <Switch
+                    value={applePay}
+                    onValueChange={setApplePay}
+                    trackColor={{ true: colors.olive, false: colors.surfaceDynamic }}
+                    thumbColor={colors.surface}
+                  />
+                </View>
                 <Input label="Where and when to collect" value={pickup} onChangeText={setPickup} multiline />
                 <Button label="Save" onPress={saveShop} loading={save.isPending} />
               </Card>
@@ -215,4 +219,14 @@ const styles = StyleSheet.create({
   body: { fontFamily: fonts.bodyRegular, fontSize: fontSize.sm, color: colors.textMuted, lineHeight: 22 },
   row: { fontFamily: fonts.bodyRegular, fontSize: fontSize.sm, color: colors.textMuted, marginBottom: spacing.s1 },
   spaced: { marginTop: spacing.s4 },
+  switchRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.s4, marginBottom: spacing.s4 },
+  switchText: { flex: 1 },
+  switchLabel: {
+    fontFamily: fonts.displaySemibold,
+    fontSize: 11,
+    letterSpacing: 1.6,
+    textTransform: 'uppercase',
+    color: colors.textMuted,
+  },
+  switchHint: { fontFamily: fonts.bodyRegular, fontSize: fontSize.xs, color: colors.textMuted, marginTop: 2 },
 });
