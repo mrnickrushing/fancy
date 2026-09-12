@@ -494,6 +494,9 @@ async function listOrders() {
 const ORDER_EDITABLE = {
   firstName: 'first_name', lastName: 'last_name', email: 'email', phone: 'phone',
   fulfillment: 'fulfillment', neededDate: 'needed_date', address: 'address', notes: 'notes',
+  // Server-set only. The admin route never copies this one out of the request
+  // body — it works it out from the fulfillment it is being moved to.
+  shippingFee: 'shipping_fee',
 };
 
 async function updateOrder(id, fields) {

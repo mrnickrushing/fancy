@@ -12,6 +12,7 @@ const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const db = require('./db');
 const mail = require('./mail');
+const { resolveBaseUrl } = require('./base-url');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,12 +24,6 @@ app.set('trust proxy', 1);
 // Absolute origin for links that leave the server — the "review & respond"
 // button in the order email. Railway injects RAILWAY_PUBLIC_DOMAIN on every
 // deploy, so a forgotten BASE_URL still yields a reachable origin.
-function resolveBaseUrl(env = process.env, port = PORT) {
-  if (env.BASE_URL) return env.BASE_URL.replace(/\/$/, '');
-  if (env.CANONICAL_HOST) return `https://${env.CANONICAL_HOST}`;
-  if (env.RAILWAY_PUBLIC_DOMAIN) return `https://${env.RAILWAY_PUBLIC_DOMAIN}`;
-  return `http://localhost:${port}`;
-}
 const BASE_URL = resolveBaseUrl();
 
 // Market days, as the day-of-week numbers Date#getDay uses.
@@ -582,6 +577,13 @@ app.patch('/api/admin/orders/:id', asyncHandler(async (req, res) => {
   if (merged.email && !isEmail(merged.email)) return res.status(400).json({ error: 'That email address does not look right.' });
   if (!FULFILLMENTS.includes(merged.fulfillment)) return res.status(400).json({ error: 'Choose pickup, delivery or shipping.' });
   if (!isIsoDate(merged.neededDate)) return res.status(400).json({ error: 'Date must be a real calendar date.' });
+  // shipping_fee was snapshotted when the order arrived. Changing how it is
+  // fulfilled has to move it too, or a pickup keeps a phantom shipping line on
+  // its next confirmation and an order moved to shipping is charged nothing.
+  if (merged.fulfillment !== current.fulfillment) {
+    const settings = merged.fulfillment === 'shipping' ? await db.getSettings() : null;
+    patch.shippingFee = settings ? Number(settings.shipping_fee) || 0 : 0;
+  }
   res.json({ ok: true, order: await db.updateOrder(req.params.id, patch) });
 }));
 

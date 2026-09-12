@@ -107,6 +107,18 @@ test('the logo the emails point at is actually served', async () => {
   assert.match(res.headers['content-type'] || '', /image\/png/);
 });
 
+// The fee arrives with /api/availability and refreshes on a timer. Redrawing
+// only the calendar leaves a cart totalled before it landed short by the fee —
+// the customer sees one number and is charged another.
+test('the order page re-totals once availability lands', async () => {
+  const js = (await request(app).get('/order.js')).text;
+  const start = js.indexOf('async function loadAvailability');
+  assert.ok(start > -1, 'loadAvailability is gone');
+  const body = js.slice(start, js.indexOf('\n  }', start) + 4);
+  assert.match(body, /renderCal\(\)/);
+  assert.match(body, /renderCart\(\)/, 'loadAvailability never re-totals the cart');
+});
+
 test('social metadata and install metadata are present', async () => {
   const html = (await request(app).get('/')).text;
   assert.match(html, /name="twitter:image"/);

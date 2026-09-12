@@ -473,6 +473,35 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
       assert.equal(Number(res.body.order.shipping_fee), 10);
     });
 
+    // The fee is a snapshot, so editing the order has to move it deliberately.
+    await t.test('changing how an order is fulfilled moves the fee with it', async () => {
+      const S = { payment_instructions: 'x', pickup_note: 'y', deposit_percent: '0' };
+      const made = await request(app).post('/api/order').send(shippedOrder());
+      const id = made.body.orderId;
+      assert.equal(Number((await db.getOrder(id)).shipping_fee), 10);
+
+      const toPickup = await B(request(app).patch(`/api/admin/orders/${id}`)).send({ fulfillment: 'pickup' });
+      assert.equal(toPickup.status, 200);
+      let order = await db.getOrder(id);
+      assert.equal(Number(order.shipping_fee), 0, 'a pickup kept the shipping fee');
+      assert.doesNotMatch(mail.buildConfirmation(order, S).html, />Shipping</,
+        'the confirmation still bills shipping on a pickup');
+
+      const back = await B(request(app).patch(`/api/admin/orders/${id}`)).send({ fulfillment: 'shipping' });
+      assert.equal(back.status, 200);
+      order = await db.getOrder(id);
+      assert.equal(Number(order.shipping_fee), 10, 'moving back to shipping charged nothing');
+      assert.match(mail.buildConfirmation(order, S).html, />Shipping</);
+    });
+
+    await t.test('the fee is the server\'s to set, not the request\'s', async () => {
+      const made = await request(app).post('/api/order').send(good());
+      const res = await B(request(app).patch(`/api/admin/orders/${made.body.orderId}`))
+        .send({ notes: 'nothing to see', shippingFee: 999, shipping_fee: 999 });
+      assert.equal(res.status, 200);
+      assert.equal(Number((await db.getOrder(made.body.orderId)).shipping_fee), 0);
+    });
+
     await t.test('the fee has to be an amount', async () => {
       for (const bad of [-1, 1001, 'free']) {
         assert.equal((await B(request(app).put('/api/admin/settings')).send({ shipping_fee: bad })).status, 400);

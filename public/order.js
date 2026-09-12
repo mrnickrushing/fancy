@@ -278,6 +278,10 @@
     try { var r = await fetch('/api/availability'); if (r.ok) { avail = await r.json(); if (avail.pickupNote) $('pickup-note').textContent = avail.pickupNote; } } catch (err) { /* the calendar still works */ }
     var m = minDate(); if (calMonth < new Date(m.getFullYear(), m.getMonth(), 1)) calMonth = new Date(m.getFullYear(), m.getMonth(), 1);
     renderCal();
+    // The fee arrives with this response, and it also refreshes on a timer.
+    // Without re-totalling, someone who chose shipping before it landed sees a
+    // total missing the ten dollars they are about to be charged.
+    renderCart();
   }
   // ── arriving from the gallery ──
   // The gallery shows thirty-one bakes; twelve are standing rows on the bill
