@@ -23,7 +23,12 @@ export function ContentFrame({
   );
 }
 
-export function Screen({ children, header = true }: { children: ReactNode; header?: boolean }) {
+// `bleed` gives the screen the whole pane, status bar included, for the one
+// screen whose photograph runs edge to edge. The inset is then the screen's
+// own problem, because only it knows what the wordmark is sitting on.
+export function Screen({
+  children, header = true, bleed = false,
+}: { children: ReactNode; header?: boolean; bleed?: boolean }) {
   const insets = useSafeAreaInsets();
   const readOnly = useReadOnly();
   return (
@@ -32,7 +37,7 @@ export function Screen({ children, header = true }: { children: ReactNode; heade
         <View style={[styles.header, { paddingTop: insets.top + spacing.s2 }]}>
           <Logo size={40} />
         </View>
-      ) : (
+      ) : bleed && !readOnly ? null : (
         <View style={{ height: insets.top }} />
       )}
       {readOnly ? (
