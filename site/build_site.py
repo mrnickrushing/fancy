@@ -78,6 +78,9 @@ LINKS = {
     EMAIL: f"mailto:{EMAIL}",
     "Oh! You Fancy Focaccia": FB,
     "Facebook": FB,
+    "Rushing Technologies": "https://rushingtechnologies.com",
+    # the build credit in the footer; rewrite_links gives it target=_blank
+
     "Write to Us": f"mailto:{EMAIL}",
     "Read the Reviews": "./reviews.html",
 }

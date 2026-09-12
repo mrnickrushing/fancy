@@ -939,6 +939,26 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     assert.equal(r.body.item.image, null);
   });
 
+  await t.test('the blood-sugar claim is taken off live rows, once', async () => {
+    const claim = 'A decadent chocolate focaccia dessert, sweetened with coconut sugar so it '
+      + 'doesn\u2019t spike your blood sugar like regular refined sugar does.';
+    // a row seeded before the wording changed; ensureCatalogItems never
+    // rewrites a description, so only the migration can reach it
+    await db.pool.query(`UPDATE menu_items SET description = $1 WHERE name = 'The Pow Cacao'`, [claim]);
+    await db.pool.query(`DELETE FROM settings WHERE key = 'pow_cacao_claim_dropped'`);
+    await db.initSchema();
+
+    let r = await db.pool.query(`SELECT description FROM menu_items WHERE name = 'The Pow Cacao'`);
+    assert.doesNotMatch(r.rows[0].description, /blood sugar/i);
+    assert.match(r.rows[0].description, /coconut sugar rather than refined sugar/);
+
+    // and a wording Amanda writes herself is not overwritten on the next boot
+    await db.pool.query(`UPDATE menu_items SET description = 'Her own words.' WHERE name = 'The Pow Cacao'`);
+    await db.initSchema();
+    r = await db.pool.query(`SELECT description FROM menu_items WHERE name = 'The Pow Cacao'`);
+    assert.equal(r.rows[0].description, 'Her own words.');
+  });
+
   await t.test('rows seeded before the image column get their photograph once', async () => {
     await db.pool.query(`UPDATE menu_items SET image = NULL`);
     await db.pool.query(`DELETE FROM settings WHERE key = 'menu_images_backfilled'`);

@@ -184,6 +184,7 @@ async function initSchema() {
   await backfillMenuPrices();
   await alignMenuToCatalog();
   await backfillMenuImages();
+  await dropBloodSugarClaim();
   await applyPriceCorrections();
 }
 
@@ -275,6 +276,39 @@ async function backfillMenuPrices() {
 // fill it from the catalog by name. Once only, and never over a value that is
 // already set: clearing an image in the admin is how Amanda takes down a photo
 // she no longer likes, and a backfill on every boot would put it straight back.
+// The Pow Cacao shipped with a line saying the coconut sugar in it would not
+// spike your blood sugar the way refined sugar does. That is a health claim on
+// a food product from a licensed kitchen, and coconut sugar is still mostly
+// sucrose, so it comes off the menu.
+//
+// It has to be done here as well as in the catalog: the live rows were seeded
+// before the wording changed, and ensureCatalogItems only inserts bakes that
+// are missing — it never rewrites a description. Matched on the exact old
+// sentence so a line Amanda has since written herself is left alone, and once
+// only, so a wording she chooses later is not overwritten on the next boot.
+const POW_CACAO_CLAIM =
+  'A decadent chocolate focaccia dessert, sweetened with coconut sugar so it ' +
+  'doesn\u2019t spike your blood sugar like regular refined sugar does.';
+const POW_CACAO_REPLACEMENT =
+  'A decadent chocolate focaccia dessert, sweetened with coconut sugar rather ' +
+  'than refined sugar.';
+
+async function dropBloodSugarClaim() {
+  const done = await pool.query(
+    `SELECT 1 FROM settings WHERE key = 'pow_cacao_claim_dropped'`
+  );
+  if (done.rowCount) return;
+  const { rowCount } = await pool.query(
+    `UPDATE menu_items SET description = $1 WHERE description = $2`,
+    [POW_CACAO_REPLACEMENT, POW_CACAO_CLAIM]
+  );
+  await pool.query(
+    `INSERT INTO settings (key, value, updated_at)
+     VALUES ('pow_cacao_claim_dropped', '1', now()) ON CONFLICT (key) DO NOTHING`
+  );
+  if (rowCount) console.log('menu: took the blood-sugar claim off The Pow Cacao');
+}
+
 async function backfillMenuImages() {
   const done = await pool.query(
     `SELECT 1 FROM settings WHERE key = 'menu_images_backfilled'`
