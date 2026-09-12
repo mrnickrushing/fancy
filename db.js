@@ -27,6 +27,11 @@ const SETTINGS_DEFAULTS = {
   // A flat fee added to every shipped order, whatever is in the box. Editable
   // from the admin, so a change in postage does not need a deploy.
   shipping_fee: '10.00',
+  // How Amanda is paid. Empty until she fills them in, and the emails simply
+  // leave the block out until then — this file will not invent somewhere for
+  // a customer's money to go.
+  venmo_handle: '',
+  apple_pay_contact: '',
 };
 
 async function initSchema() {

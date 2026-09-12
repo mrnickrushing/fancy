@@ -25,6 +25,8 @@ export default function SettingsScreen() {
   const [notice, setNotice] = useState('');
   const [deposit, setDeposit] = useState('');
   const [shipping, setShipping] = useState('');
+  const [venmo, setVenmo] = useState('');
+  const [applePay, setApplePay] = useState('');
   const [instructions, setInstructions] = useState('');
   const [pickup, setPickup] = useState('');
   const [shopStatus, setShopStatus] = useState<{ tone: 'success' | 'error'; message: string } | null>(null);
@@ -41,6 +43,8 @@ export default function SettingsScreen() {
     setNotice(data.settings.min_notice_days);
     setDeposit(data.settings.deposit_percent);
     setShipping(data.settings.shipping_fee);
+    setVenmo(data.settings.venmo_handle || '');
+    setApplePay(data.settings.apple_pay_contact || '');
     setInstructions(data.settings.payment_instructions);
     setPickup(data.settings.pickup_note);
   }, [data]);
@@ -52,6 +56,8 @@ export default function SettingsScreen() {
         min_notice_days: notice.trim(),
         deposit_percent: deposit.trim(),
         shipping_fee: shipping.trim(),
+        venmo_handle: venmo.trim(),
+        apple_pay_contact: applePay.trim(),
         payment_instructions: instructions.trim(),
         pickup_note: pickup.trim(),
       });
@@ -148,6 +154,22 @@ export default function SettingsScreen() {
                   hint="Added to every shipped order. Orders already taken keep the fee they were quoted."
                 />
                 <Input label="What you tell people about paying" value={instructions} onChangeText={setInstructions} multiline />
+                <Input
+                  label="Venmo"
+                  value={venmo}
+                  onChangeText={setVenmo}
+                  autoCapitalize="none"
+                  placeholder="@handle"
+                  hint="Shown at the foot of customer emails. Leave it empty to keep it out."
+                />
+                <Input
+                  label="Apple Pay"
+                  value={applePay}
+                  onChangeText={setApplePay}
+                  autoCapitalize="none"
+                  placeholder="phone or email"
+                  hint="Where Apple Cash should go."
+                />
                 <Input label="Where and when to collect" value={pickup} onChangeText={setPickup} multiline />
                 <Button label="Save" onPress={saveShop} loading={save.isPending} />
               </Card>

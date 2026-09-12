@@ -122,6 +122,9 @@ export type Review = {
 export type Settings = {
   deposit_percent: string;
   shipping_fee: string;
+  // Empty until Amanda fills them in; the emails leave the block out until then.
+  venmo_handle: string;
+  apple_pay_contact: string;
   payment_instructions: string;
   pickup_note: string;
   min_notice_days: string;

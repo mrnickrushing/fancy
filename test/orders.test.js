@@ -111,6 +111,53 @@ test('the receipt and the review notice still fill their tables', () => {
   assert.doesNotMatch(notice.html, /undefined/);
 });
 
+// The logo goes on everything; the payment block only on the emails a customer
+// might actually pay from.
+const MAIL_O = { first_name: 'Jane', items: [], email: 'j@example.com', needed_date: '2027-02-03', fulfillment: 'pickup' };
+const MAIL_SETTINGS = { payment_instructions: 'x', pickup_note: 'y', deposit_percent: '0' };
+
+test('every email carries the logo, and only the money ones carry the payment block', () => {
+  const paid = { ...MAIL_SETTINGS, venmo_handle: '@amanda-bakes', apple_pay_contact: '541-555-0142' };
+  const customer = [
+    mail.buildThankYou(MAIL_O, paid),
+    mail.buildConfirmation(MAIL_O, paid),
+    mail.buildReceipt({ ...MAIL_O, amount: 40, paid_amount: 40, payment_status: 'paid' }, { amount: 40 }, paid),
+    mail.buildPlain('Hello', 'A note', paid),
+  ];
+  const toAmanda = [
+    mail.buildBakeryNotice({ ...MAIL_O, id: 1 }, 'https://x'),
+    mail.buildReviewNotice({ name: 'Sam', rating: 5, review: 'Lovely' }),
+  ];
+
+  for (const built of [...customer, ...toAmanda]) {
+    assert.match(built.html, /img\/email-logo\.png/, 'no logo');
+    // The wordmark stays for anyone whose client blocks images.
+    assert.match(built.html, /Oh! You Fancy/);
+  }
+  for (const built of customer) {
+    assert.match(built.html, /How to pay/);
+    assert.match(built.html, /https:\/\/venmo\.com\/u\/amanda-bakes/);
+    assert.match(built.html, /541-555-0142/);
+  }
+  for (const built of toAmanda) assert.doesNotMatch(built.html, /How to pay/);
+});
+
+test('the payment block stays out until there is something to put in it', () => {
+  const empty = { ...MAIL_SETTINGS, venmo_handle: '', apple_pay_contact: '' };
+  assert.doesNotMatch(mail.buildThankYou(MAIL_O, empty).html, /How to pay/);
+  // either one on its own is enough
+  assert.match(mail.buildThankYou(MAIL_O, { ...empty, apple_pay_contact: 'a@example.com' }).html, /How to pay/);
+  assert.match(mail.buildThankYou(MAIL_O, { ...empty, venmo_handle: 'amanda' }).html, /How to pay/);
+});
+
+test('a Venmo handle is understood however it is written down', () => {
+  for (const given of ['amanda-bakes', '@amanda-bakes', 'https://venmo.com/u/amanda-bakes']) {
+    const html = mail.buildThankYou(MAIL_O, { ...MAIL_SETTINGS, venmo_handle: given }).html;
+    assert.match(html, /https:\/\/venmo\.com\/u\/amanda-bakes/, given);
+    assert.match(html, /@amanda-bakes/, given);
+  }
+});
+
 test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
   await db.initSchema();
   let menu, admin;

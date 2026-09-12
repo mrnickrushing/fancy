@@ -293,6 +293,7 @@
     $('set-notice').value = s.min_notice_days; $('set-deposit').value = s.deposit_percent;
     $('set-payment').value = s.payment_instructions; $('set-pickup').value = s.pickup_note;
     $('set-shipping').value = s.shipping_fee;
+    $('set-venmo').value = s.venmo_handle || ''; $('set-applepay').value = s.apple_pay_contact || '';
     var outbox = data.emailOutbox || {}, failed = (outbox.failed || 0) + (outbox.dead || 0), pending = (outbox.pending || 0) + (outbox.sending || 0);
     $('email-retry').hidden = !failed;
     $('email-state').textContent = !data.emailConfigured
@@ -304,7 +305,7 @@
   $('settings-form').addEventListener('submit', async function (e) {
     e.preventDefault();
     try {
-      await api('/api/admin/settings', { method: 'PUT', body: JSON.stringify({ min_notice_days: Number($('set-notice').value), deposit_percent: Number($('set-deposit').value), shipping_fee: Number($('set-shipping').value), payment_instructions: $('set-payment').value, pickup_note: $('set-pickup').value }) });
+      await api('/api/admin/settings', { method: 'PUT', body: JSON.stringify({ min_notice_days: Number($('set-notice').value), deposit_percent: Number($('set-deposit').value), shipping_fee: Number($('set-shipping').value), payment_instructions: $('set-payment').value, pickup_note: $('set-pickup').value, venmo_handle: $('set-venmo').value, apple_pay_contact: $('set-applepay').value }) });
       say('settings-msg', 'Saved.', true);
     } catch (err) { say('settings-msg', err.message, false); }
   });

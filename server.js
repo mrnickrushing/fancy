@@ -670,13 +670,13 @@ app.post('/api/admin/orders/:id/receipt', asyncHandler((req, res) =>
     const { paymentId } = req.body || {};
     const payment = paymentId ? order.payments.find((p) => String(p.id) === String(paymentId)) : order.payments[0];
     if (!payment) return { error: 'That payment is not on this order.' };
-    return mail.buildReceipt(order, payment);
+    return mail.buildReceipt(order, payment, await db.getSettings());
   })));
 
 app.post('/api/admin/orders/:id/email', asyncHandler((req, res) => {
   const subject = str(req.body?.subject), message = str(req.body?.message);
   if (!subject || !message) return res.status(400).json({ error: 'Subject and message are required.' });
-  return sendForOrder(req, res, async () => mail.buildPlain(subject, message));
+  return sendForOrder(req, res, async () => mail.buildPlain(subject, message, await db.getSettings()));
 }));
 
 // ── admin API: menu ──────────────────────────────────────────────────────
@@ -786,6 +786,14 @@ app.put('/api/admin/settings', asyncHandler(async (req, res) => {
     const n = Number(body.shipping_fee);
     if (!Number.isFinite(n) || n < 0 || n > 1000) return res.status(400).json({ error: 'Shipping must be an amount from 0 to 1000.' });
     patch.shipping_fee = n.toFixed(2);
+  }
+  // These two may be emptied — clearing the Venmo handle is how the block
+  // comes out of the emails again, so the not-empty rule below cannot apply.
+  for (const key of ['venmo_handle', 'apple_pay_contact']) {
+    if (!(key in body)) continue;
+    const v = str(body[key]);
+    if (v.length > 200) return res.status(400).json({ error: 'That is limited to 200 characters.' });
+    patch[key] = v;
   }
   for (const key of ['payment_instructions', 'pickup_note']) {
     if (!(key in body)) continue;

@@ -23,6 +23,13 @@ const BAKERY_INBOX = INFO_EMAIL;
 const FROM_ADDRESS = process.env.EMAIL_FROM || `${BAKERY_NAME} <${INFO_EMAIL}>`;
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+// Absolute, because an email is read somewhere this server is not. PNG rather
+// than the site's WebP: Outlook still will not render WebP.
+const SITE_URL = (process.env.BASE_URL
+  || (process.env.CANONICAL_HOST ? `https://${process.env.CANONICAL_HOST}` : 'https://ohyoufancyfocaccia.com')
+).replace(/\/$/, '');
+const LOGO_URL = `${SITE_URL}/img/email-logo.png`;
 function configured() { return Boolean(resend); }
 
 const FULFILLMENT_LABELS = {
@@ -54,20 +61,47 @@ function formatMoney(value) {
 // The palette is the label's: burgundy on parchment, gold rules, olive caps.
 const C = { burgundy: '#8E1B1B', ink: '#33190F', paper: '#F4EFE2', paper2: '#FBF8EF', rule: '#CBBB97', olive: '#4E6023', gold: '#B8862F' };
 
-function shell(inner) {
+// The wordmark stays under the logo on purpose: plenty of clients block
+// images by default, and the email should still say whose it is.
+function shell(inner, footer = '') {
   return `
 <div style="background:${C.paper};padding:28px 12px;font-family:Georgia,'Times New Roman',serif;color:${C.ink};">
   <div style="max-width:600px;margin:0 auto;background:${C.paper2};border:1px solid ${C.rule};">
-    <div style="background:${C.burgundy};color:#F6E6C6;text-align:center;padding:26px 20px;border-bottom:4px double rgba(239,224,190,.5);">
+    <div style="background:${C.burgundy};color:#F6E6C6;text-align:center;padding:0 20px 24px;border-bottom:4px double rgba(239,224,190,.5);">
+      <img src="${LOGO_URL}" alt="${BAKERY_NAME}" width="560" style="width:100%;max-width:560px;height:auto;display:block;margin:0 auto 4px;border:0;" />
       <div style="font-size:26px;font-style:italic;letter-spacing:.02em;">Oh! You Fancy</div>
       <div style="font-size:13px;letter-spacing:.38em;text-transform:uppercase;margin-top:6px;">Focaccia</div>
     </div>
     <div style="padding:26px 24px;">
       ${inner}
+      ${footer}
       <p style="margin-top:28px;color:${C.olive};font-size:12px;letter-spacing:.3em;text-transform:uppercase;text-align:center;">Pane &middot; Amore &middot; Sempre</p>
     </div>
   </div>
 </div>`;
+}
+
+// Only on the emails a customer might pay from, and only once Amanda has
+// filled the settings in. Nothing here invents a destination for money.
+function paymentFooter(settings = {}) {
+  const venmo = String(settings.venmo_handle || '').trim();
+  const applePay = String(settings.apple_pay_contact || '').trim();
+  if (!venmo && !applePay) return '';
+
+  const lines = [];
+  if (venmo) {
+    const handle = venmo.replace(/^https?:\/\/(www\.)?venmo\.com\/u\//i, '').replace(/^@/, '');
+    const url = /^https?:\/\//i.test(venmo) ? venmo : `https://venmo.com/u/${encodeURIComponent(handle)}`;
+    lines.push(`<p style="margin:0 0 8px;"><strong>Venmo</strong> &mdash; <a href="${escapeHtml(url)}" style="color:${C.burgundy};">@${escapeHtml(handle)}</a></p>`);
+  }
+  if (applePay) {
+    lines.push(`<p style="margin:0;"><strong>Apple Pay</strong> &mdash; ${escapeHtml(applePay)}</p>`);
+  }
+  return `
+      <div style="margin-top:24px;padding:16px;background:${C.paper};border:1px dashed ${C.rule};">
+        <p style="margin:0 0 8px;color:${C.olive};font-size:12px;letter-spacing:.2em;text-transform:uppercase;">How to pay</p>
+        ${lines.join('')}
+      </div>`;
 }
 
 function rowsToHtml(rows) {
@@ -145,7 +179,7 @@ function buildThankYou(o, settings) {
       ${rowsToHtml(customerRows(o))}
       <p style="margin-top:18px;">${escapeHtml(settings.payment_instructions)}</p>
       <p>Questions in the meantime? Reply to this email or write to ${INFO_EMAIL}.</p>
-      <p>— Amanda</p>`),
+      <p>— Amanda</p>`, paymentFooter(settings)),
   };
 }
 
@@ -176,13 +210,13 @@ function buildConfirmation(o, settings) {
       </div>
       ${o.fulfillment === 'pickup' ? `<p style="margin-top:16px;">${escapeHtml(settings.pickup_note)}</p>` : ''}
       <p>Questions? Reply to this email or write to ${INFO_EMAIL}.</p>
-      <p>— Amanda</p>`),
+      <p>— Amanda</p>`, paymentFooter(settings)),
   };
 }
 
 // A receipt for money actually received. States what came in, what the order
 // costs, and what is left, so the customer is not doing the subtraction.
-function buildReceipt(o, payment) {
+function buildReceipt(o, payment, settings = {}) {
   const total = Number(o.amount);
   const hasTotal = isFinite(total) && total > 0;
   const paid = Number(o.paid_amount) || 0;
@@ -202,14 +236,14 @@ function buildReceipt(o, payment) {
       ${rowsToHtml(money)}
       <h3 style="margin:22px 0 4px;color:${C.olive};font-size:13px;letter-spacing:.2em;text-transform:uppercase;">Your order</h3>
       ${itemsToHtml(o.items, o.shipping_fee)}
-      <p style="margin-top:18px;">— Amanda</p>`),
+      <p style="margin-top:18px;">— Amanda</p>`, paymentFooter(settings)),
   };
 }
 
-function buildPlain(subject, message) {
+function buildPlain(subject, message, settings = {}) {
   return {
     subject,
-    html: shell(`<div style="white-space:pre-wrap;">${escapeHtml(message)}</div><p style="margin-top:18px;">— Amanda</p>`),
+    html: shell(`<div style="white-space:pre-wrap;">${escapeHtml(message)}</div><p style="margin-top:18px;">— Amanda</p>`, paymentFooter(settings)),
   };
 }
 
