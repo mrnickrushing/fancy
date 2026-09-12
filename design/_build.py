@@ -733,6 +733,8 @@ FOOTER = f"""<footer style="background:var(--burgundy-ink);color:#D8BFA0;padding
   </div>
   <div class="ftr-bot">
     <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">&#169; 2026 Oh! You Fancy Focaccia</p>
+    <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">Site managed by
+      <a href="#" style="color:#C9A46A">Rushing Technologies</a></p>
     <p class="caps" style="color:oklch(.72 .05 60/.72);font-size:.66rem">Pane &#183; Amore &#183; Sempre</p>
   </div>
 </div></footer>"""
@@ -1101,7 +1103,7 @@ GAL_SECTIONS = [
    ("herb-rolls.webp","The Italiano Focaccia Muffins","The Italiano in muffin form &#8212; sage, oregano, thyme, basil and garlic.",300)]),
  ("I Dolci","Sweet", [
    ("sweet-cinnamon.webp","The Brown Buttered Cinnamon Roll","Flax seed oil butter. Coconut sugar.",420),
-   ("cinnamon-drizzle-2.webp","The Pow Cacao","A decadent chocolate focaccia dessert, sweetened with coconut sugar so it doesn&#8217;t spike your blood sugar like regular refined sugar does.",410),
+   ("cinnamon-drizzle-2.webp","The Pow Cacao","A decadent chocolate focaccia dessert, sweetened with coconut sugar rather than refined sugar.",410),
    ("cinnamon-dark.webp","The Apple Fritter","Apple fritter focaccia dessert.",400),
    ("hot-honey-bites.webp","The Hot Honey","Chili peppers, garlic and local honey from the happiest honey bees.",360)]),
  ("L&#8217;Arte","Focaccia Art", [

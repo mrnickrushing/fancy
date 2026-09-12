@@ -84,6 +84,31 @@ test('no unresolved placeholder links survive', async () => {
   }
 });
 
+// The build credit is a term of the work, not decoration — it should not be
+// able to fall out of the footer unnoticed.
+test('every page credits Rushing Technologies, linked and safe to open', async () => {
+  for (const p of [...PAGES, '/order.html', '/policies.html']) {
+    const res = await request(app).get(p);
+    assert.match(res.text, /Site managed by/, `${p} has no build credit`);
+    const link = res.text.match(/<a href="https:\/\/rushingtechnologies\.com"[^>]*>Rushing Technologies<\/a>/);
+    assert.ok(link, `${p} does not link the name`);
+    // a customer mid-order should not lose their cart to the credit
+    assert.match(link[0], /target="_blank"/, `${p}: credit is not a new tab`);
+    assert.match(link[0], /rel="noopener"/, `${p}: credit has no rel=noopener`);
+  }
+});
+
+// A health claim on a food product from a licensed home kitchen. Coconut
+// sugar is still mostly sucrose, so the sentence does not go back.
+test('nothing on the site claims a bake will not spike your blood sugar', async () => {
+  for (const p of [...PAGES, '/order.html']) {
+    assert.doesNotMatch((await request(app).get(p)).text, /blood sugar/i, `${p} still makes the claim`);
+  }
+  for (const item of catalog) {
+    assert.doesNotMatch(item.description, /blood sugar/i, `${item.name} still makes the claim`);
+  }
+});
+
 test('assets and crawl files serve', async () => {
   for (const a of ['/style.css', '/splash.js', '/nav.js', '/img/logo.webp', '/favicon.ico', '/site.webmanifest', '/img/splash-scene.webp', '/robots.txt', '/sitemap.xml']) {
     assert.strictEqual((await request(app).get(a)).status, 200, `${a} missing`);
