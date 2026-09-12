@@ -316,6 +316,7 @@ const SUPERSEDED_MENU_NAMES = [
   'Peppered Pickle Muffins',             // -> Peppered Pickle Focaccia Muffins
   'Sea Salt Focaccia Muffins',           // -> The Plain Jane Celtic Salted Focaccia Muffin
   'Heart Loaf',                          // -> The Everything Focaccia
+  'The Classic Sourdough',               // -> Cinnamon Swirl Artisan Sourdough
 ];
 
 // Marked unavailable rather than deleted, so past orders keep the item they
@@ -329,7 +330,7 @@ const SUPERSEDED_MENU_NAMES = [
 // is not undone by the next restart.
 async function alignMenuToCatalog() {
   const done = await pool.query(
-    `SELECT 1 FROM settings WHERE key = 'menu_catalog_v2_synced'`
+    `SELECT 1 FROM settings WHERE key = 'menu_catalog_v3_synced'`
   );
   if (done.rowCount) return;
   const { rowCount: retired } = await pool.query(
@@ -345,7 +346,7 @@ async function alignMenuToCatalog() {
   );
   await pool.query(
     `INSERT INTO settings (key, value, updated_at)
-     VALUES ('menu_catalog_v2_synced', '1', now()) ON CONFLICT (key) DO NOTHING`
+     VALUES ('menu_catalog_v3_synced', '1', now()) ON CONFLICT (key) DO NOTHING`
   );
   if (retired) console.log(`menu: retired ${retired} renamed bake(s)`);
 }
