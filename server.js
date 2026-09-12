@@ -13,6 +13,7 @@ const rateLimit = require('express-rate-limit');
 const db = require('./db');
 const mail = require('./mail');
 const { resolveBaseUrl } = require('./base-url');
+const demo = require('./demo');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -187,6 +188,18 @@ function verifyPassword(password, stored) {
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
+// A second credential, for Apple's reviewers. It signs in through the app,
+// sees the sample order book in demo.js, and cannot change anything — so no
+// real order is touched and no customer's name, phone or address is shown to
+// anyone outside the bakery. Unset in normal environments, and then it simply
+// does not exist.
+const REVIEWER_USERNAME = process.env.REVIEWER_USERNAME || '';
+const REVIEWER_PASSWORD = process.env.REVIEWER_PASSWORD || '';
+function isReviewer(user, pass) {
+  if (!REVIEWER_USERNAME || !REVIEWER_PASSWORD) return false;
+  return safeEqual(user, REVIEWER_USERNAME) && safeEqual(pass, REVIEWER_PASSWORD);
+}
+
 // The app has no cookie jar, so it presents HTTP Basic on every request. The
 // password may itself contain a colon; only the first one separates.
 function parseBasicAuth(req) {
@@ -285,6 +298,10 @@ async function adminAuth(req, res, next) {
     if (creds && token && verifySession(token, creds.password_hash)) return next();
     const provided = parseBasicAuth(req);
     if (provided) {
+      if (isReviewer(provided.user, provided.pass)) {
+        req.readOnly = true;
+        return next();
+      }
       const result = await checkLogin(provided.user, provided.pass);
       if (result && !result.unconfigured) return next();
     }
@@ -353,6 +370,26 @@ app.post('/admin/logout', (_req, res) => {
 
 app.use(['/admin', '/admin.html', '/api/admin'], adminAuthLimiter, adminAuth);
 app.get('/admin', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'admin.html')));
+
+// Who is signed in, and whether they may change anything. The app asks on
+// launch so it can say so plainly instead of letting a button fail.
+app.get('/api/admin/session', asyncHandler(async (req, res) => {
+  if (req.readOnly) return res.json({ username: REVIEWER_USERNAME, readOnly: true });
+  const creds = await db.getAdminCredentials();
+  res.json({ username: creds ? creds.username : process.env.ADMIN_USERNAME || null, readOnly: false });
+}));
+
+// Everything below this point is the real order book. The reviewer account
+// never reaches it: writes are refused, and reads are answered from the sample
+// data. An endpoint added later answers empty until it is described in
+// demo.js, which is the safe way round.
+app.use('/api/admin', (req, res, next) => {
+  if (!req.readOnly) return next();
+  if (req.method !== 'GET') {
+    return res.status(403).json({ error: 'This is the App Review account, so it can look but not change anything.' });
+  }
+  res.json(demo.responseFor(req.path));
+});
 
 // ── the app's push registration ──────────────────────────────────────────
 // The app registers on every launch, so this doubles as a heartbeat. Only

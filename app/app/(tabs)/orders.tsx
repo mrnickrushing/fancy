@@ -10,6 +10,7 @@ import { SectionTitle } from '../../src/components/SectionTitle';
 import { EmptyState, ErrorState, LoadingState } from '../../src/components/States';
 import { errorMessage } from '../../src/api/client';
 import { useOrders } from '../../src/hooks/useOrders';
+import { useReadOnly } from '../../src/hooks/useSession';
 import { useDebouncedValue } from '../../src/hooks/useDebouncedValue';
 import { FULFILLMENT_SHORT } from '../../src/api/types';
 import { filterAndSortOrders, itemCount, type OrderFilter, type OrderSort } from '../../src/utils/orders';
@@ -44,6 +45,7 @@ export default function OrdersScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ created?: string }>();
   const { data, isLoading, error, refetch, isRefetching } = useOrders();
+  const readOnly = useReadOnly();
 
   const [filter, setFilter] = useState<OrderFilter>('all');
   const [query, setQuery] = useState('');
@@ -67,7 +69,9 @@ export default function OrdersScreen() {
             <View>
               <SectionTitle eyebrow="The order book" title="Orders" />
               {params.created ? <NoticeBanner tone="success" message="That order is in the book." /> : null}
-              <Button label="Write an order in" variant="olive" onPress={() => router.push('/new-order')} />
+              {readOnly ? null : (
+                <Button label="Write an order in" variant="olive" onPress={() => router.push('/new-order')} />
+              )}
               <Input
                 placeholder="Search a name, a bake, a note"
                 value={query}

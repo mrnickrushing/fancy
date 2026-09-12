@@ -10,6 +10,8 @@ process.env.ADMIN_PASSWORD = 'test-password';
 process.env.WRITE_RATE_LIMIT = '1000';
 process.env.LOGIN_RATE_LIMIT = '1000';
 process.env.ADMIN_RATE_LIMIT = '1000';
+process.env.REVIEWER_USERNAME = 'test-reviewer';
+process.env.REVIEWER_PASSWORD = 'test-reviewer-password';
 process.env.API_RATE_LIMIT = '100000';
 process.env.BASE_URL = 'https://base-url.test';
 delete process.env.RESEND_API_KEY;   // no email in tests; the code path is exercised via mail.send's result
@@ -580,6 +582,73 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
       const order = await db.getOrder(res.body.orderId);
       assert.match(mail.buildThankYou(order, { payment_instructions: 'x' }).html, /it comes to/);
       assert.match(mail.buildThankYou({ ...order, amount: null }, { payment_instructions: 'x' }).html, /let you know the total/);
+    });
+  });
+
+  // Apple need a working sign-in for a login-gated app. This one must never
+  // reach a real order or a real customer.
+  await t.test('the App Review account looks, and touches nothing', async (t) => {
+    const R = (req) => req.set('Authorization', `Basic ${Buffer.from('test-reviewer:test-reviewer-password').toString('base64')}`);
+    const B = (req) => req.set('Authorization', `Basic ${Buffer.from('test-admin:test-password').toString('base64')}`);
+
+    await t.test('it can sign in, and says what it is', async () => {
+      const res = await R(request(app).get('/api/admin/session'));
+      assert.equal(res.status, 200);
+      assert.equal(res.body.readOnly, true);
+      const hers = await B(request(app).get('/api/admin/session'));
+      assert.equal(hers.body.readOnly, false);
+      assert.equal(hers.body.username, 'test-admin');
+    });
+
+    // The whole point: a real customer's name must not reach a reviewer.
+    await t.test('it never sees a real order or a real customer', async () => {
+      const made = await request(app).post('/api/order').send(good());
+      assert.equal(made.status, 201);
+      const real = await db.getOrder(made.body.orderId);
+
+      const orders = await R(request(app).get('/api/admin/orders'));
+      assert.equal(orders.status, 200);
+      const ids = orders.body.orders.map((o) => o.id);
+      assert.ok(!ids.includes(real.id), 'a real order reached the reviewer');
+      const names = JSON.stringify(orders.body.orders);
+      assert.ok(!names.includes(real.first_name) || real.first_name === 'Marguerite',
+        'a real customer name reached the reviewer');
+      assert.ok(orders.body.orders.length > 0, 'the reviewer sees an empty app');
+
+      const customers = await R(request(app).get('/api/admin/customers'));
+      assert.ok(!JSON.stringify(customers.body).includes(real.email), 'a real email reached the reviewer');
+    });
+
+    await t.test('every write is refused, by method not by route', async () => {
+      const writes = [
+        ['post', '/api/admin/orders'],
+        ['patch', '/api/admin/orders/1'],
+        ['delete', '/api/admin/orders/1'],
+        ['post', '/api/admin/orders/1/amount'],
+        ['post', '/api/admin/orders/1/respond'],
+        ['put', '/api/admin/settings'],
+        ['post', '/api/admin/password'],
+        ['post', '/api/admin/menu'],
+        ['post', '/api/admin/push-token'],
+      ];
+      for (const [method, route] of writes) {
+        const res = await R(request(app)[method](route)).send({});
+        assert.equal(res.status, 403, `${method.toUpperCase()} ${route} was not refused`);
+        assert.match(res.body.error, /App Review/);
+      }
+    });
+
+    // A route added later must not quietly start serving real rows to it.
+    await t.test('an endpoint it does not know about answers with nothing', async () => {
+      const res = await R(request(app).get('/api/admin/email-outbox'));
+      assert.equal(res.status, 200);
+      assert.deepEqual(res.body, {});
+    });
+
+    await t.test('Amanda is unaffected', async () => {
+      const res = await B(request(app).get('/api/admin/orders'));
+      assert.equal(res.status, 200);
+      assert.equal((await B(request(app).put('/api/admin/settings')).send({ min_notice_days: 3 })).status, 200);
     });
   });
 

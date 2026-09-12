@@ -24,6 +24,7 @@ Merges to `main` deploy themselves.
 | `ORDERS_INBOX` | Where new website-order notices go |
 | `EMAIL_FROM` | The sender. Must be on a domain verified in Resend |
 | `RESEND_API_KEY` | Resend API key for transactional email. Without it, orders still save and the admin works, but nothing is emailed — the Settings tab says so |
+| `REVIEWER_USERNAME`, `REVIEWER_PASSWORD` | Apple's App Review sign-in. Reaches the app only, sees the sample order book in `demo.js`, and is refused every write. Leave unset anywhere that does not need it |
 | `ADMIN_RATE_LIMIT` | Rejected admin credentials per 15 minutes, default 20. Only a 401 spends the budget, so the phone app — which sends its password on every request — is not locked out by ordinary validation errors |
 
 ## The phone app
@@ -46,6 +47,25 @@ Two things on the server exist for it:
 The app ships through EAS as `@rushingtechnologies/ohyoufancyfocaccia-admin`,
 and reaches the App Store as **Bread Lady** (Apple ID `6811223231`). Its own
 build, submit and over-the-air update commands are in `app/README.md`.
+
+### The App Review account
+
+Apple need working credentials for an app behind a sign-in. Amanda's own would
+let a stranger accept, decline and delete real orders, and would show them every
+customer's name, phone number and address.
+
+`REVIEWER_USERNAME` / `REVIEWER_PASSWORD` are a second sign-in that
+
+- works through the app only — the browser admin does not accept it;
+- is refused every non-GET under `/api/admin`, with a plain message saying why;
+- reads from `demo.js` — invented people, invented orders — so the real order
+  book is never queried on its behalf.
+
+An endpoint added later answers empty for it until it is described in
+`demo.js`. That is the safe way round: a new route leaks nothing by default.
+
+It also makes the better demo. A reviewer sees a populated, working order book
+instead of an empty one, and an empty app is its own reason for rejection.
 
 The `Postgres` service carries `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` and
 `PGDATA=/var/lib/postgresql/data/pgdata` (the official image needs the data

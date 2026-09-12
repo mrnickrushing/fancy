@@ -11,6 +11,7 @@ import { SectionTitle } from '../../src/components/SectionTitle';
 import { EmptyState, LoadingState } from '../../src/components/States';
 import { errorMessage } from '../../src/api/client';
 import { useOrder, useOrderActions } from '../../src/hooks/useOrders';
+import { useReadOnly } from '../../src/hooks/useSession';
 import {
   FULFILLMENT_LABELS,
   PAYMENT_STATUS_LABELS,
@@ -42,6 +43,7 @@ export default function OrderDetailScreen() {
   const orderId = Number(id);
   const { data: order, isLoading } = useOrder(orderId);
   const actions = useOrderActions();
+  const readOnly = useReadOnly();
 
   const [status, setStatus] = useState<{ tone: 'success' | 'error'; message: string } | null>(null);
   const [editing, setEditing] = useState(false);
@@ -77,8 +79,11 @@ export default function OrderDetailScreen() {
   // one Amanda typed over it. Worth saying, so she knows which she is looking at.
   const autoTotal = subtotal !== null && order.amount !== null && toNumber(order.amount) === subtotal + shipping;
 
+  const READ_ONLY_NOTE = 'The App Review account can look, but not change anything.';
+
   const run = async (fn: () => Promise<unknown>, message: string) => {
     setStatus(null);
+    if (readOnly) return setStatus({ tone: 'error', message: READ_ONLY_NOTE });
     try {
       await fn();
       setStatus({ tone: 'success', message });
@@ -444,6 +449,7 @@ export default function OrderDetailScreen() {
                     text: 'Delete',
                     style: 'destructive',
                     onPress: async () => {
+                      if (readOnly) return setStatus({ tone: 'error', message: READ_ONLY_NOTE });
                       try {
                         await actions.remove.mutateAsync(orderId);
                         router.back();

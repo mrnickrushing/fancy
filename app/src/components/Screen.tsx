@@ -1,7 +1,8 @@
 import { ReactNode } from 'react';
-import { StyleProp, StyleSheet, useWindowDimensions, View, ViewStyle } from 'react-native';
+import { StyleProp, StyleSheet, Text, useWindowDimensions, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing } from '../theme';
+import { colors, fonts, spacing } from '../theme';
+import { useReadOnly } from '../hooks/useSession';
 import { Logo } from './Logo';
 
 export const TABLET_BREAKPOINT = 768;
@@ -24,6 +25,7 @@ export function ContentFrame({
 
 export function Screen({ children, header = true }: { children: ReactNode; header?: boolean }) {
   const insets = useSafeAreaInsets();
+  const readOnly = useReadOnly();
   return (
     <View style={styles.screen}>
       {header ? (
@@ -33,6 +35,13 @@ export function Screen({ children, header = true }: { children: ReactNode; heade
       ) : (
         <View style={{ height: insets.top }} />
       )}
+      {readOnly ? (
+        <View style={styles.readOnly}>
+          <Text style={styles.readOnlyText}>
+            App Review account — sample orders, and nothing here can be changed.
+          </Text>
+        </View>
+      ) : null}
       {children}
     </View>
   );
@@ -48,4 +57,19 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.s3,
   },
   frame: { flex: 1 },
+  readOnly: {
+    backgroundColor: colors.goldPale,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    paddingVertical: spacing.s2,
+    paddingHorizontal: spacing.s5,
+  },
+  readOnlyText: {
+    fontFamily: fonts.displaySemibold,
+    fontSize: 11,
+    letterSpacing: 1.1,
+    textTransform: 'uppercase',
+    color: colors.goldRead,
+    textAlign: 'center',
+  },
 });
