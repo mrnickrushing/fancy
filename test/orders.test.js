@@ -57,6 +57,16 @@ test('mail dates use the site-wide MM-DD-YYYY format', () => {
   assert.equal(mail.formatDate('2027-02-03'), 'Wednesday, 02-03-2027');
 });
 
+// Every date that reaches a customer or a push notification comes out of
+// Postgres, and pg parses DATE into a Date object. Passing only strings here
+// is why a push went out reading "Mon Sep 28 2026 00:00:00 GMT+0000".
+test('a date straight out of Postgres formats like a date', () => {
+  assert.equal(mail.formatDate(new Date(2026, 8, 28)), 'Monday, 09-28-2026');
+  assert.equal(mail.formatDate(new Date(2027, 1, 3)), 'Wednesday, 02-03-2027');
+  assert.equal(mail.formatDate(''), '');
+  assert.equal(mail.formatDate(null), '');
+});
+
 test('email roles keep public correspondence separate from order notices', () => {
   assert.equal(mail.INFO_EMAIL, 'info@ohyoufancyfocaccia.com');
   assert.equal(mail.BAKERY_INBOX, mail.INFO_EMAIL);
