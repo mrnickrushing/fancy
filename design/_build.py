@@ -914,7 +914,7 @@ HOME = masthead("Home") + f"""
   border-top:1px solid var(--rule)">
   <div class="narrow">
     <div style="display:flex;justify-content:center;margin-bottom:var(--s6)">{olive_rule(190)}</div>
-    <h2 style="font-size:var(--xl);margin-bottom:var(--s4)">Come Wednesday. Come early.</h2>
+    <h2 style="font-size:var(--xl);margin-bottom:var(--s4)">Come Wednesday. Come Saturday. Come early.</h2>
     <p style="opacity:.8;margin-bottom:var(--s8)">
       We bake small and we sell out. Questions, delivery or shipping &#8212; just write.</p>
     <a href="#" class="btn btn-fill">info@ohyoufancyfocaccia.com</a>
@@ -1082,6 +1082,7 @@ GAL_SECTIONS = [
    ("square-focaccia.webp","The Roasted Garlic Boss","True garlic lovers want this one. Roasted garlic, garlic oil and minced garlic.",300)]),
  ("Le Teglie","Slabs &amp; Pans", [
    ("olive-slab.webp","The Mediterranean Olive","Olive variety and sun dried tomatoes.",400),
+   ("olive-you.webp","The Olive You","Olive medley, garlic and thyme.",380),
    ("rosemary-slab.webp","The Rosemary and Black Pepper","Rosemary and cracked black pepper, right across the tray.",390),
    ("potato-onion.webp","The Fall Favorite","Roasted potatoes, rosemary, garlic, caramelized onions and Fontina cheese.",380),
    ("pesto-skillet.webp","The Pesto and Cashew Cheese","Basil pesto and cashew cheese, baked in the pan it is served from.",250),
@@ -1089,7 +1090,7 @@ GAL_SECTIONS = [
  ("Le Spirali","Swirls", [
    ("jalapeno-swirl-xl.webp","Jalape&#241;o, Garlic and Chedda Sourdough","Jalape&#241;o, garlic and cheddar wound through a sourdough spiral.",300),
    ("swirl-jalapeno.webp","Jalape&#241;o Swirl","Layer on layer, blistered at the edge.",300),
-   ("classic-sourdough.webp","The Classic Sourdough","The loaf everything else is built on.",300),
+   ("classic-sourdough.webp","Cinnamon Swirl Artisan Sourdough","Cinnamon wound through the spiral.",300),
    ("garlic-rosemary-sourdough.webp","The Roasted Garlic and Rosemary Sourdough","Roasted garlic and rosemary, wound through the spiral.",300),
    ("plain-swirl.webp","Classic Artisan Celtic Salted Sourdough","Nothing on it but Celtic salt.",300),
    ("caramel-swirl.webp","The Mediterranean Sourdough","Sun dried tomato and olive variety.",300)]),
@@ -1388,7 +1389,7 @@ MOBILE = f"""
 <section style="background:var(--paper-3);padding:var(--s12) var(--s5);text-align:center;
   border-top:1px solid var(--rule)">
   <div style="display:flex;justify-content:center;margin-bottom:var(--s5)">{olive_rule(150)}</div>
-  <h2 style="font-size:1.7rem;margin-bottom:var(--s4)">Come Wednesday.<br>Come early.</h2>
+  <h2 style="font-size:1.7rem;margin-bottom:var(--s4)">Come Wednesday.<br>Come Saturday.<br>Come early.</h2>
   <p style="opacity:.8;margin-bottom:var(--s6)">We bake small and we sell out.</p>
   <a href="#" class="btn btn-fill" style="width:100%">Write to Us</a>
   <p style="margin-top:var(--s8);font-family:var(--script);font-size:2.1rem;color:var(--burgundy)">

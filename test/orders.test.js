@@ -247,9 +247,12 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
       `INSERT INTO menu_items (course, name, description, price, sort_order)
        VALUES ('art','Heart Loaf','',15,90),
               ('small','Sea Salt Focaccia Muffins','',2,91),
+              ('sourdough','The Classic Sourdough','',15,93),
               ('savory','Market Special','Whatever is best this week',15,92)`
     );
-    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_catalog_v2_synced'`);
+    // Version-agnostic on purpose: the pass is one-shot per flag, and naming
+    // the flag here means the next rename silently stops testing itself.
+    await db.pool.query(`DELETE FROM settings WHERE key LIKE 'menu\\_catalog\\_%\\_synced'`);
     await db.initSchema();
 
     const byName = new Map((await db.pool.query(
@@ -257,6 +260,10 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     )).rows.map((r) => [r.name, r.available]));
     assert.equal(byName.get('Heart Loaf'), false);
     assert.equal(byName.get('Sea Salt Focaccia Muffins'), false);
+    // renamed to Cinnamon Swirl Artisan Sourdough, because the photograph was
+    // always a swirl and the name never matched it
+    assert.equal(byName.get('The Classic Sourdough'), false);
+    assert.equal(byName.get('Cinnamon Swirl Artisan Sourdough'), true);
     // Named one by one for exactly this reason — hers is not in the catalog
     // either, and a "retire anything missing" rule would have taken it too.
     assert.equal(byName.get('Market Special'), true);

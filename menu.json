@@ -43,6 +43,13 @@
   },
   {
     "course": "savory",
+    "name": "The Olive You",
+    "description": "Olive medley, garlic and thyme.",
+    "price": 15,
+    "image": "olive-you.webp"
+  },
+  {
+    "course": "savory",
     "name": "The Italiano",
     "description": "The true Italian focaccia. Focaccia originated in Rome, Italy, and you can taste it in this loaf. Sage, oregano, thyme, basil and garlic.",
     "price": 15,
@@ -113,8 +120,8 @@
   },
   {
     "course": "sourdough",
-    "name": "The Classic Sourdough",
-    "description": "The loaf everything else is built on.",
+    "name": "Cinnamon Swirl Artisan Sourdough",
+    "description": "Cinnamon wound through the spiral.",
     "price": 15,
     "image": "classic-sourdough.webp"
   },
