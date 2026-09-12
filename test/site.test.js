@@ -131,6 +131,22 @@ test('the order page shows the address box for the fulfillment it loaded with', 
   assert.match(js, /syncFulfillment\(\);[\s\S]{0,40}\}\);/, 'the change handler no longer syncs');
 });
 
+// iOS Safari zooms the whole page when a focused field is under 16px. The
+// admin's compact table inputs were 15, so every tap on a total or a payment
+// amount zoomed in and had to be pinched back out.
+test('the admin fields do not make Safari zoom on a phone', async () => {
+  const css = (await request(app).get('/style.css')).text;
+  // There are several max-width:900px blocks, so find the rule and check the
+  // block it actually sits in rather than assuming it is the first one.
+  const at = css.indexOf('.adm input,.adm select,.adm textarea{font-size:16px}');
+  assert.ok(at > -1, 'admin fields are under 16px again, which makes Safari zoom');
+  const media = css.lastIndexOf('@media', at);
+  assert.match(css.slice(media, media + 40), /max-width/,
+    'the 16px rule is not inside a small-screen block');
+  // and Safari should not inflate body text when the phone is turned
+  assert.match(css, /-webkit-text-size-adjust:100%/);
+});
+
 test('social metadata and install metadata are present', async () => {
   const html = (await request(app).get('/')).text;
   assert.match(html, /name="twitter:image"/);

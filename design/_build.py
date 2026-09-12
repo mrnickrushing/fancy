@@ -71,6 +71,7 @@ TOKENS = """
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--paper);color:var(--ink);font-family:var(--body);
+  -webkit-text-size-adjust:100%;text-size-adjust:100%;
   font-size:var(--base);line-height:1.72;-webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;font-feature-settings:"liga","kern"}
 h1,h2,h3,h4{font-family:var(--serif);line-height:1.1;font-weight:600;text-wrap:balance}
