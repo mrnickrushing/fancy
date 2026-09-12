@@ -11,6 +11,7 @@ import { LoadingState } from '../src/components/States';
 import { errorMessage } from '../src/api/client';
 import { useMenu } from '../src/hooks/useMenu';
 import { useOrderActions } from '../src/hooks/useOrders';
+import { useSettings } from '../src/hooks/useResources';
 import { COURSE_LABELS, COURSE_ORDER, type Fulfillment } from '../src/api/types';
 import { maskDateInput, toIsoFromMasked } from '../src/utils/dateInput';
 import { fmtMoney, toNumber } from '../src/utils/format';
@@ -52,7 +53,17 @@ export default function NewOrderScreen() {
     [quantities],
   );
 
-  const total = useMemo(() => {
+  const { data: settingsData } = useSettings();
+
+  // Flat, and only on shipping — the same rule the server applies when it
+  // snapshots the fee onto the order, so the figure here is the figure it
+  // will actually be charged.
+  const shippingFee = useMemo(
+    () => (fulfillment === 'shipping' ? toNumber(settingsData?.settings.shipping_fee) : 0),
+    [fulfillment, settingsData],
+  );
+
+  const itemsTotal = useMemo(() => {
     const items = menu?.items ?? [];
     let sum = 0;
     for (const { id, quantity } of chosen) {
@@ -61,6 +72,8 @@ export default function NewOrderScreen() {
     }
     return sum;
   }, [chosen, menu]);
+
+  const total = itemsTotal + shippingFee;
 
   const bump = (id: number, by: number) => {
     setQuantities((q) => {
@@ -178,10 +191,18 @@ export default function NewOrderScreen() {
               ))
             )}
             {chosen.length ? (
-              <Text style={styles.runningTotal}>
-                {chosen.reduce((n, c) => n + c.quantity, 0)} item
-                {chosen.reduce((n, c) => n + c.quantity, 0) === 1 ? '' : 's'} · about {fmtMoney(total)}
-              </Text>
+              <>
+                {shippingFee > 0 ? (
+                  <View style={styles.feeRow}>
+                    <Text style={styles.pickName}>Shipping</Text>
+                    <Text style={styles.pickPrice}>{fmtMoney(shippingFee)}</Text>
+                  </View>
+                ) : null}
+                <Text style={styles.runningTotal}>
+                  {chosen.reduce((n, c) => n + c.quantity, 0)} item
+                  {chosen.reduce((n, c) => n + c.quantity, 0) === 1 ? '' : 's'} · about {fmtMoney(total)}
+                </Text>
+              </>
             ) : null}
           </Card>
 
@@ -222,6 +243,15 @@ const styles = StyleSheet.create({
   },
   stepLabel: { fontFamily: fonts.displaySemibold, fontSize: 18, color: colors.primary, lineHeight: 22 },
   qty: { minWidth: 20, textAlign: 'center', fontFamily: fonts.displaySemibold, fontSize: fontSize.base, color: colors.text },
+  feeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: spacing.s2,
+    marginTop: spacing.s2,
+    borderTopWidth: 1,
+    borderTopColor: colors.divider,
+  },
   runningTotal: { fontFamily: fonts.displaySemibold, fontSize: fontSize.base, color: colors.text, marginTop: spacing.s3 },
   submit: { marginBottom: spacing.s8 },
 });
