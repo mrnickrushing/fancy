@@ -3,19 +3,21 @@ import { colors, fonts } from '../theme';
 
 // The masthead, as the site sets it: the emblem, then "Oh! You Fancy" in
 // Italianno over FOCACCIA in wide-tracked Bodoni caps.
-export function Logo({ size = 44, showWordmark = true }: { size?: number; showWordmark?: boolean }) {
+export function Logo({ size = 44, showWordmark = true, inverse = false }: { size?: number; showWordmark?: boolean; inverse?: boolean }) {
   return (
     <View style={styles.row}>
       <Image
         source={require('../../assets/logo.webp')}
-        style={{ width: size, height: size }}
+        style={[{ width: size, height: size }, inverse && { tintColor: colors.bg, opacity: 0.92 }]}
         resizeMode="contain"
         accessibilityLabel="Oh! You Fancy Focaccia"
       />
       {showWordmark ? (
         <View style={styles.words}>
-          <Text style={[styles.script, { fontSize: size * 0.72 }]}>Oh! You Fancy</Text>
-          <Text style={[styles.caps, { fontSize: size * 0.26 }]}>Focaccia</Text>
+          <Text style={[styles.script, { fontSize: size * 0.72, lineHeight: size * 0.77 }, inverse && styles.scriptInverse]}>
+            Oh! You Fancy
+          </Text>
+          <Text style={[styles.caps, { fontSize: size * 0.26 }, inverse && styles.capsInverse]}>Focaccia</Text>
         </View>
       ) : null}
     </View>
@@ -25,7 +27,8 @@ export function Logo({ size = 44, showWordmark = true }: { size?: number; showWo
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   words: { justifyContent: 'center' },
-  script: { fontFamily: fonts.script, color: colors.primary, lineHeight: 34 },
+  script: { fontFamily: fonts.script, color: colors.primary },
+  scriptInverse: { color: colors.bg },
   caps: {
     fontFamily: fonts.displayBold,
     letterSpacing: 4,
@@ -33,4 +36,5 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginTop: -2,
   },
+  capsInverse: { color: 'rgba(244,239,226,0.8)' },
 });
