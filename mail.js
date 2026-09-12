@@ -8,6 +8,7 @@
 // save, the admin still works, and the response says so. A bakery whose email
 // is not set up yet should not be a bakery that cannot take orders.
 const { Resend } = require('resend');
+const { resolveBaseUrl } = require('./base-url');
 
 const BAKERY_NAME = 'Oh! You Fancy Focaccia';
 // Keep the public correspondence address separate from the order queue. The
@@ -26,9 +27,7 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 
 // Absolute, because an email is read somewhere this server is not. PNG rather
 // than the site's WebP: Outlook still will not render WebP.
-const SITE_URL = (process.env.BASE_URL
-  || (process.env.CANONICAL_HOST ? `https://${process.env.CANONICAL_HOST}` : 'https://ohyoufancyfocaccia.com')
-).replace(/\/$/, '');
+const SITE_URL = resolveBaseUrl();
 const LOGO_URL = `${SITE_URL}/img/email-logo.png`;
 function configured() { return Boolean(resend); }
 
