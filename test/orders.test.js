@@ -519,6 +519,70 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     });
   });
 
+  // She should not be adding up her own bill of fare.
+  await t.test('the total works itself out', async (t) => {
+    const B = (req) => req.set('Authorization', `Basic ${Buffer.from('test-admin:test-password').toString('base64')}`);
+    const goodsOf = (order) => order.items.reduce((n, i) => n + Number(i.unit_price) * i.quantity, 0);
+
+    await t.test('a website order arrives already totalled', async () => {
+      const res = await request(app).post('/api/order').send(good());
+      assert.equal(res.status, 201);
+      const order = await db.getOrder(res.body.orderId);
+      assert.equal(Number(order.amount), goodsOf(order));
+      assert.equal(order.payment_status, 'unpaid');
+    });
+
+    await t.test('a shipped order has the fee in its total', async () => {
+      const res = await request(app).post('/api/order').send({
+        firstName: 'Ada', lastName: 'Byron', email: 'ada@example.com',
+        fulfillment: 'shipping', neededDate: dateOffset(6), address: '1 Long Road',
+        items: [{ id: menu[0].id, quantity: 2 }],
+      });
+      assert.equal(res.status, 201);
+      const order = await db.getOrder(res.body.orderId);
+      assert.equal(Number(order.amount), goodsOf(order) + 10);
+    });
+
+    await t.test('an order taken by hand is totalled the same way', async () => {
+      const res = await B(request(app).post('/api/admin/orders')).send(good());
+      assert.equal(res.status, 201);
+      assert.equal(Number(res.body.order.amount), goodsOf(res.body.order));
+    });
+
+    // A partial sum is a wrong total, so there is none.
+    await t.test('an item quoted on request leaves the total to her', async () => {
+      await db.pool.query('UPDATE menu_items SET price = NULL WHERE id = $1', [menu[0].id]);
+      const res = await request(app).post('/api/order').send({ ...good(), items: [{ id: menu[0].id, quantity: 1 }] });
+      assert.equal(res.status, 201);
+      assert.equal((await db.getOrder(res.body.orderId)).amount, null);
+    });
+
+    await t.test('moving an order to shipping and back moves the total with it', async () => {
+      const res = await request(app).post('/api/order').send(good());
+      const id = res.body.orderId;
+      const before = Number((await db.getOrder(id)).amount);
+      await B(request(app).patch(`/api/admin/orders/${id}`)).send({ fulfillment: 'shipping', address: '1 Long Road' });
+      assert.equal(Number((await db.getOrder(id)).amount), before + 10);
+      await B(request(app).patch(`/api/admin/orders/${id}`)).send({ fulfillment: 'pickup' });
+      assert.equal(Number((await db.getOrder(id)).amount), before);
+    });
+
+    await t.test('a total she set herself is never overwritten', async () => {
+      const res = await request(app).post('/api/order').send(good());
+      const id = res.body.orderId;
+      assert.equal((await B(request(app).post(`/api/admin/orders/${id}/amount`)).send({ amount: 99 })).status, 200);
+      await B(request(app).patch(`/api/admin/orders/${id}`)).send({ fulfillment: 'shipping', address: '1 Long Road' });
+      assert.equal(Number((await db.getOrder(id)).amount), 99, 'her figure was overwritten');
+    });
+
+    await t.test('the thank-you states the total when there is one', async () => {
+      const res = await request(app).post('/api/order').send(good());
+      const order = await db.getOrder(res.body.orderId);
+      assert.match(mail.buildThankYou(order, { payment_instructions: 'x' }).html, /it comes to/);
+      assert.match(mail.buildThankYou({ ...order, amount: null }, { payment_instructions: 'x' }).html, /let you know the total/);
+    });
+  });
+
   // Amanda's phone. The push is wrapped around the order rather than part of
   // it, so these care as much about Expo being unreachable as about delivery.
   await t.test('push notifications', async (t) => {

@@ -73,6 +73,9 @@ export default function OrderDetailScreen() {
   const owed = balanceDue(order.paid_amount, order.amount, order.payment_status);
   const subtotal = itemsSubtotal(order);
   const shipping = toNumber(order.shipping_fee);
+  // Whether the figure on the order is still the one the server worked out, or
+  // one Amanda typed over it. Worth saying, so she knows which she is looking at.
+  const autoTotal = subtotal !== null && order.amount !== null && toNumber(order.amount) === subtotal + shipping;
 
   const run = async (fn: () => Promise<unknown>, message: string) => {
     setStatus(null);
@@ -248,7 +251,13 @@ export default function OrderDetailScreen() {
               onChangeText={setAmount}
               keyboardType="decimal-pad"
               placeholder={order.amount ?? 'Not set yet'}
-              hint="Leave it empty and save to clear the total again."
+              hint={
+                autoTotal
+                  ? `Worked out from the bill of fare${shipping > 0 ? ' plus shipping' : ''}. Change it only if you need to.`
+                  : order.amount === null
+                    ? 'Something here is quoted on request, so this one is yours to set.'
+                    : 'Leave it empty and save to go back to the worked-out total.'
+              }
             />
             <Button label="Save the total" small onPress={saveAmount} loading={actions.setAmount.isPending} />
 

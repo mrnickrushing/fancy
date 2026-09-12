@@ -108,7 +108,16 @@
       '</div><div>' +
       '<p class="caps" style="color:var(--olive);font-size:.62rem;margin-bottom:var(--s2)">Total</p>' +
       '<div style="display:flex;gap:var(--s2);align-items:center;margin-bottom:var(--s5)">$<input type="number" min="0" step="0.01" style="width:110px" data-field="amount" value="' + (o.amount != null ? o.amount : '') + '" placeholder="quote"> <button class="act" data-act="save-amount">Save</button></div>' +
-      (suggest != null ? '<p class="cal-note" style="margin-top:calc(var(--s5) * -1);margin-bottom:var(--s5)">Bill of fare' + (ship ? ' plus shipping' : '') + ' comes to ' + money(suggest) + '.</p>' : '') +
+      (function () {
+        // The total arrives worked out. Say so, and say when it is no longer
+        // the one we worked out, so an edited figure is visibly hers.
+        if (suggest == null) return o.amount == null ? '<p class="cal-note" style="margin-top:calc(var(--s5) * -1);margin-bottom:var(--s5)">Something here is quoted on request, so this one is yours to set.</p>' : '';
+        var auto = o.amount != null && Number(o.amount) === suggest;
+        var note = auto
+          ? 'Worked out from the bill of fare' + (ship ? ' plus shipping' : '') + '.'
+          : 'Bill of fare' + (ship ? ' plus shipping' : '') + ' comes to ' + money(suggest) + '.';
+        return '<p class="cal-note" style="margin-top:calc(var(--s5) * -1);margin-bottom:var(--s5)">' + note + '</p>';
+      })() +
       '<p class="caps" style="color:var(--olive);font-size:.62rem;margin-bottom:var(--s2)">Payments</p><div class="cart-lines">' + pays + '</div>' +
       '<div style="display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap;margin-bottom:var(--s4)">$<input type="number" min="0" step="0.01" style="width:100px" data-field="payment" placeholder="0.00"><input style="width:150px" data-field="payment-note" placeholder="note (optional)"><button class="act" data-act="add-payment">Record</button></div>' +
       '<div style="display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap"><select data-field="pstatus">' +
