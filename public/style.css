@@ -29,6 +29,7 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--paper);color:var(--ink);font-family:var(--body);
+  -webkit-text-size-adjust:100%;text-size-adjust:100%;
   font-size:var(--base);line-height:1.72;-webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;font-feature-settings:"liga","kern"}
 h1,h2,h3,h4{font-family:var(--serif);line-height:1.1;font-weight:600;text-wrap:balance}
@@ -722,6 +723,11 @@ body.splashing{overflow:hidden}
 .table-wrap{overflow-x:auto}
 @media (max-width:900px){
   .row2,.detail-cols{grid-template-columns:1fr}
+  /* iOS Safari zooms the whole page when a focused field is under 16px, and
+     these were 15. Amanda taps them on every order — the total, the payment,
+     the note — and each tap zoomed in and had to be pinched back out. The
+     compact size is kept on desktop, where nothing zooms. */
+  .adm input,.adm select,.adm textarea{font-size:16px}
   /* one column, and the summary keeps its DOM position AFTER the steps —
      nobody wants to read a summary of an order they have not made yet */
   .order-layout{grid-template-columns:1fr;gap:var(--s8)}

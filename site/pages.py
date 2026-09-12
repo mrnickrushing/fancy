@@ -220,6 +220,11 @@ FORMS_CSS = """
 .table-wrap{overflow-x:auto}
 @media (max-width:900px){
   .row2,.detail-cols{grid-template-columns:1fr}
+  /* iOS Safari zooms the whole page when a focused field is under 16px, and
+     these were 15. Amanda taps them on every order — the total, the payment,
+     the note — and each tap zoomed in and had to be pinched back out. The
+     compact size is kept on desktop, where nothing zooms. */
+  .adm input,.adm select,.adm textarea{font-size:16px}
   /* one column, and the summary keeps its DOM position AFTER the steps —
      nobody wants to read a summary of an order they have not made yet */
   .order-layout{grid-template-columns:1fr;gap:var(--s8)}
