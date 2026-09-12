@@ -212,6 +212,34 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     assert.equal(res.body.courses.savory, 'Savory');
   });
 
+  // Amanda: "the painter focaccias, the ones with herb flowers and bees, are
+  // $25 not $15". Changing menu.json alone would only move the printed bill of
+  // fare — the order form reads the database, and would have gone on charging
+  // fifteen.
+  await t.test('the painted focaccias were corrected to $25, and only them', async () => {
+    const priceOf = async (name) => {
+      const { rows } = await db.pool.query('SELECT price FROM menu_items WHERE name = $1', [name]);
+      return rows[0] ? Number(rows[0].price) : null;
+    };
+    // a fresh database seeds them at the corrected price
+    assert.equal(await priceOf('Flower Garden'), 25);
+    assert.equal(await priceOf('Flower Garden with a Bee'), 25);
+    // the seeded, not-painted one in the same course is untouched
+    assert.equal(await priceOf('The Everything Focaccia'), 15);
+
+    // what production looked like: the row still at the old figure
+    await db.pool.query(`UPDATE menu_items SET price = 15 WHERE name = 'Flower Garden'`);
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_price_corrections_1'`);
+    await db.initSchema();
+    assert.equal(await priceOf('Flower Garden'), 25, 'the correction did not reach the database');
+
+    // and a figure she set herself is left alone by it
+    await db.pool.query(`UPDATE menu_items SET price = 18 WHERE name = 'Flower Garden'`);
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_price_corrections_1'`);
+    await db.initSchema();
+    assert.equal(await priceOf('Flower Garden'), 18, 'a price she set herself was overwritten');
+  });
+
   await t.test('the rename migration retires the old names and nothing else', async () => {
     // What production looks like before the deploy: rows under the research
     // names, plus one Amanda added herself in the admin.

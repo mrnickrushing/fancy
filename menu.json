@@ -220,14 +220,14 @@
     "course": "art",
     "name": "Flower Garden with a Bee",
     "description": "Hand-painted in vegetables and herbs, with an olive bee.",
-    "price": 15,
+    "price": 25,
     "image": "art-garden.webp"
   },
   {
     "course": "art",
     "name": "Flower Garden",
     "description": "Hand-painted in vegetables and herbs — a whole garden across the top of the dough.",
-    "price": 15,
+    "price": 25,
     "image": "hero-garden.webp"
   }
 ]
