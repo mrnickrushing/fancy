@@ -34,6 +34,17 @@ const SETTINGS_DEFAULTS = {
   apple_pay_accepted: '1',
 };
 
+// Prices Amanda has corrected since the catalog was written down. Applied
+// once, and only to a row still carrying the old figure — so a price she has
+// since set herself in the admin is never overwritten by a migration.
+//
+// The hand-painted ones only. "The Everything Focaccia" is in the same course
+// but it is seeds, onion and garlic rather than a painting, and stays at 15.
+const PRICE_CORRECTIONS = [
+  ['Flower Garden with a Bee', 15, 25],
+  ['Flower Garden', 15, 25],
+];
+
 async function initSchema() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS menu_items (
@@ -173,6 +184,25 @@ async function initSchema() {
   await backfillMenuPrices();
   await alignMenuToCatalog();
   await backfillMenuImages();
+  await applyPriceCorrections();
+}
+
+async function applyPriceCorrections() {
+  const done = await pool.query(`SELECT 1 FROM settings WHERE key = 'menu_price_corrections_1'`);
+  if (done.rowCount) return;
+  let changed = 0;
+  for (const [name, from, to] of PRICE_CORRECTIONS) {
+    const { rowCount } = await pool.query(
+      `UPDATE menu_items SET price = $3 WHERE name = $1 AND price = $2`,
+      [name, from, to]
+    );
+    changed += rowCount;
+  }
+  await pool.query(
+    `INSERT INTO settings (key, value, updated_at)
+     VALUES ('menu_price_corrections_1', '1', now()) ON CONFLICT (key) DO NOTHING`
+  );
+  if (changed) console.log(`menu: corrected ${changed} price(s)`);
 }
 
 async function seedMenu() {
