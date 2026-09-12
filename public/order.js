@@ -198,8 +198,12 @@
   $('cal-prev').addEventListener('click', function () { calMonth.setMonth(calMonth.getMonth() - 1); renderCal(); });
   $('cal-next').addEventListener('click', function () { calMonth.setMonth(calMonth.getMonth() + 1); renderCal(); });
 
-  app.addEventListener('change', function (e) {
-    if (e.target.name !== 'fulfillment') return;
+  // Browsers restore a checked radio across a reload or a back-navigation, and
+  // the address field only ever appeared in response to a change event. So
+  // someone who chose delivery, went back, and returned saw shipping selected
+  // with no address box — and then got "Where should it go?" about a field
+  // that was not on the page. This runs on load as well as on change.
+  function syncFulfillment() {
     var pickup = fulfillment() === 'pickup';
     $('address-field').hidden = pickup;
     $('date-label').textContent = pickup ? 'Pickup day' : 'Needed by';
@@ -207,6 +211,11 @@
     $('cal-note').textContent = pickup ? 'Gold dot — a market day.' : (selected ? 'Needed ' + longDate(selected) + '.' : 'Any day we are baking.');
     renderCal();
     renderCart();
+  }
+
+  app.addEventListener('change', function (e) {
+    if (e.target.name !== 'fulfillment') return;
+    syncFulfillment();
   });
 
   // ── errors ──
@@ -368,6 +377,7 @@
     renderMenu(); renderCart();
     applyBake();
   }
+  syncFulfillment();
   loadMenu(); loadAvailability();
   setInterval(loadAvailability, 60000);
 })();

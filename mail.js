@@ -41,10 +41,14 @@ function escapeHtml(str) {
   return String(str ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-function formatDate(iso) {
-  if (!iso) return '';
-  const d = new Date(String(iso).slice(0, 10) + 'T00:00:00');
-  if (isNaN(d.getTime())) return String(iso);
+// Postgres hands DATE columns back as Date objects, not strings. Slicing one
+// gives "Mon Sep 2", which parses to Invalid Date, and the fallback below then
+// printed the raw toString — "Mon Sep 28 2026 00:00:00 GMT+0000 (Coordinated
+// Universal Time)" — into a push notification on Amanda's phone.
+function formatDate(value) {
+  if (!value) return '';
+  const d = value instanceof Date ? value : new Date(String(value).slice(0, 10) + 'T00:00:00');
+  if (isNaN(d.getTime())) return String(value);
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${d.toLocaleDateString('en-US', { weekday: 'long' })}, ${month}-${day}-${d.getFullYear()}`;
