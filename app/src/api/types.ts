@@ -69,6 +69,8 @@ export type Order = {
   amount: string | null;
   payment_status: PaymentStatus;
   paid_amount: string;
+  // Flat, snapshotted when the order was taken; 0 for pickup and delivery.
+  shipping_fee: string;
   source: string;
   respond_token: string;
   created_at: string;
@@ -119,6 +121,7 @@ export type Review = {
 
 export type Settings = {
   deposit_percent: string;
+  shipping_fee: string;
   payment_instructions: string;
   pickup_note: string;
   min_notice_days: string;

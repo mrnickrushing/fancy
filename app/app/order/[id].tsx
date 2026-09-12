@@ -72,6 +72,7 @@ export default function OrderDetailScreen() {
 
   const owed = balanceDue(order.paid_amount, order.amount, order.payment_status);
   const subtotal = itemsSubtotal(order);
+  const shipping = toNumber(order.shipping_fee);
 
   const run = async (fn: () => Promise<unknown>, message: string) => {
     setStatus(null);
@@ -218,14 +219,23 @@ export default function OrderDetailScreen() {
                 </Text>
               </View>
             ))}
+            {shipping > 0 ? (
+              <View style={styles.item}>
+                <Text style={styles.itemName}>Shipping</Text>
+                <Text style={styles.itemPrice}>{fmtMoney(shipping)}</Text>
+              </View>
+            ) : null}
             {subtotal !== null ? (
-              <Text style={styles.subtotal}>Bill of fare adds up to {fmtMoney(subtotal)}</Text>
+              <Text style={styles.subtotal}>
+                Bill of fare{shipping > 0 ? ' and shipping come' : ' adds up'} to {fmtMoney(subtotal + shipping)}
+              </Text>
             ) : null}
           </Card>
 
           <Card style={styles.card}>
             <Text style={styles.cardTitle}>Money</Text>
             <Row label="Total" value={fmtMoney(order.amount)} />
+            {shipping > 0 ? <Row label="Of which shipping" value={fmtMoney(shipping)} /> : null}
             <Row label="Paid so far" value={fmtMoney(order.paid_amount)} />
             {owed !== null ? <Row label="Still owed" value={fmtMoney(owed)} /> : null}
             <View style={styles.badgeRow}>

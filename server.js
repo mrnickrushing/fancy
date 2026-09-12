@@ -394,6 +394,7 @@ app.get('/api/availability', asyncHandler(async (_req, res) => {
   res.json({
     minNoticeDays: Number(settings.min_notice_days) || 0,
     marketDays: MARKET_DAYS,
+    shippingFee: Number(settings.shipping_fee) || 0,
     pickupNote: settings.pickup_note,
     blocked: blocked.map(({ start, end }) => ({ start, end })),
   });
@@ -437,7 +438,12 @@ async function prepareOrder(body, { website }) {
     if (!m || (website && !m.available)) return { error: 'One of those items is not available right now. Please refresh the menu.' };
     items.push({ menuItemId: m.id, name: m.name, unitPrice: m.price, quantity });
   }
-  return { order, items };
+  // Shipping is flat, and charged at whatever the fee is the moment the order
+  // is taken. The settings come back with it so the caller does not read them
+  // a second time.
+  const settings = await db.getSettings();
+  order.shippingFee = order.fulfillment === 'shipping' ? Number(settings.shipping_fee) || 0 : 0;
+  return { order, items, settings };
 }
 
 app.post('/api/order', writeLimiter, asyncHandler(async (req, res) => {
@@ -445,9 +451,8 @@ app.post('/api/order', writeLimiter, asyncHandler(async (req, res) => {
   if (idempotencyKey.length > 128) return res.status(400).json({ error: 'The idempotency key is too long.' });
   const prepared = await prepareOrder(req.body || {}, { website: true });
   if (prepared.error) return res.status(400).json({ error: prepared.error });
-  const { order, items } = prepared;
+  const { order, items, settings } = prepared;
 
-  const settings = await db.getSettings();
   const notice = Number(settings.min_notice_days) || 0;
   if (order.neededDate < minDateIso(notice)) {
     return res.status(400).json({ error: notice > 0 ? `Please choose a date at least ${notice} day${notice === 1 ? '' : 's'} from today.` : 'Please choose a date from today onwards.' });
@@ -776,6 +781,11 @@ app.put('/api/admin/settings', asyncHandler(async (req, res) => {
     const n = Number(body.min_notice_days);
     if (!Number.isInteger(n) || n < 0 || n > 60) return res.status(400).json({ error: 'Notice must be a whole number of days, 0 to 60.' });
     patch.min_notice_days = String(n);
+  }
+  if ('shipping_fee' in body) {
+    const n = Number(body.shipping_fee);
+    if (!Number.isFinite(n) || n < 0 || n > 1000) return res.status(400).json({ error: 'Shipping must be an amount from 0 to 1000.' });
+    patch.shipping_fee = n.toFixed(2);
   }
   for (const key of ['payment_instructions', 'pickup_note']) {
     if (!(key in body)) continue;

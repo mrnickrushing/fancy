@@ -21,6 +21,7 @@ function order(over: Partial<Order> = {}): Order {
     amount: null,
     payment_status: 'unpaid',
     paid_amount: '0',
+    shipping_fee: '0',
     source: 'website',
     respond_token: 't',
     created_at: '2026-09-01T10:00:00.000Z',

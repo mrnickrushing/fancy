@@ -271,7 +271,7 @@ ORDER = D.masthead("Order") + D.head_band("Ordina", "Place an Order",
           <label><input type="radio" name="fulfillment" value="delivery">
             <span><b>Local delivery</b><small>Around Brookings and Harbor. Any delivery fee and timing will be confirmed.</small></span></label>
           <label><input type="radio" name="fulfillment" value="shipping">
-            <span><b>Shipping</b><small>Tell us where it is going; destination, shipping cost, and timing will be confirmed.</small></span></label>
+            <span><b>Shipping</b><small>A flat shipping fee is added to your total; tell us where it is going and we will confirm timing.</small></span></label>
             </div>
             <div class="field">
               <span class="caps" id="date-label">Pickup day</span>
@@ -374,7 +374,7 @@ ORDER = D.masthead("Order") + D.head_band("Ordina", "Place an Order",
     <ul style="display:grid;gap:var(--s4);opacity:.86">
       <li>Orders are requests until Amanda confirms availability and the final total.</li>
       <li>For changes or cancellations, email <a href="#">info@ohyoufancyfocaccia.com</a> as soon as possible.</li>
-      <li>Delivery and shipping availability, timing, and cost depend on the destination.</li>
+      <li>Shipping is charged at a flat fee, shown in your total before you send the order. Delivery availability and timing depend on the destination.</li>
       <li>Please disclose allergies in the notes; we will tell you what we can safely accommodate.</li>
       <li>Pickup is at the Brookings-Harbor Farmers Market on Wednesdays and Saturdays from 9am; exact arrangements are confirmed by email.</li>
     </ul>
@@ -525,6 +525,7 @@ ADMIN = D.masthead("Order") + f"""
           <div class="row2">
             <div class="field"><label for="set-notice">Minimum notice (days)</label><input id="set-notice" type="number" min="0" max="60"></div>
             <div class="field"><label for="set-deposit">Deposit to confirm (%)</label><input id="set-deposit" type="number" min="0" max="100"><p class="cal-note">0 means no deposit is asked for.</p></div>
+            <div class="field"><label for="set-shipping">Flat shipping fee ($)</label><input id="set-shipping" type="number" min="0" max="1000" step="0.01"><p class="cal-note">Added to every shipped order. Orders already taken keep the fee they were quoted.</p></div>
           </div>
           <div class="field"><label for="set-payment">How customers pay</label><textarea id="set-payment" rows="3"></textarea>
             <p class="cal-note">Shown on the order page and in every confirmation.</p></div>
@@ -598,7 +599,7 @@ POLICIES = D.masthead("Policies") + D.head_band("Le Regole", "Before You Order",
     <div class="plate" style="padding:var(--s10);margin-bottom:var(--s8)">
       <h2>Ordering and changes</h2>
       <p>Submitting the order form sends a request. An order is not final until Amanda confirms availability, timing, delivery or shipping details, and the final total by email. There is no online payment or card collection on this website.</p>
-      <p>For a change or cancellation, email <a href="#">info@ohyoufancyfocaccia.com</a> as soon as possible. Delivery and shipping availability and costs depend on the destination.</p>
+      <p>For a change or cancellation, email <a href="#">info@ohyoufancyfocaccia.com</a> as soon as possible. Shipping is a flat fee shown in your total; delivery availability and timing depend on the destination.</p>
     </div>
     <div class="plate" style="padding:var(--s10);margin-bottom:var(--s8)">
       <h2>Allergens and ingredients</h2>

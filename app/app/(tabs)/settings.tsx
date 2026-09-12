@@ -24,6 +24,7 @@ export default function SettingsScreen() {
 
   const [notice, setNotice] = useState('');
   const [deposit, setDeposit] = useState('');
+  const [shipping, setShipping] = useState('');
   const [instructions, setInstructions] = useState('');
   const [pickup, setPickup] = useState('');
   const [shopStatus, setShopStatus] = useState<{ tone: 'success' | 'error'; message: string } | null>(null);
@@ -39,6 +40,7 @@ export default function SettingsScreen() {
     if (!data) return;
     setNotice(data.settings.min_notice_days);
     setDeposit(data.settings.deposit_percent);
+    setShipping(data.settings.shipping_fee);
     setInstructions(data.settings.payment_instructions);
     setPickup(data.settings.pickup_note);
   }, [data]);
@@ -49,6 +51,7 @@ export default function SettingsScreen() {
       await save.mutateAsync({
         min_notice_days: notice.trim(),
         deposit_percent: deposit.trim(),
+        shipping_fee: shipping.trim(),
         payment_instructions: instructions.trim(),
         pickup_note: pickup.trim(),
       });
@@ -136,6 +139,13 @@ export default function SettingsScreen() {
                   onChangeText={setDeposit}
                   keyboardType="number-pad"
                   hint="0 if you do not take deposits."
+                />
+                <Input
+                  label="Flat shipping fee"
+                  value={shipping}
+                  onChangeText={setShipping}
+                  keyboardType="decimal-pad"
+                  hint="Added to every shipped order. Orders already taken keep the fee they were quoted."
                 />
                 <Input label="What you tell people about paying" value={instructions} onChangeText={setInstructions} multiline />
                 <Input label="Where and when to collect" value={pickup} onChangeText={setPickup} multiline />

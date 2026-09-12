@@ -76,14 +76,22 @@ function rowsToHtml(rows) {
      <td style="padding:6px 0;vertical-align:top;border-bottom:1px solid ${C.rule};">${escapeHtml(value)}</td></tr>`).join('')}</table>`;
 }
 
-function itemsToHtml(items) {
+// `shippingFee` is the figure stored on the order, not the current setting, so
+// an old email re-rendered today still shows what the customer was charged.
+function itemsToHtml(items, shippingFee = 0) {
+  const ship = Number(shippingFee) || 0;
+  const shipRow = ship > 0
+    ? `<tr><td style="padding:6px 0;border-bottom:1px dotted ${C.rule};">Shipping</td>
+       <td style="padding:6px 8px;border-bottom:1px dotted ${C.rule};"></td>
+       <td style="padding:6px 0;border-bottom:1px dotted ${C.rule};text-align:right;white-space:nowrap;color:${C.ink};">${formatMoney(ship)}</td></tr>`
+    : '';
   return `<table style="border-collapse:collapse;width:100%;margin:8px 0 4px;">${items.map((it) => {
     const price = formatMoney(it.unit_price ?? it.unitPrice);
     const line = price ? formatMoney(Number(it.unit_price ?? it.unitPrice) * it.quantity) : 'to be quoted';
     return `<tr><td style="padding:6px 0;border-bottom:1px dotted ${C.rule};">${escapeHtml(it.name)}</td>
       <td style="padding:6px 8px;border-bottom:1px dotted ${C.rule};text-align:center;white-space:nowrap;">&times; ${it.quantity}</td>
       <td style="padding:6px 0;border-bottom:1px dotted ${C.rule};text-align:right;white-space:nowrap;color:${price ? C.ink : C.olive};">${line}</td></tr>`;
-  }).join('')}</table>`;
+  }).join('')}${shipRow}</table>`;
 }
 
 // The order as a table. `o` is a db row with items. Each row carries a `key`
@@ -119,7 +127,7 @@ function buildBakeryNotice(o, respondUrl) {
       <h2 style="margin:0 0 14px;font-weight:600;">New order #${o.id}</h2>
       ${rowsToHtml(orderRows(o))}
       <h3 style="margin:22px 0 4px;color:${C.olive};font-size:13px;letter-spacing:.2em;text-transform:uppercase;">Items</h3>
-      ${itemsToHtml(o.items)}
+      ${itemsToHtml(o.items, o.shipping_fee)}
       <div style="margin-top:24px;text-align:center;">
         <a href="${respondUrl}" style="display:inline-block;background:${C.burgundy};color:#F6E6C6;text-decoration:none;padding:12px 28px;letter-spacing:.2em;text-transform:uppercase;font-size:12px;">Review &amp; respond</a>
       </div>`),
@@ -133,7 +141,7 @@ function buildThankYou(o, settings) {
     html: shell(`
       <h2 style="margin:0 0 10px;font-weight:600;">Thank you, ${escapeHtml(o.first_name)}!</h2>
       <p>We have your order below. We will get back to you shortly to confirm it and let you know the total.</p>
-      ${itemsToHtml(o.items)}
+      ${itemsToHtml(o.items, o.shipping_fee)}
       ${rowsToHtml(customerRows(o))}
       <p style="margin-top:18px;">${escapeHtml(settings.payment_instructions)}</p>
       <p>Questions in the meantime? Reply to this email or write to ${INFO_EMAIL}.</p>
@@ -159,7 +167,7 @@ function buildConfirmation(o, settings) {
     html: shell(`
       <h2 style="margin:0 0 10px;font-weight:600;">Confirmed, ${escapeHtml(o.first_name)}!</h2>
       <p>Your order is in the book for <strong>${formatDate(o.needed_date)}</strong>.</p>
-      ${itemsToHtml(o.items)}
+      ${itemsToHtml(o.items, o.shipping_fee)}
       ${rowsToHtml(customerRows(o))}
       ${money}
       <div style="margin-top:18px;padding:16px;background:${C.paper};border:1px dashed ${C.rule};">
@@ -193,7 +201,7 @@ function buildReceipt(o, payment) {
       <p>${paidInFull ? 'Your order is paid in full — nothing further is due.' : `We received your payment of ${formatMoney(payment.amount)}.`}</p>
       ${rowsToHtml(money)}
       <h3 style="margin:22px 0 4px;color:${C.olive};font-size:13px;letter-spacing:.2em;text-transform:uppercase;">Your order</h3>
-      ${itemsToHtml(o.items)}
+      ${itemsToHtml(o.items, o.shipping_fee)}
       <p style="margin-top:18px;">— Amanda</p>`),
   };
 }

@@ -78,6 +78,12 @@
       var line = i.unit_price != null ? money(i.unit_price * i.quantity) : '<span style="opacity:.5">quote</span>';
       return '<div class="cart-line"><span>' + esc(i.name) + ' <span style="opacity:.6">× ' + i.quantity + '</span></span><span>' + line + '</span></div>';
     }).join('');
+    var ship = Number(o.shipping_fee) || 0;
+    if (ship > 0) items += '<div class="cart-line"><span>Shipping</span><span>' + money(ship) + '</span></div>';
+    // Every item priced means the total can be suggested, shipping included,
+    // so the fee is not left to memory when she sets it.
+    var allPriced = o.items.length && o.items.every(function (i) { return i.unit_price != null; });
+    var suggest = allPriced ? o.items.reduce(function (n, i) { return n + Number(i.unit_price) * i.quantity; }, 0) + ship : null;
     var pays = o.payments.length ? o.payments.map(function (p) {
       return '<div class="cart-line"><span><strong>' + money(p.amount) + '</strong> <span style="opacity:.6;font-size:var(--xs)">' + fmtWhen(p.received_at) + (p.note ? ' · ' + esc(p.note) : '') + '</span></span>' +
         '<button class="act" data-act="remove-payment" data-payment="' + p.id + '">Remove</button></div>';
@@ -102,6 +108,7 @@
       '</div><div>' +
       '<p class="caps" style="color:var(--olive);font-size:.62rem;margin-bottom:var(--s2)">Total</p>' +
       '<div style="display:flex;gap:var(--s2);align-items:center;margin-bottom:var(--s5)">$<input type="number" min="0" step="0.01" style="width:110px" data-field="amount" value="' + (o.amount != null ? o.amount : '') + '" placeholder="quote"> <button class="act" data-act="save-amount">Save</button></div>' +
+      (suggest != null ? '<p class="cal-note" style="margin-top:calc(var(--s5) * -1);margin-bottom:var(--s5)">Bill of fare' + (ship ? ' plus shipping' : '') + ' comes to ' + money(suggest) + '.</p>' : '') +
       '<p class="caps" style="color:var(--olive);font-size:.62rem;margin-bottom:var(--s2)">Payments</p><div class="cart-lines">' + pays + '</div>' +
       '<div style="display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap;margin-bottom:var(--s4)">$<input type="number" min="0" step="0.01" style="width:100px" data-field="payment" placeholder="0.00"><input style="width:150px" data-field="payment-note" placeholder="note (optional)"><button class="act" data-act="add-payment">Record</button></div>' +
       '<div style="display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap"><select data-field="pstatus">' +
@@ -285,6 +292,7 @@
     var data = await api('/api/admin/settings'), s = data.settings;
     $('set-notice').value = s.min_notice_days; $('set-deposit').value = s.deposit_percent;
     $('set-payment').value = s.payment_instructions; $('set-pickup').value = s.pickup_note;
+    $('set-shipping').value = s.shipping_fee;
     var outbox = data.emailOutbox || {}, failed = (outbox.failed || 0) + (outbox.dead || 0), pending = (outbox.pending || 0) + (outbox.sending || 0);
     $('email-retry').hidden = !failed;
     $('email-state').textContent = !data.emailConfigured
@@ -296,7 +304,7 @@
   $('settings-form').addEventListener('submit', async function (e) {
     e.preventDefault();
     try {
-      await api('/api/admin/settings', { method: 'PUT', body: JSON.stringify({ min_notice_days: Number($('set-notice').value), deposit_percent: Number($('set-deposit').value), payment_instructions: $('set-payment').value, pickup_note: $('set-pickup').value }) });
+      await api('/api/admin/settings', { method: 'PUT', body: JSON.stringify({ min_notice_days: Number($('set-notice').value), deposit_percent: Number($('set-deposit').value), shipping_fee: Number($('set-shipping').value), payment_instructions: $('set-payment').value, pickup_note: $('set-pickup').value }) });
       say('settings-msg', 'Saved.', true);
     } catch (err) { say('settings-msg', err.message, false); }
   });

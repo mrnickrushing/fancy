@@ -42,7 +42,8 @@ rather than charging cards:
    which is whatever the admin's Menu tab says is available), chooses market
    pickup on a Wednesday or Saturday, or delivery / shipping on any day, and
    sends the order. The server checks the date against the notice period and
-   the days off, snapshots the items by name and price, and emails a thank-you
+   the days off, snapshots the items by name and price — and, when the order
+   ships, the flat shipping fee from the Settings tab — and emails a thank-you
    that confirms nothing.
 2. The bakery gets a notice with a one-tap accept / decline link, or works the
    order from `/admin`: accept, set the total, record payments as they come in

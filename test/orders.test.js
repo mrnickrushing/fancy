@@ -366,6 +366,65 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     });
   });
 
+  // Shipping is the one charge the customer meets before Amanda has priced
+  // anything, so it has to be right on the order page and right on the order.
+  await t.test('shipping is a flat fee, snapshotted', async (t) => {
+    const B = (req) => req.set('Authorization', `Basic ${Buffer.from('test-admin:test-password').toString('base64')}`);
+    const shippedOrder = (over = {}) => ({
+      firstName: 'Ada', lastName: 'Byron', email: 'ada@example.com',
+      fulfillment: 'shipping', neededDate: dateOffset(6), address: '1 Long Road, Denver CO',
+      items: [{ id: menu[0].id, quantity: 2 }], ...over,
+    });
+
+    await t.test('the order page is told the fee, so nobody meets it first in an email', async () => {
+      const res = await request(app).get('/api/availability');
+      assert.equal(res.status, 200);
+      assert.equal(res.body.shippingFee, 10);
+    });
+
+    await t.test('it lands on shipped orders and on nothing else', async () => {
+      const ship = await request(app).post('/api/order').send(shippedOrder());
+      assert.equal(ship.status, 201);
+      assert.equal(Number((await db.getOrder(ship.body.orderId)).shipping_fee), 10);
+
+      const pickup = await request(app).post('/api/order').send(good());
+      assert.equal(pickup.status, 201);
+      assert.equal(Number((await db.getOrder(pickup.body.orderId)).shipping_fee), 0);
+
+      const deliver = await request(app).post('/api/order').send(shippedOrder({
+        fulfillment: 'delivery', email: 'del@example.com',
+      }));
+      assert.equal(deliver.status, 201);
+      assert.equal(Number((await db.getOrder(deliver.body.orderId)).shipping_fee), 0);
+    });
+
+    // The whole reason it is a column and not a lookup.
+    await t.test('raising the fee does not reprice an order already taken', async () => {
+      const before = await request(app).post('/api/order').send(shippedOrder());
+      assert.equal(before.status, 201);
+
+      const put = await B(request(app).put('/api/admin/settings')).send({ shipping_fee: 25 });
+      assert.equal(put.status, 200);
+      assert.equal(put.body.settings.shipping_fee, '25.00');
+
+      assert.equal(Number((await db.getOrder(before.body.orderId)).shipping_fee), 10);
+      const after = await request(app).post('/api/order').send(shippedOrder({ email: 'later@example.com' }));
+      assert.equal(Number((await db.getOrder(after.body.orderId)).shipping_fee), 25);
+    });
+
+    await t.test('an order taken by hand is charged it too', async () => {
+      const res = await B(request(app).post('/api/admin/orders')).send(shippedOrder());
+      assert.equal(res.status, 201);
+      assert.equal(Number(res.body.order.shipping_fee), 10);
+    });
+
+    await t.test('the fee has to be an amount', async () => {
+      for (const bad of [-1, 1001, 'free']) {
+        assert.equal((await B(request(app).put('/api/admin/settings')).send({ shipping_fee: bad })).status, 400);
+      }
+    });
+  });
+
   // Amanda's phone. The push is wrapped around the order rather than part of
   // it, so these care as much about Expo being unreachable as about delivery.
   await t.test('push notifications', async (t) => {
