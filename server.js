@@ -221,7 +221,7 @@ function minDateIso(noticeDays) {
   return db.toIsoDate(d);
 }
 function isMarketDay(iso) {
-  return MARKET_DAYS.includes(new Date(`${iso}T00:00:00`).getDay());
+  return MARKET_DAYS.includes(new Date(`${iso}T00:00:00Z`).getUTCDay());
 }
 
 // ── sessions ─────────────────────────────────────────────────────────────
@@ -630,7 +630,9 @@ app.patch('/api/admin/orders/:id', asyncHandler(async (req, res) => {
   if (!merged.email && !merged.phone) return res.status(400).json({ error: 'An email address or phone number is required.' });
   if (merged.email && !isEmail(merged.email)) return res.status(400).json({ error: 'That email address does not look right.' });
   if (!FULFILLMENTS.includes(merged.fulfillment)) return res.status(400).json({ error: 'Choose pickup, delivery or shipping.' });
+  if (merged.fulfillment !== 'pickup' && !merged.address) return res.status(400).json({ error: 'Please give us an address for delivery or shipping.' });
   if (!isIsoDate(merged.neededDate)) return res.status(400).json({ error: 'Date must be a real calendar date.' });
+  if (merged.notes.length > 2000) return res.status(400).json({ error: 'Notes are limited to 2000 characters.' });
   // shipping_fee was snapshotted when the order arrived. Changing how it is
   // fulfilled has to move it too, or a pickup keeps a phantom shipping line on
   // its next confirmation and an order moved to shipping is charged nothing.

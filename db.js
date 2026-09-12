@@ -116,11 +116,14 @@ async function initSchema() {
       attempts INTEGER NOT NULL DEFAULT 0,
       last_error TEXT,
       next_attempt_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      sending_at TIMESTAMPTZ,
       sent_at TIMESTAMPTZ,
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     );
   `);
+  await pool.query(`ALTER TABLE email_outbox ADD COLUMN IF NOT EXISTS sending_at TIMESTAMPTZ`);
   await pool.query(`CREATE INDEX IF NOT EXISTS email_outbox_due_idx ON email_outbox(status, next_attempt_at);`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS email_outbox_sending_idx ON email_outbox(sending_at) WHERE status = 'sending';`);
   await pool.query(`
     CREATE TABLE IF NOT EXISTS blocks (
       id SERIAL PRIMARY KEY,
@@ -581,7 +584,9 @@ async function queueEmail({ orderId = null, kind, to, replyTo = null, subject, h
 }
 
 // Claim rows inside a transaction so two app workers do not send the same
-// message. A failed worker can be retried after its short sending lease.
+// message. A failed worker can be reclaimed after its short sending lease.
+// Reclaiming can duplicate a message if the old worker was only slow, but
+// that is preferable to permanently losing an order notification.
 async function claimDueEmails(limit = 10) {
   const client = await pool.connect();
   try {
@@ -589,15 +594,22 @@ async function claimDueEmails(limit = 10) {
     const { rows } = await client.query(
       `WITH picked AS (
          SELECT id FROM email_outbox
-         WHERE status IN ('pending', 'failed')
-           AND next_attempt_at <= now()
-           AND attempts < 5
+         WHERE (
+           (
+             status IN ('pending', 'failed')
+             AND next_attempt_at <= now()
+           ) OR (
+             status = 'sending'
+             AND COALESCE(sending_at, created_at) <= now() - interval '15 minutes'
+           )
+         )
+         AND attempts < 5
          ORDER BY id
          FOR UPDATE SKIP LOCKED
          LIMIT $1
        )
        UPDATE email_outbox e
-       SET status = 'sending', attempts = e.attempts + 1
+       SET status = 'sending', sending_at = now(), attempts = e.attempts + 1
        FROM picked
        WHERE e.id = picked.id
        RETURNING e.*`, [limit]
@@ -614,7 +626,7 @@ async function claimDueEmails(limit = 10) {
 
 async function markEmailSent(id) {
   await pool.query(
-    `UPDATE email_outbox SET status = 'sent', sent_at = now(), last_error = NULL WHERE id = $1`, [id]
+    `UPDATE email_outbox SET status = 'sent', sending_at = NULL, sent_at = now(), last_error = NULL WHERE id = $1`, [id]
   );
 }
 
@@ -622,8 +634,15 @@ async function markEmailFailed(id, error) {
   await pool.query(
     `UPDATE email_outbox
      SET status = CASE WHEN attempts >= 5 THEN 'dead' ELSE 'failed' END,
+         sending_at = NULL,
          last_error = $2,
-         next_attempt_at = now() + CASE WHEN attempts >= 5 THEN interval '1 day' ELSE interval '5 minutes' END
+         next_attempt_at = now() + CASE
+           WHEN attempts >= 5 THEN interval '1 day'
+           WHEN attempts = 4 THEN interval '40 minutes'
+           WHEN attempts = 3 THEN interval '20 minutes'
+           WHEN attempts = 2 THEN interval '10 minutes'
+           ELSE interval '5 minutes'
+         END
      WHERE id = $1`, [id, String(error || 'Email delivery failed').slice(0, 500)]
   );
 }
@@ -637,7 +656,7 @@ async function emailOutboxSummary() {
 
 async function retryFailedEmails() {
   const { rowCount } = await pool.query(
-    `UPDATE email_outbox SET status = 'pending', attempts = 0, last_error = NULL, next_attempt_at = now()
+    `UPDATE email_outbox SET status = 'pending', attempts = 0, last_error = NULL, sending_at = NULL, next_attempt_at = now()
      WHERE status IN ('failed', 'dead')`
   );
   return rowCount;

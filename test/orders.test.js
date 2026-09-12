@@ -499,7 +499,7 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
       assert.doesNotMatch(mail.buildConfirmation(order, S).html, />Shipping</,
         'the confirmation still bills shipping on a pickup');
 
-      const back = await B(request(app).patch(`/api/admin/orders/${id}`)).send({ fulfillment: 'shipping' });
+      const back = await B(request(app).patch(`/api/admin/orders/${id}`)).send({ fulfillment: 'shipping', address: '1 Long Road' });
       assert.equal(back.status, 200);
       order = await db.getOrder(id);
       assert.equal(Number(order.shipping_fee), 10, 'moving back to shipping charged nothing');
@@ -512,6 +512,23 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
         .send({ notes: 'nothing to see', shippingFee: 999, shipping_fee: 999 });
       assert.equal(res.status, 200);
       assert.equal(Number((await db.getOrder(made.body.orderId)).shipping_fee), 0);
+    });
+
+    await t.test('delivery and shipping edits require an address', async () => {
+      const made = await request(app).post('/api/order').send(good());
+      const id = made.body.orderId;
+      const delivery = await B(request(app).patch(`/api/admin/orders/${id}`)).send({ fulfillment: 'delivery' });
+      assert.equal(delivery.status, 400);
+      const shipping = await B(request(app).patch(`/api/admin/orders/${id}`)).send({ fulfillment: 'shipping' });
+      assert.equal(shipping.status, 400);
+      const ok = await B(request(app).patch(`/api/admin/orders/${id}`)).send({ fulfillment: 'delivery', address: '1 Long Road' });
+      assert.equal(ok.status, 200);
+    });
+
+    await t.test('admin edits enforce the notes limit', async () => {
+      const made = await request(app).post('/api/order').send(good());
+      const res = await B(request(app).patch(`/api/admin/orders/${made.body.orderId}`)).send({ notes: 'x'.repeat(2001) });
+      assert.equal(res.status, 400);
     });
 
     await t.test('the fee has to be an amount', async () => {
