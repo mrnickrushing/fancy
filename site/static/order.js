@@ -9,16 +9,16 @@
   var avail = { minNoticeDays: 0, marketDays: [3, 6], blocked: [] };
   var selected = null;
   var orderIdempotencyKey = null;
-  var today = new Date(); today.setHours(0, 0, 0, 0);
-  var calMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  var today = new Date(); today.setUTCHours(0, 0, 0, 0);
+  var calMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function money(n) { return Number(n).toLocaleString('en-US', { style: 'currency', currency: 'USD' }); }
-  function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function iso(d) { return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0') + '-' + String(d.getUTCDate()).padStart(2, '0'); }
   function longDate(s) {
-    var d = new Date(s + 'T00:00:00');
-    return d.toLocaleDateString('en-US', { weekday: 'long' }) + ', ' +
-      String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') + '-' + d.getFullYear();
+    var d = new Date(s + 'T00:00:00Z');
+    return d.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' }) + ', ' +
+      String(d.getUTCMonth() + 1).padStart(2, '0') + '-' + String(d.getUTCDate()).padStart(2, '0') + '-' + d.getUTCFullYear();
   }
   function fulfillment() { return app.querySelector('input[name="fulfillment"]:checked').value; }
 
@@ -165,29 +165,29 @@
 
   // ── calendar ──
   function blocked(s) { return avail.blocked.some(function (r) { return s >= r.start && s <= r.end; }); }
-  function minDate() { var d = new Date(today); d.setDate(d.getDate() + (avail.minNoticeDays || 0)); return d; }
+  function minDate() { var d = new Date(today); d.setUTCDate(d.getUTCDate() + (avail.minNoticeDays || 0)); return d; }
   function allowed(d) {
     var s = iso(d);
     if (d < minDate() || blocked(s)) return false;
-    if (fulfillment() === 'pickup' && avail.marketDays.indexOf(d.getDay()) === -1) return false;
+    if (fulfillment() === 'pickup' && avail.marketDays.indexOf(d.getUTCDay()) === -1) return false;
     return true;
   }
   function renderCal() {
     var grid = $('cal-grid'); grid.innerHTML = '';
     ['S', 'M', 'T', 'W', 'T', 'F', 'S'].forEach(function (d) { var el = document.createElement('div'); el.className = 'cal-dow'; el.textContent = d; grid.appendChild(el); });
-    var y = calMonth.getFullYear(), m = calMonth.getMonth();
-    $('cal-month').textContent = calMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-    for (var i = 0; i < new Date(y, m, 1).getDay(); i++) grid.appendChild(document.createElement('span'));
-    var days = new Date(y, m + 1, 0).getDate();
+    var y = calMonth.getUTCFullYear(), m = calMonth.getUTCMonth();
+    $('cal-month').textContent = calMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+    for (var i = 0; i < new Date(Date.UTC(y, m, 1)).getUTCDay(); i++) grid.appendChild(document.createElement('span'));
+    var days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
     for (var day = 1; day <= days; day++) {
-      var d = new Date(y, m, day), s = iso(d);
+      var d = new Date(Date.UTC(y, m, day)), s = iso(d);
       var b = document.createElement('button'); b.type = 'button'; b.className = 'cal-day'; b.textContent = day; b.dataset.date = s;
-      if (avail.marketDays.indexOf(d.getDay()) !== -1) b.classList.add('market');
+      if (avail.marketDays.indexOf(d.getUTCDay()) !== -1) b.classList.add('market');
       if (!allowed(d)) b.disabled = true;
       if (s === selected) b.classList.add('selected');
       grid.appendChild(b);
     }
-    var first = new Date(today.getFullYear(), today.getMonth(), 1);
+    var first = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
     $('cal-prev').disabled = calMonth <= first;
   }
   $('cal-grid').addEventListener('click', function (e) {
@@ -195,8 +195,8 @@
     selected = b.dataset.date; $('needed-date').value = selected; clearErr('needed-date'); renderCal();
     $('cal-note').textContent = (fulfillment() === 'pickup' ? 'Pickup ' : 'Needed ') + longDate(selected) + '.';
   });
-  $('cal-prev').addEventListener('click', function () { calMonth.setMonth(calMonth.getMonth() - 1); renderCal(); });
-  $('cal-next').addEventListener('click', function () { calMonth.setMonth(calMonth.getMonth() + 1); renderCal(); });
+  $('cal-prev').addEventListener('click', function () { calMonth.setUTCMonth(calMonth.getUTCMonth() - 1); renderCal(); });
+  $('cal-next').addEventListener('click', function () { calMonth.setUTCMonth(calMonth.getUTCMonth() + 1); renderCal(); });
 
   // Browsers restore a checked radio across a reload or a back-navigation, and
   // the address field only ever appeared in response to a change event. So
@@ -207,7 +207,7 @@
     var pickup = fulfillment() === 'pickup';
     $('address-field').hidden = pickup;
     $('date-label').textContent = pickup ? 'Pickup day' : 'Needed by';
-    if (selected && !allowed(new Date(selected + 'T00:00:00'))) { selected = null; $('needed-date').value = ''; }
+    if (selected && !allowed(new Date(selected + 'T00:00:00Z'))) { selected = null; $('needed-date').value = ''; }
     $('cal-note').textContent = pickup ? 'Gold dot — a market day.' : (selected ? 'Needed ' + longDate(selected) + '.' : 'Any day we are baking.');
     renderCal();
     renderCart();
@@ -285,7 +285,7 @@
   // ── load ──
   async function loadAvailability() {
     try { var r = await fetch('/api/availability'); if (r.ok) { avail = await r.json(); if (avail.pickupNote) $('pickup-note').textContent = avail.pickupNote; } } catch (err) { /* the calendar still works */ }
-    var m = minDate(); if (calMonth < new Date(m.getFullYear(), m.getMonth(), 1)) calMonth = new Date(m.getFullYear(), m.getMonth(), 1);
+    var m = minDate(); if (calMonth < new Date(Date.UTC(m.getUTCFullYear(), m.getUTCMonth(), 1))) calMonth = new Date(Date.UTC(m.getUTCFullYear(), m.getUTCMonth(), 1));
     renderCal();
     // The fee arrives with this response, and it also refreshes on a timer.
     // Without re-totalling, someone who chose shipping before it landed sees a
@@ -316,7 +316,7 @@
 
   // The note is moved next to whatever it is explaining, so it is not left
   // stranded at the top of the page once we scroll somewhere else.
-  function say(msg, before) {
+  function flash(msg, before) {
     var f = $('order-flash'); if (!f) return;
     f.textContent = msg;
     f.hidden = false;
@@ -347,7 +347,7 @@
       if (row) {
         var fold = row.closest('.course-fold');
         if (fold) fold.open = true;
-        say('Added one ' + hit.name + ' from the gallery. Change the quantity below, or keep choosing.', row);
+        flash('Added one ' + hit.name + ' from the gallery. Change the quantity below, or keep choosing.', row);
         bring(row);
       }
     } else {
@@ -357,7 +357,7 @@
         if (notes.value.indexOf(line) === -1) {
           notes.value = notes.value ? notes.value.replace(/\s+$/, '') + '\n' + line : line;
         }
-        say('“' + bake + '” is one of Amanda\u2019s specialties rather than a standing row, so we have put it in your notes for Amanda. Add anything else you would like below.', notes.closest('.field') || notes);
+        flash('“' + bake + '” is one of Amanda\u2019s specialties rather than a standing row, so we have put it in your notes for Amanda. Add anything else you would like below.', notes.closest('.field') || notes);
         bring(notes);
       }
     }

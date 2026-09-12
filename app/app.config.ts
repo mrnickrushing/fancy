@@ -4,10 +4,9 @@ import { ExpoConfig, ConfigContext } from 'expo/config';
 // `extra` so a build can be pointed at a local server with EXPO_PUBLIC_API_URL
 // without editing anything that is committed.
 //
-// There is no `updates` block and no `extra.eas.projectId` yet: `eas init`
-// writes both, and inventing a project id here would only produce an app that
-// fails to fetch its own updates. Until it is run, OTA is off and push
-// registration returns nothing rather than throwing.
+// The EAS project and update channel are configured in app.json. The API URL
+// remains environment-configurable so local and production builds can share
+// this config without source edits.
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...(config as ExpoConfig),
   extra: {
