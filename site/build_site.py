@@ -9,7 +9,7 @@ the head metadata a live site needs.
 
     python3 site/build_site.py
 """
-import os, re, sys, shutil, json
+import os, re, sys, shutil, json, hashlib
 
 ROOT   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DESIGN = os.path.join(ROOT, "design")
@@ -385,7 +385,7 @@ DOC = """<!doctype html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 {fonts}
-<link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="./style.css?v={cssv}">
 {ld}
 </head>
 <body>
@@ -456,6 +456,21 @@ def build():
     for f in sorted(os.listdir(static)):
         shutil.copy2(os.path.join(static, f), os.path.join(PUBLIC, f))
 
+    # style.css and the scripts are served under fixed names, and Cloudflare
+    # caches those at its own edge TTL — four hours — regardless of the five
+    # minutes the origin asks for. A CSS fix therefore reached nobody until the
+    # edge felt like it, and in the meantime a returning visitor got new HTML
+    # with old CSS. Versioning the URL sidesteps the question: a changed file
+    # is a changed address, and an address that has never been requested cannot
+    # be stale.
+    versions = {}
+
+    def asset_version(name):
+        if name not in versions:
+            with open(os.path.join(PUBLIC, name), "rb") as fh:
+                versions[name] = hashlib.md5(fh.read()).hexdigest()[:8]
+        return versions[name]
+
     base = "https://ohyoufancyfocaccia.com/"
     all_pages = PAGES + [(f, b, t, "") for f, b, t in ADMIN_PAGES] + [(f, b, t, "") for f, b, t in UTILITY_PAGES]
     for fname, body, title, desc in all_pages:
@@ -484,7 +499,8 @@ def build():
             head_extra=head_extra,
             splash=SPLASH_HTML if is_home else "",
             body=html,
-            script="\n".join(f'<script src="./{j}" defer></script>' for j in scripts),
+            script="\n".join(f'<script src="./{j}?v={asset_version(j)}" defer></script>' for j in scripts),
+            cssv=asset_version("style.css"),
         )
         with open(os.path.join(PUBLIC, fname), "w", encoding="utf-8") as fh:
             fh.write(page)

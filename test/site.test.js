@@ -147,6 +147,23 @@ test('the admin fields do not make Safari zoom on a phone', async () => {
   assert.match(css, /-webkit-text-size-adjust:100%/);
 });
 
+// style.css and the scripts are served under fixed names, and Cloudflare caches
+// those at its own edge TTL — four hours — whatever the origin asks for. A CSS
+// fix once sat unreachable behind that while returning visitors got new HTML
+// with old CSS. A content hash in the URL makes a changed file a changed
+// address, which cannot be stale.
+test('assets are versioned so a change cannot be served stale', async () => {
+  const html = (await request(app).get('/')).text;
+  const css = /style\.css\?v=([a-f0-9]{8})/.exec(html);
+  assert.ok(css, 'the stylesheet link carries no version');
+  assert.ok(/nav\.js\?v=[a-f0-9]{8}/.test(html), 'a script carries no version');
+  // the versioned address still serves the file
+  assert.strictEqual((await request(app).get(`/style.css?v=${css[1]}`)).status, 200);
+  // and one build gives every page the same stylesheet version
+  const order = (await request(app).get('/order.html')).text;
+  assert.match(order, new RegExp(`style\\.css\\?v=${css[1]}`), 'pages disagree on the stylesheet version');
+});
+
 test('social metadata and install metadata are present', async () => {
   const html = (await request(app).get('/')).text;
   assert.match(html, /name="twitter:image"/);
