@@ -431,12 +431,12 @@ async function createOrder(order, items) {
     await client.query('BEGIN');
     const respondToken = crypto.randomBytes(20).toString('hex');
     const { rows } = await client.query(
-      `INSERT INTO orders (first_name, last_name, email, phone, fulfillment, needed_date, address, notes, source, respond_token, idempotency_key, shipping_fee)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id, respond_token`,
+      `INSERT INTO orders (first_name, last_name, email, phone, fulfillment, needed_date, address, notes, source, respond_token, idempotency_key, shipping_fee, amount)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING id, respond_token`,
       [order.firstName, order.lastName, order.email || null, order.phone || null,
        order.fulfillment, order.neededDate, order.address || null, order.notes || null,
        order.source || 'website', respondToken, order.idempotencyKey || null,
-       order.shippingFee || 0]
+       order.shippingFee || 0, order.amount ?? null]
     );
     const saved = rows[0];
     if (items.length) {
@@ -494,9 +494,10 @@ async function listOrders() {
 const ORDER_EDITABLE = {
   firstName: 'first_name', lastName: 'last_name', email: 'email', phone: 'phone',
   fulfillment: 'fulfillment', neededDate: 'needed_date', address: 'address', notes: 'notes',
-  // Server-set only. The admin route never copies this one out of the request
-  // body — it works it out from the fulfillment it is being moved to.
+  // Server-set only. The admin route never copies these out of the request
+  // body — it works them out from the fulfillment it is being moved to.
   shippingFee: 'shipping_fee',
+  amount: 'amount',
 };
 
 async function updateOrder(id, fields) {

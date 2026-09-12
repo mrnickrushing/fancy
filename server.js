@@ -438,7 +438,24 @@ async function prepareOrder(body, { website }) {
   // a second time.
   const settings = await db.getSettings();
   order.shippingFee = order.fulfillment === 'shipping' ? Number(settings.shipping_fee) || 0 : 0;
+  // Amanda should not be adding up her own bill of fare. Every priced item
+  // plus the fee is the total, worked out here so it is on the order the
+  // moment it arrives. One item quoted on request and there is no total to
+  // state — it stays empty and she fills it in, which is the only case left
+  // where she has to.
+  order.amount = itemsTotal(items) === null ? null : itemsTotal(items) + order.shippingFee;
   return { order, items, settings };
+}
+
+// null when anything is unpriced, because a partial sum is a wrong total.
+function itemsTotal(items) {
+  let sum = 0;
+  for (const it of items) {
+    const price = it.unitPrice ?? it.unit_price;
+    if (price === null || price === undefined || price === '') return null;
+    sum += Number(price) * it.quantity;
+  }
+  return sum;
 }
 
 app.post('/api/order', writeLimiter, asyncHandler(async (req, res) => {
@@ -582,9 +599,19 @@ app.patch('/api/admin/orders/:id', asyncHandler(async (req, res) => {
   // its next confirmation and an order moved to shipping is charged nothing.
   if (merged.fulfillment !== current.fulfillment) {
     const settings = merged.fulfillment === 'shipping' ? await db.getSettings() : null;
-    patch.shippingFee = settings ? Number(settings.shipping_fee) || 0 : 0;
+    const nextFee = settings ? Number(settings.shipping_fee) || 0 : 0;
+    patch.shippingFee = nextFee;
+    // Keep the total in step with the fee, but only while it is still the one
+    // we worked out. The moment Amanda types her own figure it is hers, and
+    // moving an order between pickup and shipping must not overwrite it.
+    const goods = itemsTotal(current.items || []);
+    const untouched = goods !== null && current.amount !== null
+      && Number(current.amount) === goods + (Number(current.shipping_fee) || 0);
+    if (untouched) patch.amount = goods + nextFee;
   }
-  res.json({ ok: true, order: await db.updateOrder(req.params.id, patch) });
+  const updated = await db.updateOrder(req.params.id, patch);
+  // A changed total changes what is owed, and that is derived from the money.
+  res.json({ ok: true, order: patch.amount === undefined ? updated : await db.recomputeOrderPayment(req.params.id) });
 }));
 
 app.post('/api/admin/orders/:id/respond', asyncHandler(async (req, res) => {

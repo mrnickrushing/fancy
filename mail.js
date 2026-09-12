@@ -179,7 +179,11 @@ function buildThankYou(o, settings) {
     subject: `Thank you for your order — ${BAKERY_NAME}`,
     html: shell(`
       <h2 style="margin:0 0 10px;font-weight:600;">Thank you, ${escapeHtml(o.first_name)}!</h2>
-      <p>We have your order below. We will get back to you shortly to confirm it and let you know the total.</p>
+      <p>We have your order below${formatMoney(o.amount) ? `, and it comes to <strong>${formatMoney(o.amount)}</strong>` : ''}. ${
+        formatMoney(o.amount)
+          ? 'Amanda will confirm it shortly — nothing is final until she does.'
+          : 'We will get back to you shortly to confirm it and let you know the total.'
+      }</p>
       ${itemsToHtml(o.items, o.shipping_fee)}
       ${rowsToHtml(customerRows(o))}
       <p style="margin-top:18px;">${escapeHtml(settings.payment_instructions)}</p>
