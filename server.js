@@ -787,13 +787,16 @@ app.put('/api/admin/settings', asyncHandler(async (req, res) => {
     if (!Number.isFinite(n) || n < 0 || n > 1000) return res.status(400).json({ error: 'Shipping must be an amount from 0 to 1000.' });
     patch.shipping_fee = n.toFixed(2);
   }
-  // These two may be emptied — clearing the Venmo handle is how the block
-  // comes out of the emails again, so the not-empty rule below cannot apply.
-  for (const key of ['venmo_handle', 'apple_pay_contact']) {
-    if (!(key in body)) continue;
-    const v = str(body[key]);
+  // Emptiable — clearing the handle is how the block comes out of the emails
+  // again, so the not-empty rule below cannot apply to it.
+  if ('venmo_handle' in body) {
+    const v = str(body.venmo_handle);
     if (v.length > 200) return res.status(400).json({ error: 'That is limited to 200 characters.' });
-    patch[key] = v;
+    patch.venmo_handle = v;
+  }
+  if ('apple_pay_accepted' in body) {
+    const v = body.apple_pay_accepted;
+    patch.apple_pay_accepted = (v === true || v === 1 || v === '1' || v === 'true') ? '1' : '';
   }
   for (const key of ['payment_instructions', 'pickup_note']) {
     if (!(key in body)) continue;

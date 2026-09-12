@@ -85,7 +85,7 @@ function shell(inner, footer = '') {
 // filled the settings in. Nothing here invents a destination for money.
 function paymentFooter(settings = {}) {
   const venmo = String(settings.venmo_handle || '').trim();
-  const applePay = String(settings.apple_pay_contact || '').trim();
+  const applePay = String(settings.apple_pay_accepted || '') === '1';
   if (!venmo && !applePay) return '';
 
   const lines = [];
@@ -94,8 +94,10 @@ function paymentFooter(settings = {}) {
     const url = /^https?:\/\//i.test(venmo) ? venmo : `https://venmo.com/u/${encodeURIComponent(handle)}`;
     lines.push(`<p style="margin:0 0 8px;"><strong>Venmo</strong> &mdash; <a href="${escapeHtml(url)}" style="color:${C.burgundy};">@${escapeHtml(handle)}</a></p>`);
   }
+  // A typographic badge, not Apple's mark: that is a trademark with its own
+  // identity guidelines, and a lookalike drawn here would be neither.
   if (applePay) {
-    lines.push(`<p style="margin:0;"><strong>Apple Pay</strong> &mdash; ${escapeHtml(applePay)}</p>`);
+    lines.push(`<p style="margin:0;"><span style="display:inline-block;border:1px solid ${C.rule};border-radius:6px;padding:5px 12px;font-size:13px;letter-spacing:.04em;">Apple&nbsp;Pay</span> &mdash; taken as well.</p>`);
   }
   return `
       <div style="margin-top:24px;padding:16px;background:${C.paper};border:1px dashed ${C.rule};">

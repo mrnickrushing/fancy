@@ -90,6 +90,23 @@ test('assets and crawl files serve', async () => {
   }
 });
 
+// The emails point at this by absolute URL. It is generated into design/img
+// and copied by the build, because build_site rmtree's public/ — a file put
+// straight into public/ is gone on the next rebuild, which is what happened.
+test('the logo the emails point at is actually served', async () => {
+  const mail = require('../mail');
+  const html = mail.buildThankYou(
+    { first_name: 'Jane', items: [], email: 'jane@example.com' },
+    { payment_instructions: 'x' },
+  ).html;
+  const src = /<img src="([^"]+)"/.exec(html);
+  assert.ok(src, 'the email carries no logo at all');
+  const pathname = new URL(src[1]).pathname;
+  const res = await request(app).get(pathname);
+  assert.strictEqual(res.status, 200, `${pathname} is not served`);
+  assert.match(res.headers['content-type'] || '', /image\/png/);
+});
+
 test('social metadata and install metadata are present', async () => {
   const html = (await request(app).get('/')).text;
   assert.match(html, /name="twitter:image"/);
