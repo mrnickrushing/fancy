@@ -119,6 +119,18 @@ test('the order page re-totals once availability lands', async () => {
   assert.match(body, /renderCart\(\)/, 'loadAvailability never re-totals the cart');
 });
 
+// A radio survives a reload; the address field only appeared on a change
+// event. Delivery restored as checked with the address box still hidden meant
+// the form demanded an address the customer could not see.
+test('the order page shows the address box for the fulfillment it loaded with', async () => {
+  const js = (await request(app).get('/order.js')).text;
+  assert.match(js, /function syncFulfillment\(\)/, 'the sync is gone');
+  // called at start-up, not only from the change handler
+  const atLoad = /\n\s*syncFulfillment\(\);\s*\n\s*loadMenu\(\)/.test(js);
+  assert.ok(atLoad, 'syncFulfillment never runs on load');
+  assert.match(js, /syncFulfillment\(\);[\s\S]{0,40}\}\);/, 'the change handler no longer syncs');
+});
+
 test('social metadata and install metadata are present', async () => {
   const html = (await request(app).get('/')).text;
   assert.match(html, /name="twitter:image"/);
