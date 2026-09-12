@@ -58,7 +58,7 @@
     },
     "owner": "rushingtechnologies",
     "runtimeVersion": {
-      "policy": "appVersion"
+      "policy": "fingerprint"
     },
     "updates": {
       "url": "https://u.expo.dev/05ee10d4-e4eb-4a78-a1ca-d6d35874adbf"
