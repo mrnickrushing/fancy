@@ -205,6 +205,7 @@ async function initSchema() {
   await dropBloodSugarClaim();
   await applyPriceCorrections('menu_price_corrections_1', PRICE_CORRECTIONS);
   await applyPriceCorrections('menu_price_corrections_2', PRICE_CORRECTIONS_2);
+  await applyImageAdditions();
 }
 
 async function applyPriceCorrections(marker, corrections) {
@@ -225,6 +226,35 @@ async function applyPriceCorrections(marker, corrections) {
      VALUES ($1, '1', now()) ON CONFLICT (key) DO NOTHING`, [marker]
   );
   if (changed) console.log(`menu: corrected ${changed} price(s)`);
+}
+
+// Photographs added to a bake that already has a live row. backfillMenuImages
+// has already fired on the live database and only ever filled a NULL, so a
+// picture arriving later needs its own marker to reach the order page.
+//
+// Matched on the image still being absent, so one Amanda has chosen herself
+// is never replaced.
+const IMAGE_ADDITIONS = [
+  ['The Country Loaf', 'country-loaf.webp'],
+];
+
+async function applyImageAdditions() {
+  const done = await pool.query(
+    `SELECT 1 FROM settings WHERE key = 'menu_image_additions_1'`);
+  if (done.rowCount) return;
+  let changed = 0;
+  for (const [name, image] of IMAGE_ADDITIONS) {
+    const { rowCount } = await pool.query(
+      `UPDATE menu_items SET image = $2 WHERE name = $1 AND image IS NULL`,
+      [name, image]
+    );
+    changed += rowCount;
+  }
+  await pool.query(
+    `INSERT INTO settings (key, value, updated_at)
+     VALUES ('menu_image_additions_1', '1', now()) ON CONFLICT (key) DO NOTHING`
+  );
+  if (changed) console.log(`menu: gave ${changed} bake(s) a photograph`);
 }
 
 // Renames the live row rather than letting ensureCatalogItems add a second
