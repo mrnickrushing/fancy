@@ -811,7 +811,7 @@ HOME = masthead("Home") + f"""
         Focaccia and sourdough from one mother starter &#8212; savory and sweet,
         dimpled and blistered &#8212; made by hand on the southern Oregon coast.</p>
       <div class="hero-cta">
-        <a href="#" class="btn btn-fill">Order for Pickup</a>
+        <a href="#" class="btn btn-fill">Order Here</a>
         <a href="#" class="btn btn-line">See the Bill of Fare</a>
       </div>
     </div>
