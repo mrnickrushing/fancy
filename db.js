@@ -205,7 +205,8 @@ async function initSchema() {
   await dropBloodSugarClaim();
   await applyPriceCorrections('menu_price_corrections_1', PRICE_CORRECTIONS);
   await applyPriceCorrections('menu_price_corrections_2', PRICE_CORRECTIONS_2);
-  await applyImageAdditions();
+  await applyImageAdditions('menu_image_additions_1', IMAGE_ADDITIONS);
+  await applyImageAdditions('menu_image_additions_2', IMAGE_ADDITIONS_2);
 }
 
 async function applyPriceCorrections(marker, corrections) {
@@ -238,12 +239,17 @@ const IMAGE_ADDITIONS = [
   ['The Country Loaf', 'country-loaf.webp'],
 ];
 
-async function applyImageAdditions() {
-  const done = await pool.query(
-    `SELECT 1 FROM settings WHERE key = 'menu_image_additions_1'`);
+// A later round, for the same reason the price corrections needed one: the
+// first round's marker has already fired on the live database.
+const IMAGE_ADDITIONS_2 = [
+  ['Peppered Pickle Focaccia Muffins', 'peppered-pickle-muffins.webp'],
+];
+
+async function applyImageAdditions(marker, additions) {
+  const done = await pool.query(`SELECT 1 FROM settings WHERE key = $1`, [marker]);
   if (done.rowCount) return;
   let changed = 0;
-  for (const [name, image] of IMAGE_ADDITIONS) {
+  for (const [name, image] of additions) {
     const { rowCount } = await pool.query(
       `UPDATE menu_items SET image = $2 WHERE name = $1 AND image IS NULL`,
       [name, image]
@@ -252,7 +258,7 @@ async function applyImageAdditions() {
   }
   await pool.query(
     `INSERT INTO settings (key, value, updated_at)
-     VALUES ('menu_image_additions_1', '1', now()) ON CONFLICT (key) DO NOTHING`
+     VALUES ($1, '1', now()) ON CONFLICT (key) DO NOTHING`, [marker]
   );
   if (changed) console.log(`menu: gave ${changed} bake(s) a photograph`);
 }
