@@ -963,6 +963,28 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     assert.equal(hers.rowCount, 1);
   });
 
+  await t.test('nothing on the menu describes itself as pull-apart', async () => {
+    // Two rows predate the catalog entirely — no menu.json contains them, so
+    // only a migration can reach their wording.
+    await db.pool.query(
+      `INSERT INTO menu_items (course, name, description, price, sort_order) VALUES
+       ('sweet','Honey Focaccia Bites','Pull-apart bites, boxed and drizzled with Chetco Gold raw honey.',2,90),
+       ('small','Sea Salt Rolls','Soft pull-apart rounds, olive-oil brushed and salt flaked.',2,91)`);
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_description_corrections_1'`);
+    await db.initSchema();
+
+    const { rows } = await db.pool.query(
+      `SELECT name FROM menu_items WHERE description ILIKE '%pull%apart%'`);
+    assert.deepEqual(rows, [], `still pull-apart: ${rows.map((r) => r.name).join(', ')}`);
+
+    // a wording she writes herself is not overwritten
+    await db.pool.query(`UPDATE menu_items SET description = 'Her own words.' WHERE name = 'Sea Salt Rolls'`);
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_description_corrections_1'`);
+    await db.initSchema();
+    const hers = await db.pool.query(`SELECT description FROM menu_items WHERE name = 'Sea Salt Rolls'`);
+    assert.equal(hers.rows[0].description, 'Her own words.');
+  });
+
   await t.test('a photograph added later reaches a row that already exists', async () => {
     // backfillMenuImages has already fired on a live database and only ever
     // filled a NULL, so a picture arriving afterwards needs its own marker

@@ -207,6 +207,7 @@ async function initSchema() {
   await applyPriceCorrections('menu_price_corrections_2', PRICE_CORRECTIONS_2);
   await applyImageAdditions('menu_image_additions_1', IMAGE_ADDITIONS);
   await applyImageAdditions('menu_image_additions_2', IMAGE_ADDITIONS_2);
+  await applyDescriptionCorrections();
 }
 
 async function applyPriceCorrections(marker, corrections) {
@@ -227,6 +228,39 @@ async function applyPriceCorrections(marker, corrections) {
      VALUES ($1, '1', now()) ON CONFLICT (key) DO NOTHING`, [marker]
   );
   if (changed) console.log(`menu: corrected ${changed} price(s)`);
+}
+
+// Two rows predate the catalog entirely — they are in no menu.json, so
+// nothing in the build can reach them — and both still described themselves
+// as pull-apart, which is the wording Amanda asked to be rid of. Matched on
+// the exact old sentence, so a description she has since written herself is
+// left alone, and once only.
+const DESCRIPTION_CORRECTIONS = [
+  ['Honey Focaccia Bites',
+   'Pull-apart bites, boxed and drizzled with Chetco Gold raw honey.',
+   'Boxed and drizzled with Chetco Gold raw honey.'],
+  ['Sea Salt Rolls',
+   'Soft pull-apart rounds, olive-oil brushed and salt flaked.',
+   'Soft rounds, olive-oil brushed and salt flaked.'],
+];
+
+async function applyDescriptionCorrections() {
+  const done = await pool.query(
+    `SELECT 1 FROM settings WHERE key = 'menu_description_corrections_1'`);
+  if (done.rowCount) return;
+  let changed = 0;
+  for (const [name, from, to] of DESCRIPTION_CORRECTIONS) {
+    const { rowCount } = await pool.query(
+      `UPDATE menu_items SET description = $3 WHERE name = $1 AND description = $2`,
+      [name, from, to]
+    );
+    changed += rowCount;
+  }
+  await pool.query(
+    `INSERT INTO settings (key, value, updated_at)
+     VALUES ('menu_description_corrections_1', '1', now()) ON CONFLICT (key) DO NOTHING`
+  );
+  if (changed) console.log(`menu: reworded ${changed} description(s)`);
 }
 
 // Photographs added to a bake that already has a live row. backfillMenuImages

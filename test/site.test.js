@@ -112,6 +112,17 @@ test('nothing on the site claims a bake will not spike your blood sugar', async 
 });
 
 // Every bake has a photograph now; none of them may 404 at a customer.
+// Amanda asked for this wording gone. It is out of the source and the built
+// pages; this keeps it out.
+test('no page and no catalog entry says pull-apart', async () => {
+  for (const p of [...PAGES, '/order.html']) {
+    assert.doesNotMatch((await request(app).get(p)).text, /pull[- ]?apart/i, `${p} still says it`);
+  }
+  for (const i of catalog) {
+    assert.doesNotMatch(i.description, /pull[- ]?apart/i, `${i.name} still says it`);
+  }
+});
+
 test('every bake in the catalog has a photograph that is really there', async () => {
   const dir = path.join(__dirname, '..', 'public', 'img');
   const without = catalog.filter((i) => !i.image).map((i) => i.name);
