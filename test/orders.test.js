@@ -939,6 +939,51 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     assert.equal(r.body.item.image, null);
   });
 
+  await t.test('a renamed bake is renamed, not added a second time', async () => {
+    const OLD = 'The Plain Jane Celtic Salted Focaccia Muffin';
+    const NEW = 'The Plain Jane Celtic Salted Focaccia Muffins';
+    // a live row still under the old name, as production had it
+    await db.pool.query(`UPDATE menu_items SET name = $1 WHERE name = $2`, [OLD, NEW]);
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_name_corrections_1'`);
+    const before = await db.pool.query(`SELECT count(*)::int c FROM menu_items`);
+    await db.initSchema();
+
+    const after = await db.pool.query(`SELECT count(*)::int c FROM menu_items`);
+    // the ordering is the whole point: ensureCatalogItems inserts any catalog
+    // name it cannot find, so a rename that runs after it leaves both rows
+    assert.equal(after.rows[0].c, before.rows[0].c, 'a row was added instead of renamed');
+    const names = await db.pool.query(
+      `SELECT name FROM menu_items WHERE name = ANY($1::text[])`, [[OLD, NEW]]);
+    assert.deepEqual(names.rows.map((r) => r.name), [NEW]);
+
+    // and a name she sets herself is not reverted on the next boot
+    await db.pool.query(`UPDATE menu_items SET name = 'Her own name' WHERE name = $1`, [NEW]);
+    await db.initSchema();
+    const hers = await db.pool.query(`SELECT 1 FROM menu_items WHERE name = 'Her own name'`);
+    assert.equal(hers.rowCount, 1);
+  });
+
+  await t.test('the second round of price corrections runs on its own marker', async () => {
+    // the first round's marker is already set on a live database, so a later
+    // round has to carry its own or it would never fire
+    for (const name of ['Classic Artisan Celtic Salted Sourdough', 'The Country Loaf']) {
+      await db.pool.query(`UPDATE menu_items SET price = 15 WHERE name = $1`, [name]);
+    }
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_price_corrections_2'`);
+    await db.initSchema();
+    const { rows } = await db.pool.query(
+      `SELECT name, price FROM menu_items WHERE name = ANY($1::text[]) ORDER BY name`,
+      [['Classic Artisan Celtic Salted Sourdough', 'The Country Loaf']]);
+    for (const r of rows) assert.equal(Number(r.price), 10, `${r.name} is still ${r.price}`);
+
+    // a price she sets herself survives: the update matches the old price too
+    await db.pool.query(`UPDATE menu_items SET price = 12 WHERE name = 'The Country Loaf'`);
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_price_corrections_2'`);
+    await db.initSchema();
+    const kept = await db.pool.query(`SELECT price FROM menu_items WHERE name = 'The Country Loaf'`);
+    assert.equal(Number(kept.rows[0].price), 12);
+  });
+
   await t.test('the blood-sugar claim is taken off live rows, once', async () => {
     const claim = 'A decadent chocolate focaccia dessert, sweetened with coconut sugar so it '
       + 'doesn\u2019t spike your blood sugar like regular refined sugar does.';

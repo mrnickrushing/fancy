@@ -45,6 +45,23 @@ const PRICE_CORRECTIONS = [
   ['Flower Garden', 15, 25],
 ];
 
+// A later round. The first round's marker has already fired on the live
+// database, so adding to the list above would never run; each round needs
+// its own marker.
+const PRICE_CORRECTIONS_2 = [
+  ['Classic Artisan Celtic Salted Sourdough', 15, 10],
+  ['The Country Loaf', 15, 10],
+];
+
+// Amanda spotted a name that had gone out singular while every other muffin
+// was plural. Renaming it in the catalog alone would not fix the live row:
+// ensureCatalogItems inserts any catalog name it cannot find, so the site
+// would end up showing both the old row and a new one. This runs before it.
+const NAME_CORRECTIONS = [
+  ['The Plain Jane Celtic Salted Focaccia Muffin',
+   'The Plain Jane Celtic Salted Focaccia Muffins'],
+];
+
 async function initSchema() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS menu_items (
@@ -180,19 +197,23 @@ async function initSchema() {
     );
   `);
   await seedMenu();
+  await applyNameCorrections();   // before ensureCatalogItems, or it inserts a duplicate
   await ensureCatalogItems();
   await backfillMenuPrices();
   await alignMenuToCatalog();
   await backfillMenuImages();
   await dropBloodSugarClaim();
-  await applyPriceCorrections();
+  await applyPriceCorrections('menu_price_corrections_1', PRICE_CORRECTIONS);
+  await applyPriceCorrections('menu_price_corrections_2', PRICE_CORRECTIONS_2);
 }
 
-async function applyPriceCorrections() {
-  const done = await pool.query(`SELECT 1 FROM settings WHERE key = 'menu_price_corrections_1'`);
+async function applyPriceCorrections(marker, corrections) {
+  const done = await pool.query(`SELECT 1 FROM settings WHERE key = $1`, [marker]);
   if (done.rowCount) return;
   let changed = 0;
-  for (const [name, from, to] of PRICE_CORRECTIONS) {
+  for (const [name, from, to] of corrections) {
+    // matched on the old price as well as the name, so a price Amanda has
+    // already set herself is left alone
     const { rowCount } = await pool.query(
       `UPDATE menu_items SET price = $3 WHERE name = $1 AND price = $2`,
       [name, from, to]
@@ -201,9 +222,31 @@ async function applyPriceCorrections() {
   }
   await pool.query(
     `INSERT INTO settings (key, value, updated_at)
-     VALUES ('menu_price_corrections_1', '1', now()) ON CONFLICT (key) DO NOTHING`
+     VALUES ($1, '1', now()) ON CONFLICT (key) DO NOTHING`, [marker]
   );
   if (changed) console.log(`menu: corrected ${changed} price(s)`);
+}
+
+// Renames the live row rather than letting ensureCatalogItems add a second
+// one beside it. Once only, and only where the old name is still there.
+async function applyNameCorrections() {
+  const done = await pool.query(
+    `SELECT 1 FROM settings WHERE key = 'menu_name_corrections_1'`);
+  if (done.rowCount) return;
+  let changed = 0;
+  for (const [from, to] of NAME_CORRECTIONS) {
+    const { rowCount } = await pool.query(
+      `UPDATE menu_items SET name = $2
+        WHERE name = $1 AND NOT EXISTS (SELECT 1 FROM menu_items m WHERE m.name = $2)`,
+      [from, to]
+    );
+    changed += rowCount;
+  }
+  await pool.query(
+    `INSERT INTO settings (key, value, updated_at)
+     VALUES ('menu_name_corrections_1', '1', now()) ON CONFLICT (key) DO NOTHING`
+  );
+  if (changed) console.log(`menu: renamed ${changed} bake(s)`);
 }
 
 async function seedMenu() {
@@ -348,7 +391,7 @@ const SUPERSEDED_MENU_NAMES = [
   'Honey Focaccia Muffins',              // -> The Hot Honey
   'Jalapeño & Roasted Garlic Muffins',   // -> The Jalapeño, Garlic and Onion Focaccia Muffins
   'Peppered Pickle Muffins',             // -> Peppered Pickle Focaccia Muffins
-  'Sea Salt Focaccia Muffins',           // -> The Plain Jane Celtic Salted Focaccia Muffin
+  'Sea Salt Focaccia Muffins',           // -> The Plain Jane Celtic Salted Focaccia Muffins
   'Heart Loaf',                          // -> The Everything Focaccia
   'The Classic Sourdough',               // -> Cinnamon Swirl Artisan Sourdough
 ];
