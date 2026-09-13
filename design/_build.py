@@ -1099,7 +1099,7 @@ GAL_SECTIONS = [
  ("I Piccoli","Focaccia Muffins", [
    ("muffins-jalapeno.webp","The Jalape&#241;o, Garlic and Onion Focaccia Muffins","Jalape&#241;o, garlic and onion, hand-sized.",300),
    ("parm-muffins.webp","The Roasted Garlic Focaccia Muffins","Roasted garlic, hand-sized.",300),
-   ("sea-salt-round.webp","The Plain Jane Celtic Salted Focaccia Muffin","Celtic salt, and nothing else.",300),
+   ("sea-salt-round.webp","The Plain Jane Celtic Salted Focaccia Muffins","Celtic salt, and nothing else.",300),
    ("herb-rolls.webp","The Italiano Focaccia Muffins","The Italiano in muffin form &#8212; sage, oregano, thyme, basil and garlic.",300)]),
  ("I Dolci","Sweet", [
    ("sweet-cinnamon.webp","The Brown Buttered Cinnamon Roll","Flax seed oil butter. Coconut sugar.",420),

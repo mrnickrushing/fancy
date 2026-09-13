@@ -136,7 +136,7 @@
     "course": "sourdough",
     "name": "Classic Artisan Celtic Salted Sourdough",
     "description": "Nothing on it but Celtic salt.",
-    "price": 15,
+    "price": 10,
     "image": "plain-swirl.webp"
   },
   {
@@ -150,7 +150,7 @@
     "course": "sourdough",
     "name": "The Country Loaf",
     "description": "Naturally leavened with the same starter that lifts the focaccia — mixed the day before, left to rise slow, and baked dark.",
-    "price": 15,
+    "price": 10,
     "image": null
   },
   {
@@ -197,7 +197,7 @@
   },
   {
     "course": "small",
-    "name": "The Plain Jane Celtic Salted Focaccia Muffin",
+    "name": "The Plain Jane Celtic Salted Focaccia Muffins",
     "description": "Celtic salt, and nothing else.",
     "price": 2,
     "image": "sea-salt-round.webp"
