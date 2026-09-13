@@ -963,6 +963,23 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     assert.equal(hers.rowCount, 1);
   });
 
+  await t.test('a photograph added later reaches a row that already exists', async () => {
+    // backfillMenuImages has already fired on a live database and only ever
+    // filled a NULL, so a picture arriving afterwards needs its own marker
+    await db.pool.query(`UPDATE menu_items SET image = NULL WHERE name = 'The Country Loaf'`);
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_image_additions_1'`);
+    await db.initSchema();
+    let r = await db.pool.query(`SELECT image FROM menu_items WHERE name = 'The Country Loaf'`);
+    assert.equal(r.rows[0].image, 'country-loaf.webp');
+
+    // and one she picks herself is not replaced on the next boot
+    await db.pool.query(`UPDATE menu_items SET image = 'hers.webp' WHERE name = 'The Country Loaf'`);
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_image_additions_1'`);
+    await db.initSchema();
+    r = await db.pool.query(`SELECT image FROM menu_items WHERE name = 'The Country Loaf'`);
+    assert.equal(r.rows[0].image, 'hers.webp');
+  });
+
   await t.test('the second round of price corrections runs on its own marker', async () => {
     // the first round's marker is already set on a live database, so a later
     // round has to carry its own or it would never fire
