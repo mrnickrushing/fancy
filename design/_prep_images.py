@@ -113,6 +113,7 @@ SRC_JOBS = [
     ("classic-sourdough", 560),
     ("garlic-rosemary-sourdough", 560),
     ("country-loaf", 560),
+    ("peppered-pickle-muffins", 560),
 ]
 
 if __name__ == "__main__":

@@ -972,6 +972,14 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     let r = await db.pool.query(`SELECT image FROM menu_items WHERE name = 'The Country Loaf'`);
     assert.equal(r.rows[0].image, 'country-loaf.webp');
 
+    // and the later round, which carries its own marker because the first has
+    // already fired on the live database
+    await db.pool.query(`UPDATE menu_items SET image = NULL WHERE name = 'Peppered Pickle Focaccia Muffins'`);
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_image_additions_2'`);
+    await db.initSchema();
+    r = await db.pool.query(`SELECT image FROM menu_items WHERE name = 'Peppered Pickle Focaccia Muffins'`);
+    assert.equal(r.rows[0].image, 'peppered-pickle-muffins.webp');
+
     // and one she picks herself is not replaced on the next boot
     await db.pool.query(`UPDATE menu_items SET image = 'hers.webp' WHERE name = 'The Country Loaf'`);
     await db.pool.query(`DELETE FROM settings WHERE key = 'menu_image_additions_1'`);

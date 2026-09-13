@@ -3,6 +3,8 @@ const assert = require('node:assert');
 const request = require('supertest');
 const app = require('../server');
 const catalog = require('../menu.json');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const PAGES = ['/', '/about.html', '/breads.html', '/gallery.html', '/reviews.html', '/contact.html'];
 
@@ -106,6 +108,16 @@ test('nothing on the site claims a bake will not spike your blood sugar', async 
   }
   for (const item of catalog) {
     assert.doesNotMatch(item.description, /blood sugar/i, `${item.name} still makes the claim`);
+  }
+});
+
+// Every bake has a photograph now; none of them may 404 at a customer.
+test('every bake in the catalog has a photograph that is really there', async () => {
+  const dir = path.join(__dirname, '..', 'public', 'img');
+  const without = catalog.filter((i) => !i.image).map((i) => i.name);
+  assert.deepEqual(without, [], `no photograph: ${without.join(', ')}`);
+  for (const i of catalog) {
+    assert.ok(fs.existsSync(path.join(dir, i.image)), `${i.name}: public/img/${i.image} is missing`);
   }
 });
 
