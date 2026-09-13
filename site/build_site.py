@@ -72,7 +72,7 @@ LINKS = {
     "The Full Bill of Fare": "./breads.html",
     "Find Us at the Market": "./contact.html",
     "Entra": "./",
-    "Order for Pickup": "./order.html",
+    "Order Here": "./order.html",
     "Place an Order": "./order.html",
     "View the Order Page": "./order.html",
     EMAIL: f"mailto:{EMAIL}",
