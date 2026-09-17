@@ -449,6 +449,15 @@ async function prepareOrder(body, { website }) {
   if (order.fulfillment !== 'pickup' && !order.address) return { error: 'Please give us an address for delivery or shipping.' };
   if (!isIsoDate(order.neededDate)) return { error: 'Please choose a date.' };
   if (order.notes.length > 2000) return { error: 'Notes are limited to 2000 characters.' };
+  // A gift: the address on the order may belong to the person it is a
+  // surprise for, so nothing automatic is sent to it.
+  order.isGift = body.isGift === true || body.isGift === 'true' || body.isGift === 'on';
+  // Nothing is written to the address on a gift order, so there has to be
+  // another way to reach whoever placed it. Amanda's own orders are exempt —
+  // the customer is standing in front of her.
+  if (website && order.isGift && !order.phone) {
+    return { error: 'For a gift, please leave a phone number. We will not email the address on the order, so a call or a text is how Amanda reaches you.' };
+  }
 
   const requested = Array.isArray(body.items) ? body.items : [];
   if (!requested.length) return { error: 'Add at least one item to your order.' };
@@ -517,14 +526,20 @@ app.post('/api/order', writeLimiter, asyncHandler(async (req, res) => {
   if (saved.duplicate) return res.status(201).json({ ok: true, orderId: saved.id, emailSent: false, duplicate: true });
   const full = await db.getOrder(saved.id);
   const respondUrl = `${BASE_URL}/respond/${saved.id}?token=${saved.respond_token}`;
+  // On a gift order the thank-you is not sent at all: the address on the
+  // order may be the recipient's, and a confirmation would give the surprise
+  // away. Amanda gets the notice either way, and it says so.
   const [notice1, thanks] = await Promise.all([
     queueAndDeliver({ orderId: saved.id, kind: 'order_notice', to: mail.ORDERS_INBOX, replyTo: mail.INFO_EMAIL, ...mail.buildBakeryNotice(full, respondUrl) }),
-    queueAndDeliver({ orderId: saved.id, kind: 'order_thank_you', to: order.email, replyTo: mail.INFO_EMAIL, ...mail.buildThankYou(full, settings) }),
+    order.isGift
+      ? Promise.resolve({ sent: true, skipped: 'gift' })
+      : queueAndDeliver({ orderId: saved.id, kind: 'order_thank_you', to: order.email, replyTo: mail.INFO_EMAIL, ...mail.buildThankYou(full, settings) }),
   ]);
   // Deliberately not awaited alongside the emails: the push must never hold
   // up or fail the response the customer is waiting on.
   pushNewOrder(full);
-  res.status(201).json({ ok: true, orderId: saved.id, emailSent: thanks.sent && notice1.sent });
+  res.status(201).json({ ok: true, orderId: saved.id, isGift: order.isGift,
+    emailSent: thanks.sent && notice1.sent, thankYouSkipped: thanks.skipped === 'gift' });
 }));
 
 app.get('/api/reviews', asyncHandler(async (_req, res) => {
@@ -571,6 +586,7 @@ function renderRespondPage(order) {
     ${order.address ? `<p>${e(order.address)}</p>` : ''}
     <ul style="margin-block:var(--s5)">${items}</ul>
     ${order.notes ? `<p style="font-style:italic;opacity:.8">${e(order.notes)}</p>` : ''}
+    ${order.is_gift ? `<p style="background:var(--olive-pale);border-left:3px solid var(--olive);padding:var(--s3) var(--s4);font-size:var(--sm)"><strong>A gift.</strong> Nothing has been emailed to the address below &#8212; it may belong to whoever the bread is for.</p>` : ''}
     <p style="font-size:var(--sm);opacity:.7;margin-top:var(--s4)">${e(order.email || '')} ${e(order.phone || '')}</p>
     ${done ? `<p style="margin-top:var(--s6)"><strong>This order is already ${e(order.status)}.</strong></p>`
            : `<div id="respond" data-id="${order.id}" data-token="${e(order.respond_token)}" style="display:flex;gap:var(--s4);margin-top:var(--s6)">
@@ -620,7 +636,12 @@ app.patch('/api/admin/orders/:id', asyncHandler(async (req, res) => {
   for (const key of ['firstName', 'lastName', 'email', 'phone', 'fulfillment', 'neededDate', 'address', 'notes']) {
     if (Object.prototype.hasOwnProperty.call(body, key)) patch[key] = body[key];
   }
-  if (!Object.keys(patch).length) return res.status(400).json({ error: 'Nothing to change.' });
+  // A boolean, so it is applied after the merge below rather than through it —
+  // that one runs every value through str() before validating it as text.
+  const gift = Object.prototype.hasOwnProperty.call(body, 'isGift')
+    ? body.isGift === true || body.isGift === 'true' || body.isGift === 'on'
+    : undefined;
+  if (!Object.keys(patch).length && gift === undefined) return res.status(400).json({ error: 'Nothing to change.' });
   const merged = {
     firstName: current.first_name, lastName: current.last_name, email: current.email || '', phone: current.phone || '',
     fulfillment: current.fulfillment, neededDate: db.toIsoDate(current.needed_date), address: current.address || '',
@@ -633,6 +654,7 @@ app.patch('/api/admin/orders/:id', asyncHandler(async (req, res) => {
   if (merged.fulfillment !== 'pickup' && !merged.address) return res.status(400).json({ error: 'Please give us an address for delivery or shipping.' });
   if (!isIsoDate(merged.neededDate)) return res.status(400).json({ error: 'Date must be a real calendar date.' });
   if (merged.notes.length > 2000) return res.status(400).json({ error: 'Notes are limited to 2000 characters.' });
+  if (gift !== undefined) patch.isGift = gift;
   // shipping_fee was snapshotted when the order arrived. Changing how it is
   // fulfilled has to move it too, or a pickup keeps a phantom shipping line on
   // its next confirmation and an order moved to shipping is charged nothing.
@@ -721,6 +743,17 @@ async function sendForOrder(req, res, build) {
   const order = await db.getOrder(req.params.id);
   if (!order) return res.status(404).json({ error: 'Order not found' });
   if (!order.email) return res.status(400).json({ error: 'This order has no email address.' });
+  // A gift order holds an address that may belong to the person the bread is
+  // a surprise for, so nothing is sent to it by accident. Not a dead end:
+  // sendAnyway goes through, for when she knows it reaches the buyer.
+  if (order.is_gift && (req.body || {}).sendAnyway !== true) {
+    return res.status(409).json({
+      isGift: true,
+      error: 'This order is marked as a gift, so nothing is emailed to the address on it — '
+        + 'that address may be the person it is a surprise for. Send it anyway only if you '
+        + 'know it reaches the buyer.',
+    });
+  }
   if (!mail.configured()) return res.status(503).json({ error: 'Email is not set up yet (RESEND_API_KEY is missing).' });
   const built = await build(order);
   if (built.error) return res.status(400).json({ error: built.error });

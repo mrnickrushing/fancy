@@ -69,13 +69,25 @@ export async function setPaymentStatus(id: number, paymentStatus: PaymentStatus)
   await api.post(`/api/admin/orders/${id}/payment`, { paymentStatus });
 }
 
-export async function sendConfirmation(id: number): Promise<void> {
-  await api.post(`/api/admin/orders/${id}/confirmation`);
+// `sendAnyway` is for a gift order: the server refuses to email the address
+// on one unless it is told the address really does reach the buyer.
+export async function sendConfirmation(id: number, sendAnyway = false): Promise<void> {
+  await api.post(`/api/admin/orders/${id}/confirmation`, sendAnyway ? { sendAnyway } : {});
 }
 
 // Defaults to the most recent payment when none is named.
-export async function sendReceipt(id: number, paymentId?: number): Promise<void> {
-  await api.post(`/api/admin/orders/${id}/receipt`, paymentId ? { paymentId } : {});
+export async function sendReceipt(id: number, paymentId?: number, sendAnyway = false): Promise<void> {
+  await api.post(`/api/admin/orders/${id}/receipt`, {
+    ...(paymentId ? { paymentId } : {}),
+    ...(sendAnyway ? { sendAnyway } : {}),
+  });
+}
+
+// True when the server refused because the order is a gift, which is the one
+// refusal the app can offer to push through.
+export function isGiftRefusal(err: unknown): boolean {
+  const res = (err as { response?: { status?: number; data?: { isGift?: boolean } } })?.response;
+  return res?.status === 409 && res?.data?.isGift === true;
 }
 
 export async function sendEmail(id: number, subject: string, message: string): Promise<void> {

@@ -6,7 +6,7 @@ each save and the editor drops anything over 2 MB. WebP quality is searched
 per image; where a heavily-textured crust cannot reach the budget even at low
 quality, pixel dimensions come down instead.
 """
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageEnhance
 import os, io, sys
 
 SRC = "/root/.claude/uploads/01dc96a3-a6dd-5803-8a08-d1aa320808c5"
@@ -33,10 +33,17 @@ def fit(im, path, lo=38, hi=90, target=TARGET):
         open(path, "wb").write(best[1])
     return best
 
-def fit_dim(src, name, w):
-    """Shrink until a reasonable quality fits the budget."""
+def fit_dim(src, name, w, lighten=1.0):
+    """Shrink until a reasonable quality fits the budget.
+
+    `lighten` is a brightness multiplier for a bake that came out darker on
+    the page than it does in the hand — Amanda asks for a smidge, not a
+    correction, so it stays close to 1 and is applied before the resize so
+    the encoder sees the final pixels."""
     while w >= 380:
         im = Image.open(src).convert("RGB")
+        if lighten != 1.0:
+            im = ImageEnhance.Brightness(im).enhance(lighten)
         r = w / im.size[0]
         im = im.resize((w, int(im.size[1] * r)), Image.LANCZOS)
         got = fit(im, f"{OUT}/{name}.webp", lo=55)
@@ -109,11 +116,13 @@ JOBS = [
 
 # Bakes whose only copy came through a screenshot, cropped into design/src
 # rather than sitting in the upload set. Same budget, same encoder.
+# (name, width) or (name, width, lighten)
 SRC_JOBS = [
     ("classic-sourdough", 560),
     ("garlic-rosemary-sourdough", 560),
     ("country-loaf", 560),
     ("peppered-pickle-muffins", 560),
+    ("cinnamon-swirl-sourdough", 560, 1.08),
 ]
 
 if __name__ == "__main__":
@@ -129,8 +138,10 @@ if __name__ == "__main__":
             src = f"{SRC}/{stem}-image.jpg"
         size, q, n = fit_dim(src, name, w)
         print(f"{name+'.webp':<24}{size[0]}x{size[1]:<5} q{q}  {n//1024}KB")
-    for name, w in SRC_JOBS:
-        size, q, n = fit_dim(f"{ROOT_SRC}/{name}.png", name, w)
-        print(f"{name+'.webp':<24}{size[0]}x{size[1]:<5} q{q}  {n//1024}KB")
+    for job in SRC_JOBS:
+        name, w, lighten = (*job, 1.0)[:3]
+        size, q, n = fit_dim(f"{ROOT_SRC}/{name}.png", name, w, lighten)
+        lit = f"  +{round((lighten - 1) * 100)}% light" if lighten != 1.0 else ""
+        print(f"{name+'.webp':<30}{size[0]}x{size[1]:<5} q{q}  {n//1024}KB{lit}")
     tot = sum(os.path.getsize(f"{OUT}/{f}") for f in os.listdir(OUT))
     print(f"\nTOTAL {tot//1024}KB / {len(os.listdir(OUT))} files")

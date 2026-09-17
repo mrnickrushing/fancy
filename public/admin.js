@@ -24,8 +24,26 @@
     var res = await fetch(path, Object.assign({ headers: { 'Content-Type': 'application/json' } }, opts || {}));
     if (res.status === 401) { window.location.href = '/admin/login'; throw new Error('signed out'); }
     var data = await res.json().catch(function () { return {}; });
-    if (!res.ok) throw new Error(data.error || 'Something went wrong.');
+    if (!res.ok) {
+      var err = new Error(data.error || 'Something went wrong.');
+      err.status = res.status; err.data = data;
+      throw err;
+    }
     return data;
+  }
+
+  // A gift order refuses to email the address on it. Offer the override
+  // rather than leaving her at an error she cannot get past.
+  async function sendMail(path, label) {
+    try {
+      await api(path, { method: 'POST' });
+    } catch (err) {
+      if (!err.data || !err.data.isGift) throw err;
+      if (!confirm(err.message + '\n\nSend it anyway?')) return false;
+      await api(path, { method: 'POST', body: JSON.stringify({ sendAnyway: true }) });
+    }
+    alert(label + ' sent.');
+    return true;
   }
   var FULFILL = { pickup: 'Market pickup', delivery: 'Local delivery', shipping: 'Shipping' };
 
@@ -62,7 +80,7 @@
       var itemsShort = o.items.map(function (i) { return i.quantity + '× ' + esc(i.name); }).join(', ');
       var paid = Number(o.paid_amount) || 0;
       return '<tr data-id="' + o.id + '">' +
-        '<td><strong>' + fmtDate(o.needed_date) + '</strong><br><span style="opacity:.6;font-size:var(--xs)">' + esc(FULFILL[o.fulfillment] || o.fulfillment) + (o.source === 'manual' ? ' · by hand' : '') + '</span></td>' +
+        '<td><strong>' + fmtDate(o.needed_date) + '</strong><br><span style="opacity:.6;font-size:var(--xs)">' + esc(FULFILL[o.fulfillment] || o.fulfillment) + (o.source === 'manual' ? ' · by hand' : '') + (o.is_gift ? ' · gift' : '') + '</span></td>' +
         '<td>' + esc(o.first_name) + ' ' + esc(o.last_name) + '<br><span style="opacity:.6;font-size:var(--xs)">' + esc(o.email || o.phone || '') + '</span></td>' +
         '<td style="max-width:260px">' + itemsShort + '</td>' +
         '<td>' + badge(o.status) + '</td>' +
@@ -152,8 +170,8 @@
       }
       else if (act === 'remove-payment') { if (!confirm('Remove this payment?')) return; await api('/api/admin/payments/' + btn.dataset.payment, { method: 'DELETE' }); }
       else if (act === 'save-pstatus') await api('/api/admin/orders/' + id + '/payment', { method: 'POST', body: JSON.stringify({ paymentStatus: field('pstatus').value }) });
-      else if (act === 'confirmation') { await api('/api/admin/orders/' + id + '/confirmation', { method: 'POST' }); alert('Confirmation sent.'); }
-      else if (act === 'receipt') { await api('/api/admin/orders/' + id + '/receipt', { method: 'POST' }); alert('Receipt sent.'); }
+      else if (act === 'confirmation') { await sendMail('/api/admin/orders/' + id + '/confirmation', 'Confirmation'); }
+      else if (act === 'receipt') { await sendMail('/api/admin/orders/' + id + '/receipt', 'Receipt'); }
       else if (act === 'email') { openEmail(id); return; }
       var open = $('detail-' + id) && $('detail-' + id).classList.contains('show');
       await loadOrders(); loadCustomers();

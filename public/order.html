@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..500&family=EB+Garamond:ital,wght@0,400..600;1,400..500&family=Italianno&display=swap">
-<link rel="stylesheet" href="./style.css?v=5a67a120">
+<link rel="stylesheet" href="./style.css?v=9bd7b0df">
 
 </head>
 <body>
@@ -138,7 +138,13 @@
           <div class="field"><label for="last-name">Last name</label><input id="last-name" name="lastName" autocomplete="family-name"><p class="err" data-for="last-name"></p></div>
         </div>
             <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email"><p class="err" data-for="email"></p></div>
-            <div class="field"><label for="phone">Phone <span class="opt">(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel"></div>
+            <div class="field"><label for="phone">Phone <span class="opt" id="phone-opt">(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel"><p class="err" data-for="phone"></p></div>
+            <div class="field">
+              <label class="gift-check"><input type="checkbox" id="is-gift" name="isGift">
+                <span><b>This is a gift</b><small>We will not email the address above &#8212; so if it belongs to
+                  whoever the bread is for, the surprise keeps. Leave a phone number and Amanda
+                  confirms the order and the total with you directly.</small></span></label>
+            </div>
             <div class="field"><label for="notes">Notes for Amanda <span class="opt">(optional)</span></label>
               <p class="field-help">Anything we should know &#8212; an occasion, an allergy, or a request for one of the bakes.</p>
               <textarea id="notes" name="notes" rows="3" placeholder="Extra crisp on the Roasted Garlic Boss, please&#8230;"></textarea></div>
@@ -260,6 +266,6 @@
   </div>
 </div></footer></div>
 <script src="./nav.js?v=8367b22e" defer></script>
-<script src="./order.js?v=b2339421" defer></script>
+<script src="./order.js?v=334031d8" defer></script>
 </body>
 </html>

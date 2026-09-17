@@ -3,6 +3,7 @@ import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'r
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as ordersApi from '../../src/api/orders';
 import { Badge } from '../../src/components/Badge';
 import { BakePhoto } from '../../src/components/BakePhoto';
 import { Button } from '../../src/components/Button';
@@ -132,13 +133,33 @@ export default function OrderDetailScreen() {
 
   const READ_ONLY_NOTE = 'The App Review account can look, but not change anything.';
 
-  const run = async (fn: () => Promise<unknown>, message: string) => {
+  const run = async (fn: () => Promise<unknown>, message: string, retry?: () => Promise<unknown>) => {
     setStatus(null);
     if (readOnly) return setStatus({ tone: 'error', message: READ_ONLY_NOTE });
     try {
       await fn();
       setStatus({ tone: 'success', message });
     } catch (err) {
+      // A gift order refuses to email the address on it. Offer the override
+      // rather than showing her a wall she cannot get past at the market.
+      if (retry && ordersApi.isGiftRefusal(err)) {
+        Alert.alert('This order is a gift', `${errorMessage(err)}\n\nSend it anyway?`, [
+          { text: 'Keep the surprise', style: 'cancel' },
+          {
+            text: 'Send anyway',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                await retry();
+                setStatus({ tone: 'success', message });
+              } catch (e) {
+                setStatus({ tone: 'error', message: errorMessage(e) });
+              }
+            },
+          },
+        ]);
+        return;
+      }
       setStatus({ tone: 'error', message: errorMessage(err) });
     }
   };
@@ -252,6 +273,25 @@ export default function OrderDetailScreen() {
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         {status ? <NoticeBanner tone={status.tone} message={status.message} /> : null}
 
+        {order.is_gift ? (
+          <View style={styles.gift}>
+            <Text style={styles.giftTitle}>A gift</Text>
+            <Text style={styles.giftText}>
+              Nothing has been emailed to {order.email || 'the address on this order'} — it may
+              belong to whoever the bread is for. Talk to the buyer instead.
+            </Text>
+            <Button
+              label="No longer a surprise"
+              variant="outline"
+              small
+              onPress={() => run(
+                () => actions.update.mutateAsync({ id: orderId, patch: { isGift: false } }),
+                'Emails go out as usual now.',
+              )}
+            />
+          </View>
+        ) : null}
+
         <Timeline steps={orderTimeline(order)} />
 
         <View>
@@ -327,7 +367,11 @@ export default function OrderDetailScreen() {
                   variant="outline"
                   small
                   style={styles.flex}
-                  onPress={() => run(() => actions.sendReceipt.mutateAsync({ id: orderId }), 'Receipt sent.')}
+                  onPress={() => run(
+                    () => actions.sendReceipt.mutateAsync({ id: orderId }),
+                    'Receipt sent.',
+                    () => actions.sendReceipt.mutateAsync({ id: orderId, sendAnyway: true }),
+                  )}
                 />
               )}
               {act === 'payment' ? (
@@ -448,14 +492,22 @@ export default function OrderDetailScreen() {
               variant="outline"
               small
               style={styles.flex}
-              onPress={() => run(() => actions.sendConfirmation.mutateAsync(orderId), 'Confirmation sent.')}
+              onPress={() => run(
+                () => actions.sendConfirmation.mutateAsync({ id: orderId }),
+                'Confirmation sent.',
+                () => actions.sendConfirmation.mutateAsync({ id: orderId, sendAnyway: true }),
+              )}
             />
             <Button
               label="Receipt"
               variant="outline"
               small
               style={styles.flex}
-              onPress={() => run(() => actions.sendReceipt.mutateAsync({ id: orderId }), 'Receipt sent.')}
+              onPress={() => run(
+                () => actions.sendReceipt.mutateAsync({ id: orderId }),
+                'Receipt sent.',
+                () => actions.sendReceipt.mutateAsync({ id: orderId, sendAnyway: true }),
+              )}
             />
             <Button
               label={emailOpen ? 'Close' : 'Write one'}
@@ -628,6 +680,18 @@ const styles = StyleSheet.create({
   stepDetail: { fontFamily: fonts.bodyRegular, fontSize: 14, color: colors.textMuted },
   faint: { color: colors.textFaint },
   owed: { color: colors.primary },
+
+  gift: {
+    backgroundColor: colors.olivePale,
+    borderWidth: 1,
+    borderColor: colors.olive,
+    borderRadius: radius.md,
+    padding: 18,
+    gap: spacing.s3,
+    alignItems: 'flex-start',
+  },
+  giftTitle: { fontFamily: fonts.displaySemibold, fontSize: 18, color: colors.oliveDeep },
+  giftText: { fontFamily: fonts.bodyRegular, fontSize: 14, lineHeight: 21, color: colors.oliveDeep },
 
   heading: {
     fontFamily: fonts.displaySemibold,

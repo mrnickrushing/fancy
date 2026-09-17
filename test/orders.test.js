@@ -939,6 +939,82 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     assert.equal(r.body.item.image, null);
   });
 
+  // Nothing is written to the address on a gift order, so the form has to
+  // collect some other way of reaching whoever placed it.
+  await t.test('a gift order from the website has to leave a phone number', async () => {
+    const res = await request(app).post('/api/order').send({ ...good(), isGift: true, phone: '' });
+    assert.equal(res.status, 400);
+    assert.match(res.body.error, /phone/i);
+    // Amanda's own orders are exempt — the customer is in front of her.
+    const r = await request(app).post('/api/admin/orders').set('Cookie', admin)
+      .send({ ...good(), isGift: true, phone: '' });
+    assert.equal(r.status, 201);
+    assert.equal((await db.getOrder(r.body.order.id)).is_gift, true);
+  });
+
+  await t.test('a gift order emails Amanda but never the address on it', async () => {
+    const A = (req) => req.set('Cookie', admin);
+    const res = await request(app).post('/api/order').send({ ...good(), isGift: true, phone: '541-555-0100' });
+    assert.equal(res.status, 201);
+    assert.equal(res.body.isGift, true);
+    assert.equal(res.body.thankYouSkipped, true);
+
+    // the thank-you was never queued; the notice to Amanda was
+    const { rows } = await db.pool.query(
+      `SELECT kind, recipient FROM email_outbox WHERE order_id = $1 ORDER BY kind`, [res.body.orderId]);
+    assert.deepEqual(rows.map((r) => r.kind), ['order_notice']);
+    assert.equal(rows[0].recipient, mail.ORDERS_INBOX);
+
+    // and her notice says so, while a customer's copy of the same order does not
+    const order = await db.getOrder(res.body.orderId);
+    assert.equal(order.is_gift, true);
+    assert.match(mail.buildBakeryNotice(order, 'https://x').html, /Gift/);
+    assert.doesNotMatch(mail.buildThankYou(order, { payment_instructions: 'x' }).html, /Gift/);
+
+    // the confirmation she might send later is refused, with a way through
+    let r = await A(request(app).post(`/api/admin/orders/${res.body.orderId}/confirmation`)).send({});
+    assert.equal(r.status, 409);
+    assert.equal(r.body.isGift, true);
+    // sendAnyway gets past the guard. It stops at 503 here only because the
+    // suite runs without RESEND_API_KEY — what matters is that it is no
+    // longer refused as a gift.
+    r = await A(request(app).post(`/api/admin/orders/${res.body.orderId}/confirmation`)).send({ sendAnyway: true });
+    assert.notEqual(r.status, 409, 'sendAnyway was still refused');
+    assert.notEqual(r.body.isGift, true);
+
+    // and once she turns the flag off it is an ordinary order again
+    await A(request(app).patch(`/api/admin/orders/${res.body.orderId}`)).send({ isGift: false });
+    assert.equal((await db.getOrder(res.body.orderId)).is_gift, false);
+    r = await A(request(app).post(`/api/admin/orders/${res.body.orderId}/confirmation`)).send({});
+    assert.notEqual(r.status, 409, 'still treated as a gift after the flag came off');
+  });
+
+  await t.test('an ordinary order still gets its thank-you', async () => {
+    const res = await request(app).post('/api/order').send(good());
+    assert.equal(res.status, 201);
+    assert.notEqual(res.body.isGift, true);
+    const { rows } = await db.pool.query(
+      `SELECT kind FROM email_outbox WHERE order_id = $1 ORDER BY kind`, [res.body.orderId]);
+    assert.deepEqual(rows.map((r) => r.kind), ['order_notice', 'order_thank_you']);
+  });
+
+  await t.test('a photograph swapped for another reaches the live row', async () => {
+    await db.pool.query(
+      `UPDATE menu_items SET image = 'classic-sourdough.webp' WHERE name = 'Cinnamon Swirl Artisan Sourdough'`);
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_image_replacements_1'`);
+    await db.initSchema();
+    let r = await db.pool.query(`SELECT image FROM menu_items WHERE name = 'Cinnamon Swirl Artisan Sourdough'`);
+    assert.equal(r.rows[0].image, 'cinnamon-swirl-sourdough.webp');
+
+    // one she picks herself is not swapped out from under her
+    await db.pool.query(
+      `UPDATE menu_items SET image = 'hers.webp' WHERE name = 'Cinnamon Swirl Artisan Sourdough'`);
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_image_replacements_1'`);
+    await db.initSchema();
+    r = await db.pool.query(`SELECT image FROM menu_items WHERE name = 'Cinnamon Swirl Artisan Sourdough'`);
+    assert.equal(r.rows[0].image, 'hers.webp');
+  });
+
   await t.test('a renamed bake is renamed, not added a second time', async () => {
     const OLD = 'The Plain Jane Celtic Salted Focaccia Muffin';
     const NEW = 'The Plain Jane Celtic Salted Focaccia Muffins';

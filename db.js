@@ -100,6 +100,9 @@ async function initSchema() {
   // Snapshotted at order time like the item prices above it: raising the fee
   // next month must not silently reprice an order already taken.
   await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_fee NUMERIC(10,2) NOT NULL DEFAULT 0`);
+  // A gift order: no automatic email goes to the address on it, because that
+  // address may be the person the bread is a surprise for.
+  await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS is_gift BOOLEAN NOT NULL DEFAULT false`);
   // The order page shows customers what a bake looks like; the file lives in
   // public/img and the column holds only its name.
   await pool.query(`ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS image TEXT`);
@@ -208,6 +211,7 @@ async function initSchema() {
   await applyImageAdditions('menu_image_additions_1', IMAGE_ADDITIONS);
   await applyImageAdditions('menu_image_additions_2', IMAGE_ADDITIONS_2);
   await applyDescriptionCorrections();
+  await applyImageReplacements();
 }
 
 async function applyPriceCorrections(marker, corrections) {
@@ -228,6 +232,32 @@ async function applyPriceCorrections(marker, corrections) {
      VALUES ($1, '1', now()) ON CONFLICT (key) DO NOTHING`, [marker]
   );
   if (changed) console.log(`menu: corrected ${changed} price(s)`);
+}
+
+// A photograph swapped for a different one. IMAGE_ADDITIONS only ever fills
+// a NULL, so a row that already has a picture needs its old value naming —
+// which also means a photograph Amanda has chosen herself is left alone.
+const IMAGE_REPLACEMENTS = [
+  ['Cinnamon Swirl Artisan Sourdough', 'classic-sourdough.webp', 'cinnamon-swirl-sourdough.webp'],
+];
+
+async function applyImageReplacements() {
+  const done = await pool.query(
+    `SELECT 1 FROM settings WHERE key = 'menu_image_replacements_1'`);
+  if (done.rowCount) return;
+  let changed = 0;
+  for (const [name, from, to] of IMAGE_REPLACEMENTS) {
+    const { rowCount } = await pool.query(
+      `UPDATE menu_items SET image = $3 WHERE name = $1 AND image = $2`,
+      [name, from, to]
+    );
+    changed += rowCount;
+  }
+  await pool.query(
+    `INSERT INTO settings (key, value, updated_at)
+     VALUES ('menu_image_replacements_1', '1', now()) ON CONFLICT (key) DO NOTHING`
+  );
+  if (changed) console.log(`menu: swapped ${changed} photograph(s)`);
 }
 
 // Two rows predate the catalog entirely — they are in no menu.json, so
@@ -612,12 +642,12 @@ async function createOrder(order, items) {
     await client.query('BEGIN');
     const respondToken = crypto.randomBytes(20).toString('hex');
     const { rows } = await client.query(
-      `INSERT INTO orders (first_name, last_name, email, phone, fulfillment, needed_date, address, notes, source, respond_token, idempotency_key, shipping_fee, amount)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING id, respond_token`,
+      `INSERT INTO orders (first_name, last_name, email, phone, fulfillment, needed_date, address, notes, source, respond_token, idempotency_key, shipping_fee, amount, is_gift)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING id, respond_token`,
       [order.firstName, order.lastName, order.email || null, order.phone || null,
        order.fulfillment, order.neededDate, order.address || null, order.notes || null,
        order.source || 'website', respondToken, order.idempotencyKey || null,
-       order.shippingFee || 0, order.amount ?? null]
+       order.shippingFee || 0, order.amount ?? null, order.isGift === true]
     );
     const saved = rows[0];
     if (items.length) {
@@ -675,6 +705,9 @@ async function listOrders() {
 const ORDER_EDITABLE = {
   firstName: 'first_name', lastName: 'last_name', email: 'email', phone: 'phone',
   fulfillment: 'fulfillment', neededDate: 'needed_date', address: 'address', notes: 'notes',
+  // Amanda can turn this off once she has spoken to the buyer, which puts the
+  // order back on the ordinary email path.
+  isGift: 'is_gift',
   // Server-set only. The admin route never copies these out of the request
   // body — it works them out from the fulfillment it is being moved to.
   shippingFee: 'shipping_fee',

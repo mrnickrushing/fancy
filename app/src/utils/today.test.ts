@@ -11,7 +11,7 @@ function order(over: Partial<Order> = {}): Order {
     id: 1, first_name: 'Ada', last_name: 'Byron', email: null, phone: null,
     fulfillment: 'pickup', needed_date: '2026-09-19', address: null, notes: null,
     status: 'accepted', amount: null, payment_status: 'unpaid', paid_amount: '0',
-    shipping_fee: '0', source: 'website', respond_token: 't',
+    shipping_fee: '0', is_gift: false, source: 'website', respond_token: 't',
     created_at: '2026-09-01T10:00:00.000Z', items: [item()], payments: [], ...over,
   };
 }
