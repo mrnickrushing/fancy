@@ -67,9 +67,13 @@ export function useOrderActions() {
         ordersApi.setPaymentStatus(id, paymentStatus),
       onSuccess: invalidate,
     }),
-    sendConfirmation: useMutation({ mutationFn: (id: number) => ordersApi.sendConfirmation(id) }),
+    sendConfirmation: useMutation({
+      mutationFn: ({ id, sendAnyway }: { id: number; sendAnyway?: boolean }) =>
+        ordersApi.sendConfirmation(id, sendAnyway),
+    }),
     sendReceipt: useMutation({
-      mutationFn: ({ id, paymentId }: { id: number; paymentId?: number }) => ordersApi.sendReceipt(id, paymentId),
+      mutationFn: ({ id, paymentId, sendAnyway }: { id: number; paymentId?: number; sendAnyway?: boolean }) =>
+        ordersApi.sendReceipt(id, paymentId, sendAnyway),
     }),
     sendEmail: useMutation({
       mutationFn: ({ id, subject, message }: { id: number; subject: string; message: string }) =>

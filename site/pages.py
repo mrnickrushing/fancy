@@ -94,6 +94,18 @@ FORMS_CSS = """
 .cal-day.selected::after{background:var(--gold-pale)}
 .cal-note{font-size:var(--xs);opacity:.78;margin-top:var(--s3);line-height:1.5}
 .field-help{font-size:var(--xs);opacity:.75;margin:0;line-height:1.5;max-width:56ch}
+/* reads as one of the choices above it, not a stray tickbox. It is a label
+   inside .field, so the caps and letter-spacing of a field label have to be
+   undone here or the small print arrives shouting. */
+.field label.gift-check{display:flex;align-items:flex-start;gap:var(--s4);cursor:pointer;
+  border:1px solid var(--rule);background:var(--paper-2);padding:var(--s4) var(--s5);
+  font-family:var(--body);font-size:var(--sm);font-weight:400;letter-spacing:normal;
+  text-transform:none;color:var(--ink);line-height:1.5}
+.gift-check input{margin-top:.25rem;flex-shrink:0;width:18px;height:18px;accent-color:var(--burgundy)}
+.gift-check b{font-family:var(--serif);font-size:var(--base);font-weight:600;display:block;
+  letter-spacing:normal;text-transform:none;color:var(--ink)}
+.gift-check small{display:block;font-size:var(--xs);opacity:.78;line-height:1.5;margin-top:var(--s1)}
+.gift-check:has(input:checked){background:var(--olive-pale);border-color:var(--olive)}
 
 /* ── confirmation ── */
 .confirm{background:var(--paper-2);border:1px solid var(--rule);padding:var(--s12);text-align:center;
@@ -305,7 +317,13 @@ ORDER = D.masthead("Order") + D.head_band("Ordina", "Place an Order",
           <div class="field"><label for="last-name">Last name</label><input id="last-name" name="lastName" autocomplete="family-name"><p class="err" data-for="last-name"></p></div>
         </div>
             <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email"><p class="err" data-for="email"></p></div>
-            <div class="field"><label for="phone">Phone <span class="opt">(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel"></div>
+            <div class="field"><label for="phone">Phone <span class="opt" id="phone-opt">(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel"><p class="err" data-for="phone"></p></div>
+            <div class="field">
+              <label class="gift-check"><input type="checkbox" id="is-gift" name="isGift">
+                <span><b>This is a gift</b><small>We will not email the address above &#8212; so if it belongs to
+                  whoever the bread is for, the surprise keeps. Leave a phone number and Amanda
+                  confirms the order and the total with you directly.</small></span></label>
+            </div>
             <div class="field"><label for="notes">Notes for Amanda <span class="opt">(optional)</span></label>
               <p class="field-help">Anything we should know &#8212; an occasion, an allergy, or a request for one of the bakes.</p>
               <textarea id="notes" name="notes" rows="3" placeholder="Extra crisp on the Roasted Garlic Boss, please&#8230;"></textarea></div>

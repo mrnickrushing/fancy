@@ -118,6 +118,7 @@ export default function OrdersScreen() {
                 </View>
                 <Text style={styles.meta}>
                   {fmtDate(item.needed_date)} · {FULFILLMENT_SHORT[item.fulfillment]}
+                  {item.is_gift ? ' · a gift' : ''}
                 </Text>
                 <Text style={styles.meta} numberOfLines={1}>
                   {itemCount(item)} item{itemCount(item) === 1 ? '' : 's'} ·{' '}

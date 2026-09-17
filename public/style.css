@@ -597,6 +597,18 @@ body.splashing{overflow:hidden}
 .cal-day.selected::after{background:var(--gold-pale)}
 .cal-note{font-size:var(--xs);opacity:.78;margin-top:var(--s3);line-height:1.5}
 .field-help{font-size:var(--xs);opacity:.75;margin:0;line-height:1.5;max-width:56ch}
+/* reads as one of the choices above it, not a stray tickbox. It is a label
+   inside .field, so the caps and letter-spacing of a field label have to be
+   undone here or the small print arrives shouting. */
+.field label.gift-check{display:flex;align-items:flex-start;gap:var(--s4);cursor:pointer;
+  border:1px solid var(--rule);background:var(--paper-2);padding:var(--s4) var(--s5);
+  font-family:var(--body);font-size:var(--sm);font-weight:400;letter-spacing:normal;
+  text-transform:none;color:var(--ink);line-height:1.5}
+.gift-check input{margin-top:.25rem;flex-shrink:0;width:18px;height:18px;accent-color:var(--burgundy)}
+.gift-check b{font-family:var(--serif);font-size:var(--base);font-weight:600;display:block;
+  letter-spacing:normal;text-transform:none;color:var(--ink)}
+.gift-check small{display:block;font-size:var(--xs);opacity:.78;line-height:1.5;margin-top:var(--s1)}
+.gift-check:has(input:checked){background:var(--olive-pale);border-color:var(--olive)}
 
 /* ── confirmation ── */
 .confirm{background:var(--paper-2);border:1px solid var(--rule);padding:var(--s12);text-align:center;

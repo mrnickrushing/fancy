@@ -221,14 +221,21 @@
   // ── errors ──
   function showErr(id, msg) { var f = $(id); f.closest('.field').classList.add('is-error'); f.setAttribute('aria-invalid', 'true'); var e = app.querySelector('.err[data-for="' + id + '"]'); if (e) { e.id = id + '-error'; e.setAttribute('role', 'alert'); f.setAttribute('aria-describedby', e.id); e.textContent = msg; e.classList.add('show'); } }
   function clearErr(id) { var f = $(id); if (!f) return; f.closest('.field').classList.remove('is-error'); f.removeAttribute('aria-invalid'); f.removeAttribute('aria-describedby'); var e = app.querySelector('.err[data-for="' + id + '"]'); if (e) e.classList.remove('show'); }
-  ['first-name', 'last-name', 'email', 'address'].forEach(function (id) { $(id).addEventListener('input', function () { clearErr(id); }); });
+  ['first-name', 'last-name', 'email', 'phone', 'address'].forEach(function (id) { $(id).addEventListener('input', function () { clearErr(id); }); });
   function say(msg, ok) { var m = $('form-msg'); m.textContent = msg; m.className = 'msg show ' + (ok ? 'ok' : 'error'); }
+
+  // A gift needs a phone number, so the label must not keep calling it
+  // optional the moment the box is ticked.
+  $('is-gift').addEventListener('change', function () {
+    var opt = $('phone-opt');
+    if (opt) opt.textContent = this.checked ? '(for a gift, please)' : '(optional)';
+  });
 
   // ── submit ──
   $('order-form').addEventListener('submit', async function (e) {
     e.preventDefault();
     var items = cartItems(), ok = true;
-    ['first-name', 'last-name', 'email', 'address', 'needed-date'].forEach(clearErr);
+    ['first-name', 'last-name', 'email', 'phone', 'address', 'needed-date'].forEach(clearErr);
     $('form-msg').className = 'msg';
     if (!items.length) { say('Choose at least one thing from the bill of fare.', false); return; }
     if (!$('first-name').value.trim()) { showErr('first-name', 'Please tell us your first name.'); ok = false; }
@@ -236,6 +243,9 @@
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('email').value.trim())) { showErr('email', 'We need an email address to confirm your order.'); ok = false; }
     if (!selected) { showErr('needed-date', fulfillment() === 'pickup' ? 'Pick a market day.' : 'Pick the day you need it.'); ok = false; }
     if (fulfillment() !== 'pickup' && !$('address').value.trim()) { showErr('address', 'Where should it go?'); ok = false; }
+    // Nothing is emailed to the address on a gift order, so a phone number is
+    // the only way Amanda can come back with the total.
+    if ($('is-gift').checked && !$('phone').value.trim()) { showErr('phone', 'For a gift, leave a number \u2014 it is how Amanda reaches you.'); ok = false; }
     if (!ok) { var first = app.querySelector('.field.is-error'); if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
 
     var btn = $('submit'); btn.disabled = true; btn.textContent = 'Sending…';
@@ -250,7 +260,8 @@
           firstName: $('first-name').value.trim(), lastName: $('last-name').value.trim(),
           email: $('email').value.trim(), phone: $('phone').value.trim(),
           fulfillment: fulfillment(), neededDate: selected, address: $('address').value.trim(),
-          notes: $('notes').value.trim(), items: items.map(function (it) { return { id: it.id, quantity: it.quantity }; }),
+          notes: $('notes').value.trim(), isGift: $('is-gift').checked,
+          items: items.map(function (it) { return { id: it.id, quantity: it.quantity }; }),
         }),
       });
       var data = await res.json().catch(function () { return {}; });
@@ -270,9 +281,11 @@
     $('confirm-title').textContent = 'Your order is in, ' + name;
     $('confirm-lead').textContent = 'Order #' + data.orderId + ' — ' + (fulfillment() === 'pickup' ? 'pickup ' : 'needed ') + longDate(selected) + '.';
     $('confirm-lines').innerHTML = items.map(function (it) { return '<div class="cart-line"><span>' + esc(it.name) + '</span><span>&times; ' + it.quantity + '</span></div>'; }).join('');
-    $('confirm-foot').textContent = data.emailSent
-      ? 'A note is on its way to ' + $('email').value.trim() + '. Amanda will confirm the order and the total from there.'
-      : 'Amanda has your order and will confirm it and the total by email.';
+    $('confirm-foot').textContent = data.thankYouSkipped
+      ? 'Nothing has been sent to ' + $('email').value.trim() + ', so the surprise keeps. Amanda has your order and will call or text you with the total.'
+      : data.emailSent
+        ? 'A note is on its way to ' + $('email').value.trim() + '. Amanda will confirm the order and the total from there.'
+        : 'Amanda has your order and will confirm it and the total by email.';
     app.style.display = 'none'; $('confirmation').hidden = false;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }

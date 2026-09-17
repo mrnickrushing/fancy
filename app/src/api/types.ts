@@ -71,6 +71,9 @@ export type Order = {
   paid_amount: string;
   // Flat, snapshotted when the order was taken; 0 for pickup and delivery.
   shipping_fee: string;
+  // A gift: nothing is emailed to the address on the order, because it may
+  // belong to whoever the bread is a surprise for.
+  is_gift: boolean;
   source: string;
   respond_token: string;
   created_at: string;
@@ -148,7 +151,11 @@ export type ManualOrderInput = {
   items: OrderItemInput[];
 };
 
-export type OrderEditInput = Partial<Omit<ManualOrderInput, 'items'>>;
+export type OrderEditInput = Partial<Omit<ManualOrderInput, 'items'>> & {
+  // Cleared once Amanda has spoken to the buyer, which puts the order back on
+  // the ordinary email path.
+  isGift?: boolean;
+};
 
 export type MenuItemInput = {
   course: Course;

@@ -1,0 +1,28 @@
+# Ships the JavaScript already on main to the phones running the production
+# build, without waiting on the App Store. It is dispatch-only on purpose:
+# nothing goes to Amanda's phone because a commit landed, only because
+# somebody asked for it.
+#
+#   eas workflow:run publish-update.yml
+#
+# The runtime version is a fingerprint, so an update only reaches a build
+# whose native side matches. A change that touches the native side needs a
+# new build instead, and this workflow will simply find no build to update.
+name: Publish update
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        type: string
+        required: false
+        description: The EAS Update branch to publish to
+        default: production
+
+jobs:
+  publish_ios_update:
+    name: Publish iOS update
+    type: update
+    params:
+      branch: ${{ inputs.branch || 'production' }}
+      platform: ios

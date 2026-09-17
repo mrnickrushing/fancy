@@ -138,7 +138,7 @@ function itemsToHtml(items, shippingFee = 0) {
 // rows that only read their details back to them — and picking those off by
 // position silently took the date with them whenever a row above was absent,
 // which is every order without a phone number.
-const WHO_ROWS = ['name', 'email', 'phone'];
+const WHO_ROWS = ['name', 'email', 'phone', 'gift'];
 
 function orderRows(o) {
   return [
@@ -149,6 +149,8 @@ function orderRows(o) {
     { key: 'how', label: 'How', value: FULFILLMENT_LABELS[o.fulfillment] || o.fulfillment },
     o.address ? { key: 'address', label: 'Address', value: o.address } : null,
     o.notes ? { key: 'notes', label: 'Notes', value: o.notes } : null,
+    // Amanda needs to see this before she replies to anyone.
+    o.is_gift ? { key: 'gift', label: 'Gift', value: 'Yes — nothing has been emailed to the address on this order' } : null,
   ].filter(Boolean);
 }
 
