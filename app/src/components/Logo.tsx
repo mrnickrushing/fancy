@@ -6,9 +6,13 @@ import { colors, fonts } from '../theme';
 export function Logo({ size = 44, showWordmark = true, inverse = false }: { size?: number; showWordmark?: boolean; inverse?: boolean }) {
   return (
     <View style={styles.row}>
+      {/* The emblem is full-colour artwork and stays that way on a dark
+          ground. A tint replaces every opaque pixel with one colour, and on
+          a round badge that leaves a flat disc where the logo was. Only the
+          wordmark inverts. */}
       <Image
         source={require('../../assets/logo.webp')}
-        style={[{ width: size, height: size }, inverse && { tintColor: colors.bg, opacity: 0.92 }]}
+        style={{ width: size, height: size }}
         resizeMode="contain"
         accessibilityLabel="Oh! You Fancy Focaccia"
       />

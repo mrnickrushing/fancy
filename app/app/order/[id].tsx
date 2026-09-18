@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Linking, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -174,6 +174,7 @@ export default function OrderDetailScreen() {
       neededDate: fmtNumericDate(order.needed_date),
       address: order.address ?? '',
       notes: order.notes ?? '',
+      isGift: order.is_gift,
     });
     setEditing(true);
   };
@@ -559,6 +560,23 @@ export default function OrderDetailScreen() {
               </View>
               <Input label="Address" value={form.address} onChangeText={(v) => setForm({ ...form, address: v })} multiline />
               <Input label="Notes" value={form.notes} onChangeText={(v) => setForm({ ...form, notes: v })} multiline />
+              {/* Customers tick this on the website. Here it is for the
+                  order that comes in by phone or at the stall, where the
+                  buyer says so out loud. */}
+              <View style={styles.switchRow}>
+                <View style={styles.switchText}>
+                  <Text style={styles.label}>This is a gift</Text>
+                  <Text style={styles.switchHint}>
+                    Nothing is emailed to the address on the order while this is on.
+                  </Text>
+                </View>
+                <Switch
+                  value={form.isGift ?? false}
+                  onValueChange={(v) => setForm({ ...form, isGift: v })}
+                  trackColor={{ true: colors.olive, false: colors.surfaceDynamic }}
+                  thumbColor={colors.surface}
+                />
+              </View>
               <View style={styles.actRow}>
                 <Button label="Cancel" variant="outline" small style={styles.flex} onPress={() => setEditing(false)} />
                 <Button label="Save" small style={styles.flex} onPress={saveEdit} loading={actions.update.isPending} />
@@ -752,6 +770,9 @@ const styles = StyleSheet.create({
   remove: { fontFamily: fonts.displaySemibold, fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase', color: colors.primary },
   none: { fontFamily: fonts.bodyRegular, fontSize: fontSize.sm, color: colors.textMuted, marginBottom: spacing.s4 },
   label: { fontFamily: fonts.displaySemibold, fontSize: 11, letterSpacing: 1.6, textTransform: 'uppercase', color: colors.textMuted, marginBottom: spacing.s2 },
+  switchRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.s4, marginBottom: spacing.s4 },
+  switchText: { flex: 1 },
+  switchHint: { fontFamily: fonts.bodyRegular, fontSize: fontSize.sm, color: colors.textMuted },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.s2, marginBottom: spacing.s4 },
   chip: { paddingVertical: spacing.s2, paddingHorizontal: spacing.s3, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
   chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
