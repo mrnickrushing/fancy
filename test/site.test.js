@@ -123,6 +123,22 @@ test('no page and no catalog entry says pull-apart', async () => {
   }
 });
 
+// Amanda's own correction: the FAQ said $15 for any bread when two loaves are
+// $10 and the focaccia art is $25. The answer is generated from the catalog
+// now, so this asserts the two cannot part company again — every price she
+// charges is named, and no price she does not charge is.
+test('the price answer on the contact page names exactly the catalog prices', async () => {
+  const res = await request(app).get('/contact.html');
+  const answer = /How much does it cost\?<\/[^>]+>\s*<[^>]*>([^<]+)/.exec(res.text);
+  assert.ok(answer, 'the cost question is not on the contact page');
+
+  const said = [...new Set(answer[1].match(/\$\d+/g) || [])]
+    .map((m) => Number(m.slice(1))).sort((a, b) => a - b);
+  const charged = [...new Set(catalog.map((i) => i.price))].sort((a, b) => a - b);
+  assert.deepEqual(said, charged,
+    `the FAQ says ${said.join(', ')} but the bill of fare charges ${charged.join(', ')}`);
+});
+
 test('every bake in the catalog has a photograph that is really there', async () => {
   const dir = path.join(__dirname, '..', 'public', 'img');
   const without = catalog.filter((i) => !i.image).map((i) => i.name);
@@ -130,6 +146,14 @@ test('every bake in the catalog has a photograph that is really there', async ()
   for (const i of catalog) {
     assert.ok(fs.existsSync(path.join(dir, i.image)), `${i.name}: public/img/${i.image} is missing`);
   }
+});
+
+// Amanda asked for this exact phrasing, without the trailing "on".
+test('the credo heading reads the way Amanda asked for it', async () => {
+  const res = await request(app).get('/about.html');
+  assert.match(res.text, /Six things we will not<br>compromise</,
+    'the credo heading is not the wording Amanda asked for');
+  assert.doesNotMatch(res.text, /compromise on/, 'it still says "compromise on"');
 });
 
 test('assets and crawl files serve', async () => {

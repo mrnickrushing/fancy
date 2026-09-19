@@ -17,6 +17,36 @@ OUT = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(os.path.dirname(OUT), "menu.json"), encoding="utf-8") as _fh:
     MENU_CATALOG = json.load(_fh)
 CATALOG_PRICES = {item["name"]: item["price"] for item in MENU_CATALOG}
+# What a bake costs is answered on the contact page, and a figure typed into
+# prose there goes stale the moment Amanda reprices one. This one had: it said
+# $15 for any bread when two loaves are $10 and the focaccia art reaches $25.
+# So the figures come out of the catalog, and the sentence is rebuilt with it.
+def _money(n):
+    return f"${n:g}"
+
+def _join(parts, last="and"):
+    if len(parts) == 1:
+        return parts[0]
+    return f"{', '.join(parts[:-1])} {last} {parts[-1]}"
+
+def cost_answer():
+    bands = {}
+    for item in MENU_CATALOG:
+        bands.setdefault(item["price"], []).append(item)
+    every = sorted(bands)
+    # The price most of the bill of fare is sold at, and the two courses that
+    # sit at either end of it.
+    common = max(bands, key=lambda p: len(bands[p]))
+    small = min(p for p, its in bands.items() if any(i["course"] == "small" for i in its))
+    art = max(p for p, its in bands.items() if any(i["course"] == "art" for i in its))
+    return (f"It depends on the bake. Prices on the bill of fare are "
+            f"{_join([_money(p) for p in every])}: most focaccia and sourdough "
+            f"loaves are {_money(common)}, the muffin-sized focaccia are "
+            f"{_money(small)} each, and the focaccia art goes up to {_money(art)}. "
+            f"Delivery and shipping are quoted separately, and the final total "
+            f"is confirmed before payment.")
+
+
 ROMAN = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
          "XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII","XXIV","XXV","XXVI","XXVII",
          "XXVIII","XXIX","XXX","XXXI","XXXII","XXXIII","XXXIV","XXXV"]
@@ -973,7 +1003,7 @@ ABOUT = masthead("About") + head_band("La Nostra Storia","Welcome to Oh! You Fan
 <section class="sec" style="background:var(--paper-3);border-block:1px solid var(--rule)">
   <div class="wrap">
     <p class="caps kicker">Il Nostro Credo</p>
-    <h2 class="h-sec">Six things we will not<br>compromise on</h2>
+    <h2 class="h-sec">Six things we will not<br>compromise</h2>
     {dimple_rule()}
     <div class="grid g3">
       {''.join(f'<div class="plate"><p class="roman">{r}</p><h3>{t}</h3><p>{d}</p></div>' for r,(t,d) in zip(['I','II','III','IV','V','VI'],CREED))}
@@ -1227,7 +1257,7 @@ FAQ = [("Do you have a storefront?","Not yet. You will find us at the Brookings-
 ("Can you make something custom?","Tell us the occasion. We have made hearts, flower gardens, and plenty of things that were never on a menu."),
 ("How do I change or cancel?","Email info@ohyoufancyfocaccia.com as soon as possible; orders are not final until Amanda confirms them."),
 ("What about allergies?","Tell us in the order notes. We cannot promise an allergen-free kitchen; Amanda will confirm what can be accommodated."),
-("How much does it cost?","$15 for any bread, focaccia or sourdough, and $2 each for the muffin-sized focaccia and the honey buns. Delivery and shipping are quoted separately, and the final total is confirmed before payment."),
+("How much does it cost?", cost_answer()),
 ("What time should I come?","Early. We bake in small batches and we sell out most market days.")]
 
 def contact_row(icon, title, body, link=None):
