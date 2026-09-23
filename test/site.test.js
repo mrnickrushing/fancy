@@ -68,6 +68,26 @@ test('the bill of fare lists the sourdough', async () => {
   assert.match(res.text, /The Country Loaf/);
 });
 
+// The numerals run straight through every course. They used to be a
+// hand-written list that ran out the moment Amanda added three bakes at once,
+// taking the build with it; they are counted out now. This checks the sequence
+// end to end, so a gap, a repeat or a miscount shows up as a failing test
+// rather than as numerals Amanda notices on her phone.
+test('the bill of fare numbers straight through with no gap or repeat', async () => {
+  const res = await request(app).get('/breads.html');
+  const seen = [...res.text.matchAll(/<span class="fare-n">([IVXLCDM]+)<\/span>/g)].map((m) => m[1]);
+  assert.ok(seen.length >= catalog.length, `only ${seen.length} numerals for ${catalog.length} bakes`);
+
+  const VALUE = { I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000 };
+  const toInt = (r) => [...r].reduce((sum, ch, i) =>
+    sum + (VALUE[ch] < VALUE[r[i + 1]] ? -VALUE[ch] : VALUE[ch]), 0);
+
+  const got = seen.map(toInt);
+  const want = got.map((_, i) => i + 1);
+  assert.deepEqual(got, want,
+    `numerals are ${seen[0]}..${seen[seen.length - 1]} but do not run 1..${got.length}`);
+});
+
 test('the public standing menu exposes every catalog item and price', async () => {
   const res = await request(app).get('/breads.html');
   const text = res.text
