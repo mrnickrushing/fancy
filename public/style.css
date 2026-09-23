@@ -180,7 +180,8 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
    courses get a column wide enough for the longest. In em, so it tracks
    whatever face is actually serving rather than a pixel guess made against
    the fallback. The home page board stops at V and keeps the narrow one. */
-.course{--fare-n:4.4em}
+.course{--fare-n:5em}  /* wide enough for XXXVIII; sized off the real
+     glyph box, because Amanda saw numerals running into the titles once */
 .fare-b{flex-grow:1}
 .fare-t{font-family:var(--serif);font-size:var(--lg);font-weight:600;
   display:flex;align-items:baseline;gap:var(--s3)}

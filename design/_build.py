@@ -47,9 +47,29 @@ def cost_answer():
             f"is confirmed before payment.")
 
 
-ROMAN = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
-         "XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII","XXIV","XXV","XXVI","XXVII",
-         "XXVIII","XXIX","XXX","XXXI","XXXII","XXXIII","XXXIV","XXXV"]
+# The bill of fare numbers straight through every course, so the numerals have
+# to keep up with the catalog. A hand-written list ran out the first time
+# Amanda added three bakes at once and took the build down with it, so they are
+# counted out instead.
+_ROMAN_UNITS = [(1000, "M"), (900, "CM"), (500, "D"), (400, "CD"), (100, "C"), (90, "XC"),
+                (50, "L"), (40, "XL"), (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I")]
+
+def roman(n):
+    out = []
+    for value, sign in _ROMAN_UNITS:
+        while n >= value:
+            out.append(sign)
+            n -= value
+    return "".join(out)
+
+class _Roman:
+    """ROMAN[i] for any i, so the bill of fare cannot outgrow it."""
+    def __getitem__(self, i):
+        if i < 0:
+            raise IndexError(i)
+        return roman(i + 1)
+
+ROMAN = _Roman()
 
 def fare(n, title, desc, price=True, extra=""):
     label = html.unescape(re.sub(r"<[^>]+>", "", title))
@@ -252,7 +272,8 @@ footer :focus-visible,.splash :focus-visible{outline-color:var(--gold-pale)}
    courses get a column wide enough for the longest. In em, so it tracks
    whatever face is actually serving rather than a pixel guess made against
    the fallback. The home page board stops at V and keeps the narrow one. */
-.course{--fare-n:4.4em}
+.course{--fare-n:5em}  /* wide enough for XXXVIII; sized off the real
+     glyph box, because Amanda saw numerals running into the titles once */
 .fare-b{flex-grow:1}
 .fare-t{font-family:var(--serif);font-size:var(--lg);font-weight:600;
   display:flex;align-items:baseline;gap:var(--s3)}
