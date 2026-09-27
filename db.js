@@ -62,6 +62,14 @@ const NAME_CORRECTIONS = [
    'The Plain Jane Celtic Salted Focaccia Muffins'],
 ];
 
+// Amanda spells the agave loaf "Honee" and the plain one "Honey" — she has
+// written it that way every time, so it is hers, not a slip. A second list
+// because the first one's marker has already run in production; adding to it
+// would have renamed nothing and I would not have known.
+const NAME_CORRECTIONS_2 = [
+  ['The Hot Honey with Agave', 'The Hot Honee with Agave'],
+];
+
 async function initSchema() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS menu_items (
@@ -200,7 +208,10 @@ async function initSchema() {
     );
   `);
   await seedMenu();
-  await applyNameCorrections();   // before ensureCatalogItems, or it inserts a duplicate
+  // Both before ensureCatalogItems, or it inserts a second row under the
+  // new name and the site shows the bake twice.
+  await applyNameCorrections('menu_name_corrections_1', NAME_CORRECTIONS);
+  await applyNameCorrections('menu_name_corrections_2', NAME_CORRECTIONS_2);
   await ensureCatalogItems();
   await backfillMenuPrices();
   await alignMenuToCatalog();
@@ -330,12 +341,12 @@ async function applyImageAdditions(marker, additions) {
 
 // Renames the live row rather than letting ensureCatalogItems add a second
 // one beside it. Once only, and only where the old name is still there.
-async function applyNameCorrections() {
+async function applyNameCorrections(marker, corrections) {
   const done = await pool.query(
-    `SELECT 1 FROM settings WHERE key = 'menu_name_corrections_1'`);
+    `SELECT 1 FROM settings WHERE key = $1`, [marker]);
   if (done.rowCount) return;
   let changed = 0;
-  for (const [from, to] of NAME_CORRECTIONS) {
+  for (const [from, to] of corrections) {
     const { rowCount } = await pool.query(
       `UPDATE menu_items SET name = $2
         WHERE name = $1 AND NOT EXISTS (SELECT 1 FROM menu_items m WHERE m.name = $2)`,
@@ -345,7 +356,7 @@ async function applyNameCorrections() {
   }
   await pool.query(
     `INSERT INTO settings (key, value, updated_at)
-     VALUES ('menu_name_corrections_1', '1', now()) ON CONFLICT (key) DO NOTHING`
+     VALUES ($1, '1', now()) ON CONFLICT (key) DO NOTHING`, [marker]
   );
   if (changed) console.log(`menu: renamed ${changed} bake(s)`);
 }

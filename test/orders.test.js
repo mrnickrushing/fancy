@@ -1049,6 +1049,29 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     assert.equal(r.rows[0].image, 'hers.webp');
   });
 
+  // Amanda spells the agave loaf "Honee". The trap is not the rename itself:
+  // it is that the first corrections list is behind a marker that already
+  // fired in production, so a correction added to THAT list renames nothing
+  // and says nothing about it. Only the second marker is cleared here, so
+  // this test fails if the correction is ever moved into the wrong list.
+  await t.test('the agave loaf takes her spelling, on a marker that has not fired', async () => {
+    const OLD = 'The Hot Honey with Agave';
+    const NEW = 'The Hot Honee with Agave';
+    await db.pool.query(`UPDATE menu_items SET name = $1 WHERE name = $2`, [OLD, NEW]);
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_name_corrections_2'`);
+    const before = await db.pool.query(`SELECT count(*)::int c, max(id)::int m FROM menu_items`);
+    const was = await db.pool.query(`SELECT id FROM menu_items WHERE name = $1`, [OLD]);
+    await db.initSchema();
+
+    const after = await db.pool.query(`SELECT count(*)::int c FROM menu_items`);
+    assert.equal(after.rows[0].c, before.rows[0].c, 'a second row was added instead of renaming');
+    const rows = await db.pool.query(
+      `SELECT id, name FROM menu_items WHERE name = ANY($1::text[])`, [[OLD, NEW]]);
+    assert.deepEqual(rows.rows.map((r) => r.name), [NEW], 'the old spelling is still on the menu');
+    assert.equal(rows.rows[0].id, was.rows[0].id,
+      'the bake was re-created rather than renamed, so past orders point at the old row');
+  });
+
   await t.test('a renamed bake is renamed, not added a second time', async () => {
     const OLD = 'The Plain Jane Celtic Salted Focaccia Muffin';
     const NEW = 'The Plain Jane Celtic Salted Focaccia Muffins';
