@@ -1,6 +1,27 @@
 [
   {
     "course": "savory",
+    "name": "The Hot Honey Focaccia",
+    "description": "Chili flakes and garlic across a full dimpled round, drizzled with Chetco Gold raw honey from the happiest honey bees.",
+    "price": 15,
+    "image": "hot-honey-round.webp"
+  },
+  {
+    "course": "savory",
+    "name": "The Hot Honee with Agave Drizzle",
+    "description": "The same chili-flecked round, finished with a drizzle of organic blue agave instead of honey.",
+    "price": 15,
+    "image": "hot-honey-agave.webp"
+  },
+  {
+    "course": "savory",
+    "name": "The Peppered Pickle Focaccia",
+    "description": "Brookings Pickled Goodies’ spicy bread-and-butter pickles and cracked black pepper, baked into a full round.",
+    "price": 15,
+    "image": "peppered-pickle-round.webp"
+  },
+  {
+    "course": "savory",
     "name": "Jalapeño, Olive & Red Onion",
     "description": "Fresh jalapeño, mixed olives, red onion and herbs across a golden, dimpled crust.",
     "price": 15,
@@ -155,6 +176,13 @@
   },
   {
     "course": "sweet",
+    "name": "The Cinnamon Raisin Focaccia",
+    "description": "Cinnamon and raisins baked through a full round, finished with a sweet icing drizzle.",
+    "price": 15,
+    "image": "cinnamon-raisin-focaccia.webp"
+  },
+  {
+    "course": "sweet",
     "name": "The Brown Buttered Cinnamon Roll",
     "description": "Flax seed oil butter. Coconut sugar.",
     "price": 15,
@@ -236,26 +264,5 @@
     "description": "Hand-painted in vegetables and herbs — a whole garden across the top of the dough.",
     "price": 25,
     "image": "hero-garden.webp"
-  },
-  {
-    "course": "savory",
-    "name": "The Hot Honey Focaccia",
-    "description": "Chili flakes and garlic across a full dimpled round, drizzled with Chetco Gold raw honey from the happiest honey bees.",
-    "price": 15,
-    "image": "hot-honey-round.webp"
-  },
-  {
-    "course": "savory",
-    "name": "The Hot Honey with Agave",
-    "description": "The same chili-flecked round, finished with organic blue agave instead of honey.",
-    "price": 15,
-    "image": "hot-honey-agave.webp"
-  },
-  {
-    "course": "savory",
-    "name": "The Peppered Pickle Focaccia",
-    "description": "Brookings Pickled Goodies’ spicy bread-and-butter pickles and cracked black pepper, baked into a full round.",
-    "price": 15,
-    "image": "peppered-pickle-round.webp"
   }
 ]

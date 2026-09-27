@@ -62,6 +62,14 @@ const NAME_CORRECTIONS = [
    'The Plain Jane Celtic Salted Focaccia Muffins'],
 ];
 
+// Amanda spells the agave loaf "Honee" and the plain one "Honey" — she has
+// written it that way every time, so it is hers, not a slip. A second list
+// because the first one's marker has already run in production; adding to it
+// would have renamed nothing and I would not have known.
+const NAME_CORRECTIONS_2 = [
+  ['The Hot Honey with Agave', 'The Hot Honee with Agave Drizzle'],
+];
+
 async function initSchema() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS menu_items (
@@ -200,7 +208,10 @@ async function initSchema() {
     );
   `);
   await seedMenu();
-  await applyNameCorrections();   // before ensureCatalogItems, or it inserts a duplicate
+  // Both before ensureCatalogItems, or it inserts a second row under the
+  // new name and the site shows the bake twice.
+  await applyNameCorrections('menu_name_corrections_1', NAME_CORRECTIONS);
+  await applyNameCorrections('menu_name_corrections_2', NAME_CORRECTIONS_2);
   await ensureCatalogItems();
   await backfillMenuPrices();
   await alignMenuToCatalog();
@@ -210,8 +221,11 @@ async function initSchema() {
   await applyPriceCorrections('menu_price_corrections_2', PRICE_CORRECTIONS_2);
   await applyImageAdditions('menu_image_additions_1', IMAGE_ADDITIONS);
   await applyImageAdditions('menu_image_additions_2', IMAGE_ADDITIONS_2);
-  await applyDescriptionCorrections();
+  await applyDescriptionCorrections('menu_description_corrections_1', DESCRIPTION_CORRECTIONS);
+  // After applyNameCorrections, because it matches on the new name.
+  await applyDescriptionCorrections('menu_description_corrections_2', DESCRIPTION_CORRECTIONS_2);
   await applyImageReplacements();
+  await alignMenuOrder();
 }
 
 async function applyPriceCorrections(marker, corrections) {
@@ -274,12 +288,21 @@ const DESCRIPTION_CORRECTIONS = [
    'Soft rounds, olive-oil brushed and salt flaked.'],
 ];
 
-async function applyDescriptionCorrections() {
+// Amanda calls it an agave drizzle, so the description says drizzle too and
+// does not leave the name to carry it alone. Own marker: the first list's has
+// already fired in production, and a line added to it would change nothing.
+const DESCRIPTION_CORRECTIONS_2 = [
+  ['The Hot Honee with Agave Drizzle',
+   'The same chili-flecked round, finished with organic blue agave instead of honey.',
+   'The same chili-flecked round, finished with a drizzle of organic blue agave instead of honey.'],
+];
+
+async function applyDescriptionCorrections(marker, corrections) {
   const done = await pool.query(
-    `SELECT 1 FROM settings WHERE key = 'menu_description_corrections_1'`);
+    `SELECT 1 FROM settings WHERE key = $1`, [marker]);
   if (done.rowCount) return;
   let changed = 0;
-  for (const [name, from, to] of DESCRIPTION_CORRECTIONS) {
+  for (const [name, from, to] of corrections) {
     const { rowCount } = await pool.query(
       `UPDATE menu_items SET description = $3 WHERE name = $1 AND description = $2`,
       [name, from, to]
@@ -288,7 +311,7 @@ async function applyDescriptionCorrections() {
   }
   await pool.query(
     `INSERT INTO settings (key, value, updated_at)
-     VALUES ('menu_description_corrections_1', '1', now()) ON CONFLICT (key) DO NOTHING`
+     VALUES ($1, '1', now()) ON CONFLICT (key) DO NOTHING`, [marker]
   );
   if (changed) console.log(`menu: reworded ${changed} description(s)`);
 }
@@ -329,12 +352,12 @@ async function applyImageAdditions(marker, additions) {
 
 // Renames the live row rather than letting ensureCatalogItems add a second
 // one beside it. Once only, and only where the old name is still there.
-async function applyNameCorrections() {
+async function applyNameCorrections(marker, corrections) {
   const done = await pool.query(
-    `SELECT 1 FROM settings WHERE key = 'menu_name_corrections_1'`);
+    `SELECT 1 FROM settings WHERE key = $1`, [marker]);
   if (done.rowCount) return;
   let changed = 0;
-  for (const [from, to] of NAME_CORRECTIONS) {
+  for (const [from, to] of corrections) {
     const { rowCount } = await pool.query(
       `UPDATE menu_items SET name = $2
         WHERE name = $1 AND NOT EXISTS (SELECT 1 FROM menu_items m WHERE m.name = $2)`,
@@ -344,7 +367,7 @@ async function applyNameCorrections() {
   }
   await pool.query(
     `INSERT INTO settings (key, value, updated_at)
-     VALUES ('menu_name_corrections_1', '1', now()) ON CONFLICT (key) DO NOTHING`
+     VALUES ($1, '1', now()) ON CONFLICT (key) DO NOTHING`, [marker]
   );
   if (changed) console.log(`menu: renamed ${changed} bake(s)`);
 }
@@ -526,6 +549,41 @@ async function alignMenuToCatalog() {
      VALUES ('menu_catalog_v3_synced', '1', now()) ON CONFLICT (key) DO NOTHING`
   );
   if (retired) console.log(`menu: retired ${retired} renamed bake(s)`);
+}
+
+// alignMenuToCatalog renumbered sort_order once, behind its own marker, so it
+// will not do it again — and ensureCatalogItems only numbers the rows it
+// inserts. That left Amanda's three newest rounds at 34, 35, 36: last in a
+// list of eighteen, five phone-screens down, which is where she went looking
+// and did not find them. This re-reads the running order off the catalog so
+// the file is the one place that decides it.
+//
+// Rows that are in no catalog — older bakes still on her book — are pushed
+// after it rather than left where they are, because the catalog now reaches
+// further than it used to and would otherwise land on top of them.
+async function alignMenuOrder() {
+  const done = await pool.query(
+    `SELECT 1 FROM settings WHERE key = 'menu_catalog_v4_synced'`
+  );
+  if (done.rowCount) return;
+  const names = MENU_SEED.map(([, name]) => name);
+  const { rowCount: moved } = await pool.query(
+    `UPDATE menu_items m SET sort_order = v.ord - 1
+       FROM unnest($1::text[]) WITH ORDINALITY AS v(name, ord)
+      WHERE m.name = v.name AND m.sort_order IS DISTINCT FROM v.ord - 1`,
+    [names]
+  );
+  // id keeps them in the order they were first taken on, and guarantees no
+  // two of them collide.
+  await pool.query(
+    `UPDATE menu_items SET sort_order = $1 + id WHERE name <> ALL($2::text[])`,
+    [names.length, names]
+  );
+  await pool.query(
+    `INSERT INTO settings (key, value, updated_at)
+     VALUES ('menu_catalog_v4_synced', '1', now()) ON CONFLICT (key) DO NOTHING`
+  );
+  if (moved) console.log(`menu: reordered ${moved} bake(s) to match the catalog`);
 }
 
 function toIsoDate(d) {

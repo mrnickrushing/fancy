@@ -24,6 +24,7 @@ const path = require('node:path');
 const db = require('../db');
 const mail = require('../mail');
 const app = require('../server');
+const catalog = require('../menu.json');
 
 const HAS_DB = Boolean(process.env.TEST_DATABASE_URL);
 
@@ -998,6 +999,39 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     assert.deepEqual(rows.map((r) => r.kind), ['order_notice', 'order_thank_you']);
   });
 
+  // Amanda went looking for her three newest rounds and could not find them:
+  // they had been appended to the end of the catalog, which put them 16th,
+  // 17th and 18th of eighteen savory bakes. menu.json decides the running
+  // order now, so this asserts the live rows actually follow it — and that a
+  // bake Amanda has that lives in no catalog is pushed after it, never
+  // renumbered on top of.
+  await t.test('the order page follows the running order in the catalog', async () => {
+    await db.pool.query(
+      `INSERT INTO menu_items (course, name, description, price, sort_order)
+       VALUES ('savory', 'A Bake From Before The Catalog', 'Still on her book.', 12, 4)
+       ON CONFLICT DO NOTHING`);
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_catalog_v4_synced'`);
+    await db.initSchema();
+
+    const live = await db.listMenu();
+    const bySort = live.filter((i) => catalog.some((c) => c.name === i.name));
+    assert.deepEqual(
+      bySort.map((i) => i.name),
+      catalog.map((c) => c.name),
+      'the live running order has drifted from menu.json');
+
+    // nothing shares a place
+    const orders = live.map((i) => i.sort_order);
+    assert.equal(new Set(orders).size, orders.length, 'two bakes hold the same sort_order');
+
+    // the pre-catalog bake is kept, and sits after everything in the catalog
+    const stray = live.find((i) => i.name === 'A Bake From Before The Catalog');
+    assert.ok(stray, 'a bake that predates the catalog was dropped');
+    assert.ok(stray.sort_order >= catalog.length,
+      `a pre-catalog bake kept sort_order ${stray.sort_order}, inside the catalog's range`);
+    await db.pool.query(`DELETE FROM menu_items WHERE name = 'A Bake From Before The Catalog'`);
+  });
+
   await t.test('a photograph swapped for another reaches the live row', async () => {
     await db.pool.query(
       `UPDATE menu_items SET image = 'classic-sourdough.webp' WHERE name = 'Cinnamon Swirl Artisan Sourdough'`);
@@ -1013,6 +1047,42 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     await db.initSchema();
     r = await db.pool.query(`SELECT image FROM menu_items WHERE name = 'Cinnamon Swirl Artisan Sourdough'`);
     assert.equal(r.rows[0].image, 'hers.webp');
+  });
+
+  // Amanda spells the agave loaf "Honee". The trap is not the rename itself:
+  // it is that the first corrections list is behind a marker that already
+  // fired in production, so a correction added to THAT list renames nothing
+  // and says nothing about it. Only the second marker is cleared here, so
+  // this test fails if the correction is ever moved into the wrong list.
+  await t.test('the agave loaf takes her spelling, on a marker that has not fired', async () => {
+    const OLD = 'The Hot Honey with Agave';
+    const NEW = 'The Hot Honee with Agave Drizzle';
+    await db.pool.query(`UPDATE menu_items SET name = $1 WHERE name = $2`, [OLD, NEW]);
+    await db.pool.query(
+      `UPDATE menu_items SET description = $1 WHERE name = $2`,
+      ['The same chili-flecked round, finished with organic blue agave instead of honey.', OLD]);
+    await db.pool.query(
+      `DELETE FROM settings WHERE key = ANY($1::text[])`,
+      [['menu_name_corrections_2', 'menu_description_corrections_2']]);
+    const before = await db.pool.query(`SELECT count(*)::int c, max(id)::int m FROM menu_items`);
+    const was = await db.pool.query(`SELECT id FROM menu_items WHERE name = $1`, [OLD]);
+    await db.initSchema();
+
+    const after = await db.pool.query(`SELECT count(*)::int c FROM menu_items`);
+    assert.equal(after.rows[0].c, before.rows[0].c, 'a second row was added instead of renaming');
+    const rows = await db.pool.query(
+      `SELECT id, name FROM menu_items WHERE name = ANY($1::text[])`, [[OLD, NEW]]);
+    assert.deepEqual(rows.rows.map((r) => r.name), [NEW], 'the old spelling is still on the menu');
+    assert.equal(rows.rows[0].id, was.rows[0].id,
+      'the bake was re-created rather than renamed, so past orders point at the old row');
+
+    // She calls it a drizzle, so the description has to say drizzle as well —
+    // and it matches on the NEW name, so it only lands if the rename ran
+    // first. Its own marker too, for the same reason as the rename's.
+    const desc = await db.pool.query(
+      `SELECT description FROM menu_items WHERE name = $1`, [NEW]);
+    assert.match(desc.rows[0].description, /drizzle of organic blue agave/,
+      'the description never picked up the drizzle');
   });
 
   await t.test('a renamed bake is renamed, not added a second time', async () => {
