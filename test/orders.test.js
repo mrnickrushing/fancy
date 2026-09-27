@@ -24,6 +24,7 @@ const path = require('node:path');
 const db = require('../db');
 const mail = require('../mail');
 const app = require('../server');
+const catalog = require('../menu.json');
 
 const HAS_DB = Boolean(process.env.TEST_DATABASE_URL);
 
@@ -996,6 +997,39 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     const { rows } = await db.pool.query(
       `SELECT kind FROM email_outbox WHERE order_id = $1 ORDER BY kind`, [res.body.orderId]);
     assert.deepEqual(rows.map((r) => r.kind), ['order_notice', 'order_thank_you']);
+  });
+
+  // Amanda went looking for her three newest rounds and could not find them:
+  // they had been appended to the end of the catalog, which put them 16th,
+  // 17th and 18th of eighteen savory bakes. menu.json decides the running
+  // order now, so this asserts the live rows actually follow it — and that a
+  // bake Amanda has that lives in no catalog is pushed after it, never
+  // renumbered on top of.
+  await t.test('the order page follows the running order in the catalog', async () => {
+    await db.pool.query(
+      `INSERT INTO menu_items (course, name, description, price, sort_order)
+       VALUES ('savory', 'A Bake From Before The Catalog', 'Still on her book.', 12, 4)
+       ON CONFLICT DO NOTHING`);
+    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_catalog_v4_synced'`);
+    await db.initSchema();
+
+    const live = await db.listMenu();
+    const bySort = live.filter((i) => catalog.some((c) => c.name === i.name));
+    assert.deepEqual(
+      bySort.map((i) => i.name),
+      catalog.map((c) => c.name),
+      'the live running order has drifted from menu.json');
+
+    // nothing shares a place
+    const orders = live.map((i) => i.sort_order);
+    assert.equal(new Set(orders).size, orders.length, 'two bakes hold the same sort_order');
+
+    // the pre-catalog bake is kept, and sits after everything in the catalog
+    const stray = live.find((i) => i.name === 'A Bake From Before The Catalog');
+    assert.ok(stray, 'a bake that predates the catalog was dropped');
+    assert.ok(stray.sort_order >= catalog.length,
+      `a pre-catalog bake kept sort_order ${stray.sort_order}, inside the catalog's range`);
+    await db.pool.query(`DELETE FROM menu_items WHERE name = 'A Bake From Before The Catalog'`);
   });
 
   await t.test('a photograph swapped for another reaches the live row', async () => {

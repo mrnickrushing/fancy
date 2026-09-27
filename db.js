@@ -212,6 +212,7 @@ async function initSchema() {
   await applyImageAdditions('menu_image_additions_2', IMAGE_ADDITIONS_2);
   await applyDescriptionCorrections();
   await applyImageReplacements();
+  await alignMenuOrder();
 }
 
 async function applyPriceCorrections(marker, corrections) {
@@ -526,6 +527,41 @@ async function alignMenuToCatalog() {
      VALUES ('menu_catalog_v3_synced', '1', now()) ON CONFLICT (key) DO NOTHING`
   );
   if (retired) console.log(`menu: retired ${retired} renamed bake(s)`);
+}
+
+// alignMenuToCatalog renumbered sort_order once, behind its own marker, so it
+// will not do it again — and ensureCatalogItems only numbers the rows it
+// inserts. That left Amanda's three newest rounds at 34, 35, 36: last in a
+// list of eighteen, five phone-screens down, which is where she went looking
+// and did not find them. This re-reads the running order off the catalog so
+// the file is the one place that decides it.
+//
+// Rows that are in no catalog — older bakes still on her book — are pushed
+// after it rather than left where they are, because the catalog now reaches
+// further than it used to and would otherwise land on top of them.
+async function alignMenuOrder() {
+  const done = await pool.query(
+    `SELECT 1 FROM settings WHERE key = 'menu_catalog_v4_synced'`
+  );
+  if (done.rowCount) return;
+  const names = MENU_SEED.map(([, name]) => name);
+  const { rowCount: moved } = await pool.query(
+    `UPDATE menu_items m SET sort_order = v.ord - 1
+       FROM unnest($1::text[]) WITH ORDINALITY AS v(name, ord)
+      WHERE m.name = v.name AND m.sort_order IS DISTINCT FROM v.ord - 1`,
+    [names]
+  );
+  // id keeps them in the order they were first taken on, and guarantees no
+  // two of them collide.
+  await pool.query(
+    `UPDATE menu_items SET sort_order = $1 + id WHERE name <> ALL($2::text[])`,
+    [names.length, names]
+  );
+  await pool.query(
+    `INSERT INTO settings (key, value, updated_at)
+     VALUES ('menu_catalog_v4_synced', '1', now()) ON CONFLICT (key) DO NOTHING`
+  );
+  if (moved) console.log(`menu: reordered ${moved} bake(s) to match the catalog`);
 }
 
 function toIsoDate(d) {
