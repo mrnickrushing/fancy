@@ -6,6 +6,10 @@ const catalog = require('../menu.json');
 const fs = require('node:fs');
 const path = require('node:path');
 
+const decode = (t) => t
+  .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+  .replace(/&amp;/g, '&');
+
 const PAGES = ['/', '/about.html', '/breads.html', '/gallery.html', '/reviews.html', '/contact.html'];
 
 test('health check responds', async () => {
@@ -157,6 +161,30 @@ test('the price answer on the contact page names exactly the catalog prices', as
   const charged = [...new Set(catalog.map((i) => i.price))].sort((a, b) => a - b);
   assert.deepEqual(said, charged,
     `the FAQ says ${said.join(', ')} but the bill of fare charges ${charged.join(', ')}`);
+});
+
+// The gallery is its own hand-kept list, and it had quietly drifted: five
+// bakes were never added to it, and the Cinnamon Swirl had been showing the
+// placeholder loaf for ten days after its real photograph went in. A customer
+// clicking that plate saw the wrong bread. The two are tied together here so
+// the next bake cannot go missing the same way.
+test('the gallery shows every bake, with the photograph the catalog names', async () => {
+  const res = await request(app).get('/gallery.html');
+  const plates = new Map(
+    [...res.text.matchAll(/data-src="([^"]+)"\s+data-name="([^"]+)"/g)].map(
+      (m) => [decode(m[2]), m[1].replace(/^\.\/img\//, '')]));
+
+  for (const item of catalog) {
+    const shown = plates.get(item.name);
+    assert.ok(shown, `the gallery has no plate for ${item.name}`);
+    assert.equal(shown, item.image,
+      `the gallery shows ${shown} for ${item.name}, but the catalog says ${item.image}`);
+  }
+  // and nothing hangs around in the gallery that is no longer a bake
+  const names = new Set(catalog.map((i) => i.name));
+  for (const name of plates.keys()) {
+    assert.ok(names.has(name), `the gallery still shows ${name}, which is not in the catalog`);
+  }
 });
 
 test('every bake in the catalog has a photograph that is really there', async () => {

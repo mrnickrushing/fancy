@@ -176,6 +176,13 @@
   },
   {
     "course": "sweet",
+    "name": "The Cinnamon Raisin Focaccia",
+    "description": "Cinnamon and raisins baked through a full round, finished with a sweet icing drizzle.",
+    "price": 15,
+    "image": "cinnamon-raisin-focaccia.webp"
+  },
+  {
+    "course": "sweet",
     "name": "The Brown Buttered Cinnamon Roll",
     "description": "Flax seed oil butter. Coconut sugar.",
     "price": 15,

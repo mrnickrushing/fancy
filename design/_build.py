@@ -1124,6 +1124,9 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
 # ══ GALLERY ═══════════════════════════════════════════════════════════
 GAL_SECTIONS = [
  ("I Salati","Savory", [
+   ("hot-honey-round.webp","The Hot Honey Focaccia","Chili flakes and garlic across a full dimpled round, drizzled with Chetco Gold raw honey from the happiest honey bees.",290),
+   ("hot-honey-agave.webp","The Hot Honey with Agave","The same chili-flecked round, finished with organic blue agave instead of honey.",290),
+   ("peppered-pickle-round.webp","The Peppered Pickle Focaccia","Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles and cracked black pepper, baked into a full round.",290),
    ("savory-round.webp","Jalape&#241;o, Olive &amp; Red Onion","Specialty made to order.",300),
    ("jalapeno-garlic-round.webp","The Jalape&#241;o, Garlic and Onion Focaccia","Jalape&#241;o, garlic and onion.",300),
    ("jalapeno-dimpled.webp","The Jalape&#241;o n Chedda n Garlic","Jalape&#241;o, cheddar and garlic, baked into a golden dimpled round.",300),
@@ -1141,18 +1144,21 @@ GAL_SECTIONS = [
    ("pesto-skillet.webp","The Pesto and Cashew Cheese","Basil pesto and cashew cheese, baked in the pan it is served from.",250),
    ("wide-slab.webp","The Focaccia Queen","Tomatoes, cheese, onions, garlic and an olive variety &#8212; Kalamata, pimento and black olives &#8212; with cold pressed olive oil and Celtic sea salt.",250)]),
  ("Le Spirali","Swirls", [
+   ("country-loaf.webp","The Country Loaf","Naturally leavened with the same starter that lifts the focaccia — mixed the day before, left to rise slow, and baked dark.",290),
    ("jalapeno-swirl-xl.webp","Jalape&#241;o, Garlic and Chedda Sourdough","Jalape&#241;o, garlic and cheddar wound through a sourdough spiral.",300),
    ("swirl-jalapeno.webp","Jalape&#241;o Swirl","Layer on layer, blistered at the edge.",300),
-   ("classic-sourdough.webp","Cinnamon Swirl Artisan Sourdough","Cinnamon wound through the spiral.",300),
+   ("cinnamon-swirl-sourdough.webp","Cinnamon Swirl Artisan Sourdough","Cinnamon wound through the spiral.",300),
    ("garlic-rosemary-sourdough.webp","The Roasted Garlic and Rosemary Sourdough","Roasted garlic and rosemary, wound through the spiral.",300),
    ("plain-swirl.webp","Classic Artisan Celtic Salted Sourdough","Nothing on it but Celtic salt.",300),
    ("caramel-swirl.webp","The Mediterranean Sourdough","Sun dried tomato and olive variety.",300)]),
  ("I Piccoli","Focaccia Muffins", [
+   ("peppered-pickle-muffins.webp","Peppered Pickle Focaccia Muffins","Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles, infused right into the dough.",290),
    ("muffins-jalapeno.webp","The Jalape&#241;o, Garlic and Onion Focaccia Muffins","Jalape&#241;o, garlic and onion, hand-sized.",300),
    ("parm-muffins.webp","The Roasted Garlic Focaccia Muffins","Roasted garlic, hand-sized.",300),
    ("sea-salt-round.webp","The Plain Jane Celtic Salted Focaccia Muffins","Celtic salt, and nothing else.",300),
    ("herb-rolls.webp","The Italiano Focaccia Muffins","The Italiano in muffin form &#8212; sage, oregano, thyme, basil and garlic.",300)]),
  ("I Dolci","Sweet", [
+   ("cinnamon-raisin-focaccia.webp","The Cinnamon Raisin Focaccia","Cinnamon and raisins baked through a full round, finished with a sweet icing drizzle.",400),
    ("sweet-cinnamon.webp","The Brown Buttered Cinnamon Roll","Flax seed oil butter. Coconut sugar.",420),
    ("cinnamon-drizzle-2.webp","The Pow Cacao","A decadent chocolate focaccia dessert, sweetened with coconut sugar rather than refined sugar.",410),
    ("cinnamon-dark.webp","The Apple Fritter","Apple fritter focaccia dessert.",400),
