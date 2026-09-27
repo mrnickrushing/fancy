@@ -1125,7 +1125,7 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
 GAL_SECTIONS = [
  ("I Salati","Savory", [
    ("hot-honey-round.webp","The Hot Honey Focaccia","Chili flakes and garlic across a full dimpled round, drizzled with Chetco Gold raw honey from the happiest honey bees.",290),
-   ("hot-honey-agave.webp","The Hot Honee with Agave","The same chili-flecked round, finished with organic blue agave instead of honey.",290),
+   ("hot-honey-agave.webp","The Hot Honee with Agave Drizzle","The same chili-flecked round, finished with a drizzle of organic blue agave instead of honey.",290),
    ("peppered-pickle-round.webp","The Peppered Pickle Focaccia","Brookings Pickled Goodies&#8217; spicy bread-and-butter pickles and cracked black pepper, baked into a full round.",290),
    ("savory-round.webp","Jalape&#241;o, Olive &amp; Red Onion","Specialty made to order.",300),
    ("jalapeno-garlic-round.webp","The Jalape&#241;o, Garlic and Onion Focaccia","Jalape&#241;o, garlic and onion.",300),

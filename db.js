@@ -67,7 +67,7 @@ const NAME_CORRECTIONS = [
 // because the first one's marker has already run in production; adding to it
 // would have renamed nothing and I would not have known.
 const NAME_CORRECTIONS_2 = [
-  ['The Hot Honey with Agave', 'The Hot Honee with Agave'],
+  ['The Hot Honey with Agave', 'The Hot Honee with Agave Drizzle'],
 ];
 
 async function initSchema() {
@@ -221,7 +221,9 @@ async function initSchema() {
   await applyPriceCorrections('menu_price_corrections_2', PRICE_CORRECTIONS_2);
   await applyImageAdditions('menu_image_additions_1', IMAGE_ADDITIONS);
   await applyImageAdditions('menu_image_additions_2', IMAGE_ADDITIONS_2);
-  await applyDescriptionCorrections();
+  await applyDescriptionCorrections('menu_description_corrections_1', DESCRIPTION_CORRECTIONS);
+  // After applyNameCorrections, because it matches on the new name.
+  await applyDescriptionCorrections('menu_description_corrections_2', DESCRIPTION_CORRECTIONS_2);
   await applyImageReplacements();
   await alignMenuOrder();
 }
@@ -286,12 +288,21 @@ const DESCRIPTION_CORRECTIONS = [
    'Soft rounds, olive-oil brushed and salt flaked.'],
 ];
 
-async function applyDescriptionCorrections() {
+// Amanda calls it an agave drizzle, so the description says drizzle too and
+// does not leave the name to carry it alone. Own marker: the first list's has
+// already fired in production, and a line added to it would change nothing.
+const DESCRIPTION_CORRECTIONS_2 = [
+  ['The Hot Honee with Agave Drizzle',
+   'The same chili-flecked round, finished with organic blue agave instead of honey.',
+   'The same chili-flecked round, finished with a drizzle of organic blue agave instead of honey.'],
+];
+
+async function applyDescriptionCorrections(marker, corrections) {
   const done = await pool.query(
-    `SELECT 1 FROM settings WHERE key = 'menu_description_corrections_1'`);
+    `SELECT 1 FROM settings WHERE key = $1`, [marker]);
   if (done.rowCount) return;
   let changed = 0;
-  for (const [name, from, to] of DESCRIPTION_CORRECTIONS) {
+  for (const [name, from, to] of corrections) {
     const { rowCount } = await pool.query(
       `UPDATE menu_items SET description = $3 WHERE name = $1 AND description = $2`,
       [name, from, to]
@@ -300,7 +311,7 @@ async function applyDescriptionCorrections() {
   }
   await pool.query(
     `INSERT INTO settings (key, value, updated_at)
-     VALUES ('menu_description_corrections_1', '1', now()) ON CONFLICT (key) DO NOTHING`
+     VALUES ($1, '1', now()) ON CONFLICT (key) DO NOTHING`, [marker]
   );
   if (changed) console.log(`menu: reworded ${changed} description(s)`);
 }

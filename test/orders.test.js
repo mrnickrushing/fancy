@@ -1056,9 +1056,14 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
   // this test fails if the correction is ever moved into the wrong list.
   await t.test('the agave loaf takes her spelling, on a marker that has not fired', async () => {
     const OLD = 'The Hot Honey with Agave';
-    const NEW = 'The Hot Honee with Agave';
+    const NEW = 'The Hot Honee with Agave Drizzle';
     await db.pool.query(`UPDATE menu_items SET name = $1 WHERE name = $2`, [OLD, NEW]);
-    await db.pool.query(`DELETE FROM settings WHERE key = 'menu_name_corrections_2'`);
+    await db.pool.query(
+      `UPDATE menu_items SET description = $1 WHERE name = $2`,
+      ['The same chili-flecked round, finished with organic blue agave instead of honey.', OLD]);
+    await db.pool.query(
+      `DELETE FROM settings WHERE key = ANY($1::text[])`,
+      [['menu_name_corrections_2', 'menu_description_corrections_2']]);
     const before = await db.pool.query(`SELECT count(*)::int c, max(id)::int m FROM menu_items`);
     const was = await db.pool.query(`SELECT id FROM menu_items WHERE name = $1`, [OLD]);
     await db.initSchema();
@@ -1070,6 +1075,14 @@ test('the order book (requires Postgres)', { skip: !HAS_DB }, async (t) => {
     assert.deepEqual(rows.rows.map((r) => r.name), [NEW], 'the old spelling is still on the menu');
     assert.equal(rows.rows[0].id, was.rows[0].id,
       'the bake was re-created rather than renamed, so past orders point at the old row');
+
+    // She calls it a drizzle, so the description has to say drizzle as well —
+    // and it matches on the NEW name, so it only lands if the rename ran
+    // first. Its own marker too, for the same reason as the rename's.
+    const desc = await db.pool.query(
+      `SELECT description FROM menu_items WHERE name = $1`, [NEW]);
+    assert.match(desc.rows[0].description, /drizzle of organic blue agave/,
+      'the description never picked up the drizzle');
   });
 
   await t.test('a renamed bake is renamed, not added a second time', async () => {
