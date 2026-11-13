@@ -11,7 +11,7 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.nickrushing.ohyoufancyfocaccia",
       "buildNumber": "1",
       "infoPlist": {
