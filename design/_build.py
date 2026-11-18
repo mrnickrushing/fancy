@@ -942,7 +942,7 @@ HOME = masthead("Home") + f"""
     <h2 class="h-sec">We bake with our town</h2>
     <p class="lede">Half of what goes into these loaves comes from someone we know by name.</p>
     {dimple_rule()}
-    <div class="grid g2" style="gap:var(--s8) var(--s16);max-width:980px;margin-inline:auto">
+    <div class="grid g3" style="gap:var(--s8) var(--s12);max-width:980px;margin-inline:auto">
       <div style="display:flex;gap:var(--s5);align-items:baseline;padding-block:var(--s5);
         border-bottom:1px solid var(--rule-soft)">
         <span class="fare-n">&#8212;</span><div><h3 style="font-size:var(--lg)">Brookings Pickled Goodies</h3>
@@ -951,10 +951,6 @@ HOME = masthead("Home") + f"""
         border-bottom:1px solid var(--rule-soft)">
         <span class="fare-n">&#8212;</span><div><h3 style="font-size:var(--lg)">Chetco Gold Raw Honey</h3>
         <p style="font-size:var(--sm);opacity:.74">Award-winning raw honey from the Chetco River, over our honey focaccia muffins.</p></div></div>
-      <div style="display:flex;gap:var(--s5);align-items:baseline;padding-block:var(--s5);
-        border-bottom:1px solid var(--rule-soft)">
-        <span class="fare-n">&#8212;</span><div><h3 style="font-size:var(--lg)">The Dawg House</h3>
-        <p style="font-size:var(--sm);opacity:.74">Monica builds her sandwiches on our bread, two stalls down.</p></div></div>
       <div style="display:flex;gap:var(--s5);align-items:baseline;padding-block:var(--s5);
         border-bottom:1px solid var(--rule-soft)">
         <span class="fare-n">&#8212;</span><div><h3 style="font-size:var(--lg)">Sylvia&#8217;s Farm Fresh Produce</h3>
@@ -1105,9 +1101,8 @@ BREADS = masthead("Our Breads") + head_band("La Lista","The Bill of Fare",
     <p class="caps kicker">Come Si Mangia</p>
     <h2 class="h-sec">Our customers are more<br>inventive than we are</h2>
     {dimple_rule()}
-    <div class="grid g4">
+    <div class="grid g3">
       <div class="plate"><h3>As pizza</h3><p>&#8220;It was delicious the way it is, but turning it into a pizza was super fast and easy.&#8221;</p></div>
-      <div class="plate"><h3>As a sandwich</h3><p>Go see Monica at The Dawg House &#8212; she builds hers on our focaccia at the market.</p></div>
       <div class="plate"><h3>As toast</h3><p>Avocado, feta and heirloom tomatoes on a thick slice. A customer sent us that one.</p></div>
       <div class="plate"><h3>As it comes</h3><p>Warm, torn by hand, with extra virgin cold-pressed organic olive oil. Honestly the best way.</p></div>
     </div>
@@ -1249,12 +1244,10 @@ REVIEWS = masthead("Reviews") + head_band("Parole Gentili","What Our Customers S
   <div class="wrap">
     <p class="caps kicker">Dal Mercato</p>
     <div style="height:var(--s10)"></div>
-    <div class="grid g2" style="align-items:start">
-      {quote("I stopped at The Dawg House for a sandwich at the Farmer&#8217;s Market today. I received one of the most delicious Italian garden sandwiches I&#8217;ve ever had in my entire existence and it was because she made it with FRESH Focaccia bread from Oh You Fancy Focaccia! It&#8217;s fluffy, it&#8217;s fresh, it&#8217;s flavorful. Must try.","Jessica Dora","1.5rem")}
-      <div style="display:flex;flex-direction:column;gap:var(--s6)">
-        {quote("Best Focaccia I&#8217;ve ever had. She definitely knows what she&#8217;s doing. Absolutely scrumptious.","TonyandTasha Holden")}
-        {quote("This bread is made with love, so delicious that it compliments every meal. Stop and taste her many yummy varieties.","Char Rigg")}
-      </div>
+    <div class="grid g3">
+      {quote("Best Focaccia I&#8217;ve ever had. She definitely knows what she&#8217;s doing. Absolutely scrumptious.","TonyandTasha Holden")}
+      {quote("This bread is made with love, so delicious that it compliments every meal. Stop and taste her many yummy varieties.","Char Rigg")}
+      {quote("OMG! I tried some the other day and it is absolutely the best focaccia I&#8217;ve ever had in my life. My husband agreed.","A market regular")}
     </div>
   </div>
 </section>
@@ -1264,9 +1257,8 @@ REVIEWS = masthead("Reviews") + head_band("Parole Gentili","What Our Customers S
     <p class="caps kicker">In Paese</p>
     <h2 class="h-sec">Go see Amanda,<br>you will love it</h2>
     {dimple_rule()}
-    <div class="grid g2">
+    <div class="grid g3">
       {quote("Who has tried the Focaccia from the Brookings Farmers market?? They have sweet and savory flavors. The samples were amazing so I bought the &#8216;Oh you Fancy.&#8217; It was delicious the way it is but turning into a pizza was super fast and easy. Go see Amanda, you will love it.","A neighbor in Brookings")}
-      {quote("OMG! I tried some the other day and it is absolutely the best focaccia I&#8217;ve ever had in my life. My husband agreed.","A market regular")}
       {quote("Super yummy food. Baked with love for sure. So many varieties. Get there early cause this girl sells out quick!","Linnea")}
       {quote("It is the best. My family loved it. All three were gone in a day.","A Brookings customer")}
     </div>
